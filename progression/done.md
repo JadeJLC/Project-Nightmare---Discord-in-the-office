@@ -10,6 +10,7 @@
 - Table **"messages"** avec : post_id, sujet, contenu, auteur, date de création, nombre de réactions
 - Table **"roles"** avec : role_id, nom du rôle (Admin, modo, membre, banni)
 - Table **"reactions"** avec : type (like, dislike, etc), id du post concerné, id de la personne ayant réagi
+- Table **"sessions** avec : id, utilisateur, données, date d'expiration, date de création
 
 ### Remplissage initial
 
