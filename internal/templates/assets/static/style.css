@@ -1,0 +1,281 @@
+/* #region **** Variables de thème  */
+:root {
+  --bg: #0a0f1f;
+  --bg-dim: #050914;
+  --bg-down: #000000;
+  --panel: rgba(10, 20, 40, 0.85);
+  --neon: #48c7ff;
+  --neon-soft: #8ee7ff;
+  --accent: #9d7cff;
+  --danger: #ff5e7a;
+  --text: #cfe8ff;
+  --shadow: rgba(72, 199, 255, 0.3);
+  --button: rgba(10, 20, 40, 0.85);
+  --header-font: "Press Start 2P", monospace;
+}
+
+[data-theme="light"] {
+  --bg: #73acd1;
+  --bg-dim: #6abdcc;
+  --bg-down: #3765a0;
+  --panel: rgba(162, 202, 218, 0.959);
+  --neon: #0a6085;
+  --neon-soft: #b7e6f3;
+  --accent: #652774;
+  --danger: #ff5e7a;
+  --text: #0b1c2c;
+  --shadow: rgba(200, 230, 243, 0.3);
+  --button: rgba(122, 195, 218, 0.85);
+  --header-font: "Press Start 2P", monospace;
+}
+
+/* Bouton sélecteur */
+/* The switch - the box around the slider */
+.switch {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--accent);
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: var(--bg);
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: var(--bg-down);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--bg-dim);
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* #endregion **** Variables de thème  */
+
+html,
+body {
+  height: 100%;
+  background: radial-gradient(
+    1200px 600px at 50% 20%,
+    var(--bg) 0%,
+    var(--bg-dim) 60%,
+    var(--bg-down) 100%
+  );
+  color: var(--text);
+  font-family: var(--header-font);
+  transition: all 0.3s ease;
+}
+
+/* #region ***** Header */
+header {
+  background-color: var(--bg);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 90%;
+  height: 50px;
+  padding: 10px 5%;
+  border-bottom: 2px solid var(--neon);
+  box-shadow: 0 0 12px var(--neon-soft);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Section ----- Titre du forum */
+#forum-title {
+  width: 350px;
+  font-size: inherit;
+  color: inherit;
+  font-weight: normal;
+  margin: 0px;
+}
+
+#forum-title-long {
+  display: block;
+}
+#forum-title-short {
+  display: none;
+}
+
+#forum-title img {
+  float: left;
+  height: 48px;
+  margin-right: 5px;
+  image-rendering: pixelated;
+}
+
+/* Boutons */
+.header-buttons {
+  margin-right: 100px;
+}
+
+.header-buttons button {
+  background-color: var(--bg-down);
+  border-radius: 100%;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  margin: 0px 5px;
+  position: relative;
+  cursor: pointer;
+  border: 2px solid var(--accent);
+}
+
+[data-theme="light"] .header-buttons button {
+  background-color: var(--bg-dim);
+}
+
+.header-buttons button:hover {
+  box-shadow: 0 0 12px var(--neon-soft);
+}
+
+[data-theme="dark"] .header-buttons button img {
+  filter: invert(100%);
+}
+
+.header-buttons {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.header-buttons button span {
+  min-width: 2px;
+  width: 2px;
+  overflow: hidden;
+  z-index: 5;
+  position: absolute;
+  left: 20px;
+  top: 30px;
+  font-size: 14px;
+  padding: 7px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--bg-dim);
+  max-height: 1px;
+  --webkit-line-clamp: 2;
+  font-family: var(--header-font);
+  opacity: 0;
+}
+
+.header-buttons button:hover span {
+  opacity: 1;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  min-width: 90px;
+  width: fit-content;
+  max-height: 30px;
+}
+
+#display-notifications:hover span,
+#log-in:hover span,
+#display-online-users:hover span {
+  min-width: 120px;
+}
+/* #endregion */
+
+/* #region ***** Page d'accueil */
+#front-page {
+  margin-top: 100px;
+}
+
+.front-page-header {
+  width: 80%;
+  max-width: 600px;
+  margin: auto;
+  text-align: justify;
+}
+
+.front-page-header img {
+  width: 100%;
+  image-rendering: pixelated;
+}
+/* #endregion */
+
+/* #region ***** Responsive */
+
+@media (max-width: 1130px) {
+  #header-username {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  #forum-title img {
+    height: 48px;
+    margin-left: -10px;
+  }
+  .header-buttons {
+    margin-right: 80px;
+  }
+}
+
+@media (max-width: 780px), (orientation: portrait) {
+  #forum-title-short {
+    display: none;
+  }
+  #forum-title-long {
+    display: block;
+  }
+
+  header {
+    height: 110px;
+    display: block;
+  }
+
+  #front-page {
+    margin-top: 140px;
+  }
+
+  #forum-title {
+    width: auto;
+    margin-bottom: 10px;
+  }
+
+  .header-buttons {
+    width: fit-content;
+    margin: auto;
+  }
+}
