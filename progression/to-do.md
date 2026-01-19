@@ -62,10 +62,11 @@ Format des messages :
 
 ### A intégrer au minimum
 
-- Une catégorie "News développeur" pour indiquer les mises à jour et les prochains jeux
-- Une catégorie "Suggestions" pour les joueurs
-- Une catégorie "Discussion"
-- Une catégorie par jeu Project Nightmare pour discuter du jeu
+- Une catégorie "Règles de la communauté ✔
+- Une catégorie "News développeur" pour indiquer les mises à jour et les prochains jeux ✔
+- Une catégorie "Suggestions" pour les joueurs ✔
+- Une catégorie "Discussion" ✔
+- Une catégorie par jeu Project Nightmare pour discuter du jeu ✔
 
 ### Profil utilisateur
 
@@ -113,8 +114,8 @@ Format des messages :
 
 ### Back
 
-- Gestion des cookies et des sections
-- Création et organisation de la base de données
+- Gestion des cookies et des sessions
+- Création et organisation de la base de données ✔
 - Gestion des notifications
 - Affichage des nouveaux messages privés en temps réel
 - Détecter si un utilisateur est en ligne
