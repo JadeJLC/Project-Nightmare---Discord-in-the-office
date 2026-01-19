@@ -8,8 +8,8 @@ func Router() http.Handler{
 	// Routes:
 	mux.HandleFunc("/", HomeHandler)
 
-	fs := http.FileServer(http.Dir("../page/"))
-	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	fs := http.FileServer(http.Dir("./internal/templates/assets"))
+	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
 	return mux
 }

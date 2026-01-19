@@ -8,15 +8,15 @@
       @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
     </style>
     <title>PN : Discord in the Office</title>
-    <script src="theme-switch.js"></script>
+    <script src="/assets/theme-switch.js"></script>
 
     <!-- Sélecteur de thème -->
-    <link rel="stylesheet" href="./static/style.css" />
+    <link rel="stylesheet" href="/assets/static/style.css" />
   </head>
   <body>
     <header>
       <h1 id="forum-title">
-        <img src="./assets/images/favicon.ico" alt="Logo du forum" />
+        <img src="/assets/images/favicon.ico" alt="Logo du forum" />
         <span id="forum-title-long">Project Nightmare&nbsp;:</span>
         <span id="forum-title-short">PN&nbsp;:</span>&nbsp;Discord
         in&nbsp;the&nbsp;office
@@ -30,7 +30,7 @@
       <div class="header-buttons">
         <!-- Le bouton inscription / connexion devient "déconnexion" si l'utilisateur est en ligne -->
         <button type="button" id="log-in">
-          <img src="images/log-in.svg" />
+          <img src="/assets/images/log-in.svg" />
           <span id="log-in-text" style="white-space: nowrap">
             Inscription /<br />
             Connexion
@@ -38,19 +38,19 @@
         </button>
         <!-- Si connecté -->
         <button type="button" id="display-profile">
-          <img src="images/user.svg" />
+          <img src="/assets/images/user.svg" />
           <span>Ouvrir mon profil</span>
         </button>
         <button type="button" id="display-online-users">
-          <img src="images/message-circle.svg" />
+          <img src="/assets/images/message-circle.svg" />
           <span>Messagerie privée</span>
         </button>
         <button type="button" id="display-notifications">
-          <img src="images/bell.svg" />
+          <img src="/assets/images/bell.svg" />
           <span>Afficher les notifications</span>
         </button>
         <button type="button" id="display-favorites">
-          <img src="images/star.svg" />
+          <img src="/assets/images/star.svg" />
           <span>
             Voir mes <br />
             favoris
@@ -66,7 +66,10 @@
     <!-- Page d'accueil -->
     <div id="front-page">
       <div class="front-page-header">
-        <img src="images/front-page.png" alt="Visuel de la page d'accueil" />
+        <img
+          src="/assets/images/front-page.png"
+          alt="Visuel de la page d'accueil"
+        />
         <span>
           <center>
             Bienvenue sur Project Nightmare&nbsp;: Discord in the office.
