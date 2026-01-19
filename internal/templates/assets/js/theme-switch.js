@@ -2,7 +2,7 @@
 const localThemeKey = "pn-theme";
 const rootElement = document.documentElement;
 
-function setTheme(theme) {
+export function setTheme(theme) {
   const themeSwitchBtn = document.getElementById("theme-selector");
 
   // Apply theme attribute to <html>
@@ -17,7 +17,7 @@ function setTheme(theme) {
   }
 }
 
-function initTheme() {
+export function initTheme() {
   const themeSwitchBtn = document.getElementById("theme-selector");
   const savedTheme = localStorage.getItem(localThemeKey) || "dark";
 
@@ -34,9 +34,9 @@ function initTheme() {
     console.error("Theme switch button (#theme-selector) not found in DOM.");
   }
 }
-
+/*
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initTheme);
 } else {
   initTheme();
-}
+}*/
