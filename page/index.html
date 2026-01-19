@@ -8,21 +8,92 @@
       @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
     </style>
     <title>PN : Discord in the Office</title>
+    <script src="theme-switch.js"></script>
+
+    <!-- Sélecteur de thème -->
+    <link rel="stylesheet" href="./static/style.css" />
   </head>
   <body>
     <header>
-      <img src="./images/favicon.ico" alt="" /> Project Nightmare : Discord in
-      the office
+      <h1 id="forum-title">
+        <img src="./images/favicon.ico" alt="Logo du forum" />
+        <span id="forum-title-long">Project Nightmare&nbsp;:</span>
+        <span id="forum-title-short">PN&nbsp;:</span>&nbsp;Discord
+        in&nbsp;the&nbsp;office
+      </h1>
 
-      <!-- Le bouton inscription / connexion devient "déconnexion" si l'utilisateur est en ligne -->
-      <button type="button">Inscription / Connexion || Déconnexion</button>
-      <!-- Si connecté -->
-      <button type="button">Voir mon profil</button>
-      <button type="button">
-        Afficher / Masquer les utilisateurs en ligne
-      </button>
-      <button type="button">Afficher / Masquer les notifications</button>
-      <button type="button">Favoris</button>
+      <div id="header-username">
+        Bienvenue (Nom) ! <br />
+        - Page actuelle -
+      </div>
+
+      <div class="header-buttons">
+        <!-- Le bouton inscription / connexion devient "déconnexion" si l'utilisateur est en ligne -->
+        <button type="button" id="log-in">
+          <img src="images/log-in.svg" />
+          <span id="log-in-text" style="white-space: nowrap">
+            Inscription /<br />
+            Connexion
+          </span>
+        </button>
+        <!-- Si connecté -->
+        <button type="button" id="display-profile">
+          <img src="images/user.svg" />
+          <span>Ouvrir mon profil</span>
+        </button>
+        <button type="button" id="display-online-users">
+          <img src="images/message-circle.svg" />
+          <span>Messagerie privée</span>
+        </button>
+        <button type="button" id="display-notifications">
+          <img src="images/bell.svg" />
+          <span>Afficher les notifications</span>
+        </button>
+        <button type="button" id="display-favorites">
+          <img src="images/star.svg" />
+          <span>
+            Voir mes <br />
+            favoris
+          </span>
+        </button>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="theme-selector" />
+        <span class="slider round"></span>
+      </label>
     </header>
+
+    <!-- Page d'accueil -->
+    <div id="front-page">
+      <div class="front-page-header">
+        <img src="images/front-page.png" alt="Visuel de la page d'accueil" />
+        <span>
+          <center>
+            Bienvenue sur Project Nightmare&nbsp;: Discord in the office.
+          </center>
+          <br />
+          Ce forum est dédié à la licence Project Nightmare et à sa communauté.
+          Discutez, partagez vos scores et vos parties, proposez des
+          améliorations et suivez les sorties et les avancements de
+          projets&nbsp;!
+          <br />
+        </span>
+      </div>
+
+      <div class="front-page-buttons">
+        <button type="button" id="display-front-page-categ">
+          Affichage en catégories
+        </button>
+        <button type="button" id="display-front-page-feed">
+          Affichage en feed
+        </button>
+      </div>
+
+      <!-- Affichage en catégories -->
+      <div id="front-page-catégories"></div>
+
+      <!-- Affichage en feed -->
+      <div id="front-page-feed"></div>
+    </div>
   </body>
 </html>
