@@ -11,18 +11,46 @@
   </head>
   <body>
     <header>
-      <img src="./images/favicon.ico" alt="" /> Project Nightmare : Discord in
-      the office
+      <img src="./images/favicon.ico" alt="Logo du forum" /> Project Nightmare :
+      Discord in the office
 
       <!-- Le bouton inscription / connexion devient "déconnexion" si l'utilisateur est en ligne -->
-      <button type="button">Inscription / Connexion || Déconnexion</button>
+      <button type="button" id="log-in">
+        Inscription / Connexion || Déconnexion
+      </button>
       <!-- Si connecté -->
-      <button type="button">Voir mon profil</button>
-      <button type="button">
+      <button type="button" id="display-profile">Voir mon profil</button>
+      <button type="button" id="display-online-users">
         Afficher / Masquer les utilisateurs en ligne
       </button>
-      <button type="button">Afficher / Masquer les notifications</button>
-      <button type="button">Favoris</button>
+      <button type="button" id="display-notifications">
+        Afficher / Masquer les notifications
+      </button>
+      <button type="button" id="display-favorites">Favoris</button>
+      <button type="button" id="switch-theme">Sélécteur de thème</button>
     </header>
+
+    <!-- Page d'accueil -->
+    <div id="front-page">
+      <div class="front-page-header">
+        <img src="" alt="Visuel de la page d'accueil" />
+        <span>Description courte</span>
+      </div>
+
+      <div class="front-page-buttons">
+        <button type="button" id="display-front-page-categ">
+          Affichage en catégories
+        </button>
+        <button type="button" id="display-front-page-feed">
+          Affichage en feed
+        </button>
+      </div>
+
+      <!-- Affichage en catégories -->
+      <div id="front-page-catégories"></div>
+
+      <!-- Affichage en feed -->
+      <div id="front-page-feed"></div>
+    </div>
   </body>
 </html>
