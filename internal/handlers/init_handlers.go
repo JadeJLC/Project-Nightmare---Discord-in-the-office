@@ -5,9 +5,11 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"real-time-forum/internal/domain"
 )
 
 var templates *template.Template
+var userRepository domain.UserRepository
 
 
 func RenderTemplate(w http.ResponseWriter, tmpl string, datas any) {
@@ -18,4 +20,8 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, datas any) {
 		//http.Error(w, "❌ internal error: "+err.Error(), http.StatusInternalServerError)
 		w.Write([]byte("❌ internal error: " + err.Error()))
 	}
+}
+
+func InitHandlers(ur domain.UserRepository) {
+	userRepository = ur
 }
