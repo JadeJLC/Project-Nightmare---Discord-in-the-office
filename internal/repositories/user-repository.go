@@ -32,3 +32,23 @@ func (r *userRepository) Create(user *domain.User) error {
 	}
 	return nil
 }
+
+func (r *userRepository) GetUserByEmail(email string) (*domain.User, error) {
+	row := r.db.QueryRow("SELECT user_id, username, email, password, age, gender, firstname, lastname FROM users WHERE email = ?", email)
+	user := &domain.User{}
+	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Age, &user.Gender, &user.Firstname, &user.Lastname)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (r *userRepository) GetUserByUsername(username string) (*domain.User, error) {
+	row := r.db.QueryRow("SELECT user_id, username, email, password, age, gender, firstname, lastname FROM users WHERE username = ?", username)
+	user := &domain.User{}
+	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Age, &user.Gender, &user.Firstname, &user.Lastname)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}

@@ -20,7 +20,16 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Données invalides", http.StatusBadRequest)
 		return
 	}
-	log.Println(newUser.Age)
+	existingUser, err := userRepository.GetUserByEmail(newUser.Email)
+	if err == nil && existingUser != nil {
+		http.Error(w, "Email déjà associé à un compte", http.StatusBadRequest)
+		return
+	}
+	existingUser, err = userRepository.GetUserByUsername(newUser.Username)
+	if err == nil && existingUser != nil {
+		http.Error(w, "Pseudonyme déjà associé à un compte", http.StatusBadRequest)
+		return
+	}
 
 	err = userRepository.Create(&newUser)
 	if err !=nil {
