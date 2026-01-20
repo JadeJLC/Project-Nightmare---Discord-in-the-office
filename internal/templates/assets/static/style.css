@@ -319,3 +319,7 @@ header {
     margin: auto;
   }
 }
+
+.is-hidden {
+  display: none !important;
+}

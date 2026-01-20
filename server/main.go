@@ -3,11 +3,17 @@ package main
 import (
 	"log"
 	"net/http"
+	"real-time-forum/internal/config"
 	"real-time-forum/internal/handlers"
+	"real-time-forum/internal/repositories"
 )
 
 func main(){
-	router := handlers.Router()
+	db := config.InitDB()
+	defer db.Close()
+
+	userRepository := repositories.NewUserRepository(db)
+	router := handlers.Router(userRepository)
 	//5- Lancement serveur:
 	addr := ""//os.Getenv("SERVER_PORT")
 	if addr == "" {
