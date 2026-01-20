@@ -28,3 +28,8 @@
 - Role 1 : Modo
 - Role 2 : Membre
 - Role 3 : Banni
+
+## Affichage
+
+- Header
+- Sélecteur de thème
