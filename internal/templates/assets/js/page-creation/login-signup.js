@@ -39,6 +39,14 @@ function switchToLogin() {
   setupInteractions();
 }
 
+function generateAgeOptions() {
+  let options = "";
+  for (let i = 1; i <= 100; i++) {
+    options += `<option value="${i}">${i}</option>`;
+  }
+  return options;
+}
+
 function switchToRegister() {
   const popupContent = document.querySelector(".popup-content");
   popupContent.innerHTML = `
@@ -46,11 +54,17 @@ function switchToRegister() {
         <h2>Inscription</h2>
         <form id="register-form">
             <div class="form-group"><label>Pseudo</label><input type="text" name="username" required></div>
-            <div class="form-group"><label>Email</label><input type="text" name="mail" required></div>
+            <div class="form-group"><label>Email</label><input type="text" name="email" required></div>
             <div class="form-group"><label>Mot de passe</label><input type="password" name="password" required></div>
             <div class="form-group"><label>Prénom</label><input type="text" name="firstname" required></div>
             <div class="form-group"><label>Nom de famille</label><input type="text" name="lastname" required></div>
-            <div class="form-group"><label>Age</label><input type="text" name="age" required></div>
+            <div class="form-group">
+            <label>Âge</label>
+                <select name="age" id="age-select" required>
+                  <option value="" disabled selected>Choisir...</option>
+                  ${generateAgeOptions()} 
+                </select>
+            </div>
             <div class="form-group"><label>Genre</label><input type="text" name="genre" required></div>
             <button type="submit">S'inscrire</button>
         </form>
@@ -109,14 +123,34 @@ function setupInteractions() {
 
   // Gestion Formulaire Register
   if (registerForm) {
-    registerForm.onsubmit = (e) => {
+    registerForm.onsubmit = async (e) => {
+      // Ajout de async pour fetch
       e.preventDefault();
-      const authData = new FormData(registerForm);
-      console.log(
-        "Register JS :",
-        authData.get("username"),
-        authData.get("mail"),
-      );
+      const formData = new FormData(registerForm);
+
+      // Conversion FormData en objet simple
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const response = await fetch("/api/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data), // On envoie le JSON
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          alert("Inscription réussie !");
+          document.getElementById("auth-popup").classList.add("is-hidden");
+        } else {
+          const error = await response.text();
+          alert("Erreur : " + error);
+        }
+      } catch (err) {
+        console.error("Erreur réseau :", err);
+      }
     };
   }
 }
