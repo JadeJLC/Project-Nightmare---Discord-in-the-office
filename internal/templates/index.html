@@ -3,20 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href="./assets/images/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="./images/favicon.ico" />
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
     </style>
     <title>PN : Discord in the Office</title>
-    <script src="/assets/theme-switch.js"></script>
+    <script src="assets/theme-switch.js"></script>
 
     <!-- Sélecteur de thème -->
-    <link rel="stylesheet" href="/assets/static/style.css" />
+    <link rel="stylesheet" href="assets/static/style.css" />
   </head>
   <body>
     <header>
       <h1 id="forum-title">
-        <img src="/assets/images/favicon.ico" alt="Logo du forum" />
+        <img src="assets/images/favicon.ico" alt="Logo du forum" />
         <span id="forum-title-long">Project Nightmare&nbsp;:</span>
         <span id="forum-title-short">PN&nbsp;:</span>&nbsp;Discord
         in&nbsp;the&nbsp;office
@@ -30,7 +30,7 @@
       <div class="header-buttons">
         <!-- Le bouton inscription / connexion devient "déconnexion" si l'utilisateur est en ligne -->
         <button type="button" id="log-in">
-          <img src="/assets/images/log-in.svg" />
+          <img src="assets/images/log-in.svg" />
           <span id="log-in-text" style="white-space: nowrap">
             Inscription /<br />
             Connexion
@@ -38,19 +38,19 @@
         </button>
         <!-- Si connecté -->
         <button type="button" id="display-profile">
-          <img src="/assets/images/user.svg" />
+          <img src="assets/images/user.svg" />
           <span>Ouvrir mon profil</span>
         </button>
         <button type="button" id="display-online-users">
-          <img src="/assets/images/message-circle.svg" />
+          <img src="assets/images/message-circle.svg" />
           <span>Messagerie privée</span>
         </button>
         <button type="button" id="display-notifications">
-          <img src="/assets/images/bell.svg" />
+          <img src="assets/images/bell.svg" />
           <span>Afficher les notifications</span>
         </button>
         <button type="button" id="display-favorites">
-          <img src="/assets/images/star.svg" />
+          <img src="assets/images/star.svg" />
           <span>
             Voir mes <br />
             favoris
@@ -67,7 +67,7 @@
     <div id="front-page">
       <div class="front-page-header">
         <img
-          src="/assets/images/front-page.png"
+          src="assets/images/front-page.png"
           alt="Visuel de la page d'accueil"
         />
         <span>
@@ -85,10 +85,10 @@
 
       <div class="front-page-buttons">
         <button type="button" id="display-front-page-categ">
-          Affichage en catégories
+          Passer en affichage catégories
         </button>
         <button type="button" id="display-front-page-feed">
-          Affichage en feed
+          Passer en affichage feed
         </button>
       </div>
 
@@ -96,7 +96,7 @@
       <div id="front-page-catégories"></div>
 
       <!-- Affichage en feed -->
-      <div id="front-page-feed"></div>
+      <div id="front-page-feed" style="height: 900px"></div>
     </div>
   </body>
 </html>
