@@ -1,3 +1,6 @@
+import { isLogged } from "../variables/page-data.js";
+import { displayHome } from "./home-display.js";
+
 // On déplace la recherche du bouton à l'intérieur pour éviter les erreurs de chargement
 function getLoginBtn() {
   return document.getElementById("log-in");
@@ -14,6 +17,7 @@ function injectpopupHTML() {
     </div>`;
 
   document.body.insertAdjacentHTML("beforeend", popupHTML);
+  console.log("Popup injecté");
 }
 
 function switchToLogin() {
@@ -75,6 +79,9 @@ function switchToRegister() {
 }
 
 function setupInteractions() {
+  console.log("setupInteractions exécuté");
+  console.log("loginForm =", document.getElementById("login-form"));
+
   const popup = document.getElementById("auth-popup");
   const loginBtn = getLoginBtn();
   const closeBtn = document.querySelector(".close-popup-btn");
@@ -110,14 +117,35 @@ function setupInteractions() {
 
   // Gestion Formulaire Login
   if (loginForm) {
-    loginForm.onsubmit = (e) => {
+    loginForm.onsubmit = async (e) => {
       e.preventDefault();
-      const authData = new FormData(loginForm);
-      console.log(
-        "Login JS :",
-        authData.get("username"),
-        authData.get("password"),
-      );
+
+      const formData = new FormData(loginForm);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+          credentials: "include", // important pour le cookie du token
+        });
+        console.log(response);
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          alert("Connexion réussie !");
+          isLogged = true;
+          displayHome();
+          window.location.reload();
+        } else {
+          alert(result.message || "Erreur de connexion");
+        }
+      } catch (err) {
+        console.error("Erreur réseau :", err);
+      }
     };
   }
 

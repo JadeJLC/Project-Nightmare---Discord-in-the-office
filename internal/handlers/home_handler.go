@@ -1,17 +1,19 @@
+// internal/handlers/home_handler.go
 package handlers
 
 import "net/http"
 
-type Datas struct {
+type HomeHandler struct{}
 
+func NewHomeHandler() *HomeHandler {
+    return &HomeHandler{}
 }
 
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
+func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    if r.URL.Path != "/" {
+        http.Error(w, "❌ not found", http.StatusNotFound)
+        return
+    }
 
-	if r.URL.Path != "/" {
-		http.Error(w, "❌ not found", http.StatusNotFound)
-		return
-	}
-	var datas Datas
-	RenderTemplate(w, "index.html", datas)
+    RenderTemplate(w, "index.html", nil)
 }

@@ -1,49 +1,37 @@
+// internal/handlers/register_handler.go
 package handlers
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
-	"strings"
+	"real-time-forum/internal/services"
 )
 
-func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
-		return
-	}
+type RegisterHandler struct {
+    userService *services.UserService
+}
 
-	var newUser domain.User
-	err := json.NewDecoder(r.Body).Decode(&newUser)
-	if err != nil {
-		http.Error(w, "Données invalides", http.StatusBadRequest)
-		return
-	}
-	if strings.Contains(newUser.Username, "@") {
-		http.Error(w, "Le nom ne doit pas contenir le caractère @", http.StatusBadRequest)
-		return
-	}
-	existingUser, err := userRepository.GetUserByEmail(newUser.Email)
-	if err == nil && existingUser != nil {
-		http.Error(w, "Email déjà associé à un compte", http.StatusBadRequest)
-		return
-	}
-	existingUser, err = userRepository.GetUserByUsername(newUser.Username)
-	if err == nil && existingUser != nil {
-		http.Error(w, "Pseudonyme déjà associé à un compte", http.StatusBadRequest)
-		return
-	}
+func NewRegisterHandler(us *services.UserService) *RegisterHandler {
+    return &RegisterHandler{userService: us}
+}
 
-	err = userRepository.Create(&newUser)
-	if err !=nil {
-		log.Fatal("Erreur injection : ", err)
-		return
-	}
-	fmt.Printf("Nouvel utilisateur reçu : %+v\n", newUser)
+func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+        http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+        return
+    }
 
-	// Réponse au client
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "success"})
+    var newUser domain.User
+    if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
+        http.Error(w, "Données invalides", http.StatusBadRequest)
+        return
+    }
+
+    if err := h.userService.Register(&newUser); err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    json.NewEncoder(w).Encode(map[string]string{"status": "success"})
 }

@@ -6,22 +6,27 @@ import (
 	"real-time-forum/internal/config"
 	"real-time-forum/internal/handlers"
 	"real-time-forum/internal/repositories"
+	"real-time-forum/internal/services"
 )
 
-func main(){
-	db := config.InitDB()
-	defer db.Close()
+func main() {
+    db := config.InitDB()
+    defer db.Close()
 
-	userRepository := repositories.NewUserRepository(db)
-	router := handlers.Router(userRepository)
-	//5- Lancement serveur:
-	addr := ""//os.Getenv("SERVER_PORT")
-	if addr == "" {
-		addr = ":5005" // valeur par défaut en dev, sinon c'est une variable définie dans .env
-	}
-	log.Printf("Server start → http://localhost%s\n", addr)
-	err := http.ListenAndServe(addr, router)
-	if err != nil {
-		log.Fatal("❌ error trying to run the server: ", err)
-	}
+    // Repository
+    userRepository := repositories.NewUserRepository(db)
+
+    // Service
+    userService := services.NewUserService(userRepository)
+
+    // Router (handlers instanciés proprement)
+    router := handlers.Router(userService)
+
+    // Lancement serveur
+    addr := ":5005"
+    log.Printf("Server start → http://localhost%s\n", addr)
+
+    if err := http.ListenAndServe(addr, router); err != nil {
+        log.Fatal("❌ error trying to run the server: ", err)
+    }
 }
