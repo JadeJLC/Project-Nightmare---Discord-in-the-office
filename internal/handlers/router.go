@@ -13,11 +13,13 @@ func Router(userService *services.UserService) http.Handler {
     loginHandler := NewLoginHandler(userService)
     registerHandler := NewRegisterHandler(userService)
     homeHandler := NewHomeHandler()
+	meHandler := NewMeHandler(userService)
 
     // Routes
     mux.Handle("/", homeHandler)
     mux.Handle("/api/login", loginHandler)
     mux.Handle("/api/register", registerHandler)
+	mux.Handle("/api/me", meHandler)
 
     // Assets
     fs := http.FileServer(http.Dir("./internal/templates/assets"))

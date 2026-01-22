@@ -63,3 +63,24 @@ func (r *userRepository) GetUserByUsername(username string) (*domain.User, error
     }
     return user, nil
 }
+
+func (r *userRepository) GetUserByToken(token string) (*domain.User, error) { 
+	user := &domain.User{}
+	err := r.db.QueryRow(`SELECT id, username FROM users WHERE token = ?`, token).Scan(&user.ID, &user.Username) 
+	if err != nil {
+        return nil, err
+    }
+	return user, nil 
+}
+
+func (r *userRepository) GetUserByID(id int) (*domain.User, error) { 
+    user := &domain.User{}
+    err := r.db.QueryRow(`
+        SELECT user_id, username FROM users WHERE user_id = ?`, id).
+        Scan(&user.ID, &user.Username)
+
+    if err != nil {
+        return nil, err
+    }
+    return user, nil 
+}

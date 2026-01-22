@@ -42,6 +42,7 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         Path:     "/",
         HttpOnly: true,
         MaxAge:   86400,
+		Secure: false,
     })
 
     json.NewEncoder(w).Encode(map[string]any{

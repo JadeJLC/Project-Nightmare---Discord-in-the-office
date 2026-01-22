@@ -1,7 +1,7 @@
-import { isLogged } from "../variables/page-data.js";
+// register-login.js
+import { SessionData } from "../variables/session.js";
 import { displayHome } from "./home-display.js";
 
-// On déplace la recherche du bouton à l'intérieur pour éviter les erreurs de chargement
 function getLoginBtn() {
   return document.getElementById("log-in");
 }
@@ -9,37 +9,33 @@ function getLoginBtn() {
 function injectpopupHTML() {
   if (document.getElementById("auth-popup")) return;
 
-  // On injecte la base du popup
   const popupHTML = `
     <div id="auth-popup" class="popup-overlay is-hidden">
-        <div class="popup-content">
-            </div>
+        <div class="popup-content"></div>
     </div>`;
 
   document.body.insertAdjacentHTML("beforeend", popupHTML);
-  console.log("Popup injecté");
 }
 
 function switchToLogin() {
   const popupContent = document.querySelector(".popup-content");
   popupContent.innerHTML = `
-        <span class="close-popup-btn">&times;</span>
-        <h2>Connexion</h2>
-        <form id="login-form">
-            <div class="form-group">
-                <label>Pseudo</label>
-                <input type="text" name="username" required>
-            </div>
-            <div class="form-group">
-                <label>Mot de passe</label>
-                <input type="password" name="password" required>
-            </div>
-            <button type="submit">Se connecter</button>
-        </form>
-        <hr>
-        <button id="register-btn" type="button">Créer un compte</button>
-    `;
-  // On doit relancer les interactions car le HTML interne est neuf
+    <span class="close-popup-btn">&times;</span>
+    <h2>Connexion</h2>
+    <form id="login-form">
+        <div class="form-group">
+            <label>Pseudo</label>
+            <input type="text" name="username" required>
+        </div>
+        <div class="form-group">
+            <label>Mot de passe</label>
+            <input type="password" name="password" required>
+        </div>
+        <button type="submit">Se connecter</button>
+    </form>
+    <hr>
+    <button id="register-btn" type="button">Créer un compte</button>
+  `;
   setupInteractions();
 }
 
@@ -54,34 +50,31 @@ function generateAgeOptions() {
 function switchToRegister() {
   const popupContent = document.querySelector(".popup-content");
   popupContent.innerHTML = `
-        <span class="close-popup-btn">&times;</span>
-        <h2>Inscription</h2>
-        <form id="register-form">
-            <div class="form-group"><label>Pseudo</label><input type="text" name="username" required></div>
-            <div class="form-group"><label>Email</label><input type="text" name="email" required></div>
-            <div class="form-group"><label>Mot de passe</label><input type="password" name="password" required></div>
-            <div class="form-group"><label>Prénom</label><input type="text" name="firstname" required></div>
-            <div class="form-group"><label>Nom de famille</label><input type="text" name="lastname" required></div>
-            <div class="form-group">
+    <span class="close-popup-btn">&times;</span>
+    <h2>Inscription</h2>
+    <form id="register-form">
+        <div class="form-group"><label>Pseudo</label><input type="text" name="username" required></div>
+        <div class="form-group"><label>Email</label><input type="text" name="email" required></div>
+        <div class="form-group"><label>Mot de passe</label><input type="password" name="password" required></div>
+        <div class="form-group"><label>Prénom</label><input type="text" name="firstname" required></div>
+        <div class="form-group"><label>Nom de famille</label><input type="text" name="lastname" required></div>
+        <div class="form-group">
             <label>Âge</label>
-                <select name="age" id="age-select" required>
-                  <option value="" disabled selected>Choisir...</option>
-                  ${generateAgeOptions()} 
-                </select>
-            </div>
-            <div class="form-group"><label>Genre</label><input type="text" name="genre" required></div>
-            <button type="submit">S'inscrire</button>
-        </form>
-        <hr>
-        <button id="login-switch-btn" type="button">Déjà un compte ? Se connecter</button>
-    `;
+            <select name="age" id="age-select" required>
+              <option value="" disabled selected>Choisir...</option>
+              ${generateAgeOptions()}
+            </select>
+        </div>
+        <div class="form-group"><label>Genre</label><input type="text" name="genre" required></div>
+        <button type="submit">S'inscrire</button>
+    </form>
+    <hr>
+    <button id="login-switch-btn" type="button">Déjà un compte ? Se connecter</button>
+  `;
   setupInteractions();
 }
 
 function setupInteractions() {
-  console.log("setupInteractions exécuté");
-  console.log("loginForm =", document.getElementById("login-form"));
-
   const popup = document.getElementById("auth-popup");
   const loginBtn = getLoginBtn();
   const closeBtn = document.querySelector(".close-popup-btn");
@@ -90,55 +83,34 @@ function setupInteractions() {
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
 
-  // Ouverture (Bouton dans la page)
-  if (loginBtn) {
-    loginBtn.onclick = () => popup.classList.remove("is-hidden");
-  }
+  if (loginBtn) loginBtn.onclick = () => popup.classList.remove("is-hidden");
+  if (closeBtn) closeBtn.onclick = () => popup.classList.add("is-hidden");
 
-  // Fermeture (Croix)
-  if (closeBtn) {
-    closeBtn.onclick = () => popup.classList.add("is-hidden");
-  }
-
-  // Fermeture (Fond gris) - On utilise onclick pour écraser les anciens événements
   popup.onclick = (e) => {
     if (e.target === popup) popup.classList.add("is-hidden");
   };
 
-  // Switch vers Inscription
-  if (registerBtn) {
-    registerBtn.onclick = () => switchToRegister();
-  }
+  if (registerBtn) registerBtn.onclick = () => switchToRegister();
+  if (loginSwitchBtn) loginSwitchBtn.onclick = () => switchToLogin();
 
-  // Switch vers Connexion
-  if (loginSwitchBtn) {
-    loginSwitchBtn.onclick = () => switchToLogin();
-  }
-
-  // Gestion Formulaire Login
   if (loginForm) {
     loginForm.onsubmit = async (e) => {
       e.preventDefault();
 
-      const formData = new FormData(loginForm);
-      const data = Object.fromEntries(formData.entries());
+      const data = Object.fromEntries(new FormData(loginForm).entries());
 
       try {
         const response = await fetch("/api/login", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
-          credentials: "include", // important pour le cookie du token
+          credentials: "include",
         });
-        console.log(response);
+
         const result = await response.json();
 
         if (response.ok && result.success) {
           alert("Connexion réussie !");
-          isLogged = true;
-          displayHome();
           window.location.reload();
         } else {
           alert(result.message || "Erreur de connexion");
@@ -149,32 +121,24 @@ function setupInteractions() {
     };
   }
 
-  // Gestion Formulaire Register
   if (registerForm) {
     registerForm.onsubmit = async (e) => {
-      // Ajout de async pour fetch
       e.preventDefault();
-      const formData = new FormData(registerForm);
 
-      // Conversion FormData en objet simple
-      const data = Object.fromEntries(formData.entries());
+      const data = Object.fromEntries(new FormData(registerForm).entries());
 
       try {
         const response = await fetch("/api/register", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data), // On envoie le JSON
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
         });
 
         if (response.ok) {
-          const result = await response.json();
           alert("Inscription réussie !");
-          document.getElementById("auth-popup").classList.add("is-hidden");
+          popup.classList.add("is-hidden");
         } else {
-          const error = await response.text();
-          alert("Erreur : " + error);
+          alert("Erreur : " + (await response.text()));
         }
       } catch (err) {
         console.error("Erreur réseau :", err);
@@ -185,5 +149,5 @@ function setupInteractions() {
 
 export function initAuth() {
   injectpopupHTML();
-  switchToLogin(); // On initialise avec la vue login par défaut
+  switchToLogin();
 }
