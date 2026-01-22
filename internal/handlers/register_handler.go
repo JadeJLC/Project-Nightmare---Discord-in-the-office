@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
+	"strings"
 )
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
@@ -18,6 +19,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&newUser)
 	if err != nil {
 		http.Error(w, "Données invalides", http.StatusBadRequest)
+		return
+	}
+	if strings.Contains(newUser.Username, "@") {
+		http.Error(w, "Le nom ne doit pas contenir le caractère @", http.StatusBadRequest)
 		return
 	}
 	existingUser, err := userRepository.GetUserByEmail(newUser.Email)
