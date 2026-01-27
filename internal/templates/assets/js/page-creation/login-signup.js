@@ -23,8 +23,8 @@ function switchToLogin() {
         <h2>Connexion</h2>
         <form id="login-form">
             <div class="form-group">
-                <label>Pseudo</label>
-                <input type="text" name="username" required>
+                <label>Identifiant</label>
+                <input type="text" name="username" placeholder="Pseudo ou mail" required>
             </div>
             <div class="form-group">
                 <label>Mot de passe</label>
@@ -85,7 +85,7 @@ function setupInteractions() {
 
   // Ouverture (Bouton dans la page)
   if (loginBtn) {
-    loginBtn.onclick = () => popup.classList.remove("is-hidden");
+    loginBtn.onclick = () => popup.classList.toggle("is-hidden");
   }
 
   // Fermeture (Croix)
