@@ -6,15 +6,15 @@ import (
 	"real-time-forum/internal/services"
 )
 
-func Router(userService *services.UserService) http.Handler {
+func Router(userService *services.UserService, sessionService *services.SessionService) http.Handler {
     mux := http.NewServeMux()
 
     // Handlers instanciés proprement
-    loginHandler := NewLoginHandler(userService)
+    loginHandler := NewLoginHandler(userService, sessionService)
     registerHandler := NewRegisterHandler(userService)
     homeHandler := NewHomeHandler()
 	meHandler := NewMeHandler(userService)
-    logoutHandler := NewLogoutHandler(userService)
+    logoutHandler := NewLogoutHandler(userService, sessionService)
 
     // Routes
     mux.Handle("/", homeHandler)

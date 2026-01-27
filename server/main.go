@@ -15,12 +15,14 @@ func main() {
 
     // Repository
     userRepository := repositories.NewUserRepository(db)
+    sessionRepository := repositories.NewSessionRepo(db)
 
     // Service
     userService := services.NewUserService(userRepository)
+    sessionService := services.NewSessionService(sessionRepository)
 
     // Router (handlers instanciés proprement)
-    router := handlers.Router(userService)
+    router := handlers.Router(userService, sessionService)
 
     // Lancement serveur
     addr := ":5006"

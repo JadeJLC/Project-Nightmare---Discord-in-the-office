@@ -10,10 +10,11 @@ import (
 
 type LoginHandler struct {
     userService *services.UserService
+    sessionService *services.SessionService
 }
 
-func NewLoginHandler(us *services.UserService) *LoginHandler {
-    return &LoginHandler{userService: us}
+func NewLoginHandler(us *services.UserService, ss *services.SessionService) *LoginHandler {
+    return &LoginHandler{userService: us, sessionService: ss,}
 }
 
 type LoginRequest struct {
@@ -35,6 +36,12 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     }
 
     token, _ := auth.GenerateToken(user.ID)
+
+    if err := h.sessionService.CreateSession(user.ID, token); err != nil {
+        http.Error(w, "Erreur session", http.StatusInternalServerError)
+        return
+    }
+
 
     http.SetCookie(w, &http.Cookie{
         Name:     "auth_token",
