@@ -2,4 +2,4 @@
 
 const themeBox = document.getElementById("theme-style");
 
-export { themeBox, isLogged };
+export { themeBox };

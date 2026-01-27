@@ -1,5 +1,5 @@
 // session/check-login.js
-import { SessionData } from "../variables/session.js";
+import { SessionData } from "../variables/session-data.js";
 
 export async function checkLoginStatus() {
   try {

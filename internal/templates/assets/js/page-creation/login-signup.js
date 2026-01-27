@@ -1,5 +1,5 @@
 // register-login.js
-import { SessionData } from "../variables/session.js";
+import { SessionData } from "../variables/session-data.js";
 import { displayHome } from "./home-display.js";
 
 function getLoginBtn() {
@@ -83,7 +83,10 @@ function setupInteractions() {
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
 
-  if (!loginBtn) return;
+  // Ouverture (Bouton dans la page)
+  if (loginBtn) {
+    loginBtn.onclick = () => popup.classList.toggle("is-hidden");
+  }
 
   // --- LOGIN / LOGOUT BUTTON ---
   loginBtn.onclick = async () => {
