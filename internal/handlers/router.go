@@ -1,21 +1,31 @@
+// internal/handlers/router.go
 package handlers
 
 import (
 	"net/http"
-	"real-time-forum/internal/domain"
+	"real-time-forum/internal/services"
 )
 
-func Router(ur domain.UserRepository) http.Handler{
-	InitHandlers(ur)
-	mux := http.NewServeMux()
+func Router(userService *services.UserService, sessionService *services.SessionService) http.Handler {
+    mux := http.NewServeMux()
 
-	// Routes:
-	mux.HandleFunc("/", HomeHandler)
-	mux.HandleFunc("/api/register", RegisterHandler)
+    // Handlers instanciés proprement
+    loginHandler := NewLoginHandler(userService, sessionService)
+    registerHandler := NewRegisterHandler(userService)
+    homeHandler := NewHomeHandler()
+	meHandler := NewMeHandler(userService)
+    logoutHandler := NewLogoutHandler(userService, sessionService)
 
-	fs := http.FileServer(http.Dir("./internal/templates/assets"))
-	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
+    // Routes
+    mux.Handle("/", homeHandler)
+    mux.Handle("/api/login", loginHandler)
+    mux.Handle("/api/logout", logoutHandler)
+    mux.Handle("/api/register", registerHandler)
+	mux.Handle("/api/me", meHandler)
 
-	return mux
+    // Assets
+    fs := http.FileServer(http.Dir("./internal/templates/assets"))
+    mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
+
+    return mux
 }
-// Fonctions pour la gestion de l'url

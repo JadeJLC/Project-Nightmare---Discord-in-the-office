@@ -1,6 +1,6 @@
 // Création de la page profil
 
-import { isLogged } from "../variables/page-data.js";
+import { SessionData } from "../variables/session-data.js";
 import { displayHome } from "./home-display.js";
 
 // Manque : récupération des variables dans la base de données
@@ -11,7 +11,7 @@ export function displayProfile() {
 
   const usernameHeader = document.getElementById("header-username");
   usernameHeader.innerHTML = "";
-  if (!isLogged) {
+  if (!SessionData.isLogged) {
     // Seul les membres connectés peuvent accéder aux profils
     console.log("Vous devez vous connecter pour ouvrir un profil");
     const popup = document.getElementById("auth-popup");

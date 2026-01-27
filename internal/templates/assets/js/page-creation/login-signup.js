@@ -1,4 +1,7 @@
-// On déplace la recherche du bouton à l'intérieur pour éviter les erreurs de chargement
+// register-login.js
+import { SessionData } from "../variables/session-data.js";
+import { displayHome } from "./home-display.js";
+
 function getLoginBtn() {
   return document.getElementById("log-in");
 }
@@ -6,11 +9,9 @@ function getLoginBtn() {
 function injectpopupHTML() {
   if (document.getElementById("auth-popup")) return;
 
-  // On injecte la base du popup
   const popupHTML = `
     <div id="auth-popup" class="popup-overlay is-hidden">
-        <div class="popup-content">
-            </div>
+        <div class="popup-content"></div>
     </div>`;
 
   document.body.insertAdjacentHTML("beforeend", popupHTML);
@@ -19,23 +20,22 @@ function injectpopupHTML() {
 function switchToLogin() {
   const popupContent = document.querySelector(".popup-content");
   popupContent.innerHTML = `
-        <span class="close-popup-btn">&times;</span>
-        <h2>Connexion</h2>
-        <form id="login-form">
-            <div class="form-group">
-                <label>Identifiant</label>
-                <input type="text" name="username" placeholder="Pseudo ou mail" autocomplete="username" required>
-            </div>
-            <div class="form-group">
-                <label>Mot de passe</label>
-                <input type="password" name="password" autocomplete="current-password" required>
-            </div>
-            <button type="submit">Se connecter</button>
-        </form>
-        <hr>
-        <button id="register-btn" type="button">Créer un compte</button>
-    `;
-  // On doit relancer les interactions car le HTML interne est neuf
+    <span class="close-popup-btn">&times;</span>
+    <h2>Connexion</h2>
+    <form id="login-form">
+        <div class="form-group">
+            <label>Pseudo</label>
+            <input type="text" name="username" required>
+        </div>
+        <div class="form-group">
+            <label>Mot de passe</label>
+            <input type="password" name="password" required>
+        </div>
+        <button type="submit">Se connecter</button>
+    </form>
+    <hr>
+    <button id="register-btn" type="button">Créer un compte</button>
+  `;
   setupInteractions();
 }
 
@@ -50,27 +50,27 @@ function generateAgeOptions() {
 function switchToRegister() {
   const popupContent = document.querySelector(".popup-content");
   popupContent.innerHTML = `
-        <span class="close-popup-btn">&times;</span>
-        <h2>Inscription</h2>
-        <form id="register-form">
-            <div class="form-group"><label>Pseudo</label><input type="text" name="username" required></div>
-            <div class="form-group"><label>Email</label><input type="text" name="email" required></div>
-            <div class="form-group"><label>Mot de passe</label><input type="password" name="password" required></div>
-            <div class="form-group"><label>Prénom</label><input type="text" name="firstname" required></div>
-            <div class="form-group"><label>Nom de famille</label><input type="text" name="lastname" required></div>
-            <div class="form-group">
+    <span class="close-popup-btn">&times;</span>
+    <h2>Inscription</h2>
+    <form id="register-form">
+        <div class="form-group"><label>Pseudo</label><input type="text" name="username" required></div>
+        <div class="form-group"><label>Email</label><input type="text" name="email" required></div>
+        <div class="form-group"><label>Mot de passe</label><input type="password" name="password" required></div>
+        <div class="form-group"><label>Prénom</label><input type="text" name="firstname" required></div>
+        <div class="form-group"><label>Nom de famille</label><input type="text" name="lastname" required></div>
+        <div class="form-group">
             <label>Âge</label>
-                <select name="age" id="age-select" required>
-                  <option value="" disabled selected>Choisir...</option>
-                  ${generateAgeOptions()} 
-                </select>
-            </div>
-            <div class="form-group"><label>Genre</label><input type="text" name="genre" required></div>
-            <button type="submit">S'inscrire</button>
-        </form>
-        <hr>
-        <button id="login-switch-btn" type="button">Déjà un compte ? Se connecter</button>
-    `;
+            <select name="age" id="age-select" required>
+              <option value="" disabled selected>Choisir...</option>
+              ${generateAgeOptions()}
+            </select>
+        </div>
+        <div class="form-group"><label>Genre</label><input type="text" name="genre" required></div>
+        <button type="submit">S'inscrire</button>
+    </form>
+    <hr>
+    <button id="login-switch-btn" type="button">Déjà un compte ? Se connecter</button>
+  `;
   setupInteractions();
 }
 
@@ -88,65 +88,100 @@ function setupInteractions() {
     loginBtn.onclick = () => popup.classList.toggle("is-hidden");
   }
 
-  // Fermeture (Croix)
-  if (closeBtn) {
-    closeBtn.onclick = () => popup.classList.add("is-hidden");
-  }
+  // --- LOGIN / LOGOUT BUTTON ---
+  loginBtn.onclick = async () => {
+    if (SessionData.isLogged) {
+      // Déconnexion
+      try {
+        const response = await fetch("/api/logout", {
+          method: "POST",
+          credentials: "include",
+        });
 
-  // Fermeture (Fond gris) - On utilise onclick pour écraser les anciens événements
+        // Si la route n'existe pas ou renvoie du texte → éviter JSON.parse
+        if (!response.ok) {
+          const text = await response.text();
+          console.error("Erreur logout :", text);
+          alert("Erreur logout : " + text);
+          return;
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert("Déconnexion réussie !");
+          SessionData.isLogged = false;
+          window.location.reload();
+        } else {
+          alert(result.message || "Erreur lors de la déconnexion");
+        }
+      } catch (err) {
+        console.error("Erreur réseau :", err);
+      }
+      return;
+    }
+
+    // Sinon → ouvrir la popup de connexion
+    popup.classList.remove("is-hidden");
+  };
+
+  // --- POPUP CLOSE ---
+  if (closeBtn) closeBtn.onclick = () => popup.classList.add("is-hidden");
+
   popup.onclick = (e) => {
     if (e.target === popup) popup.classList.add("is-hidden");
   };
 
-  // Switch vers Inscription
-  if (registerBtn) {
-    registerBtn.onclick = () => switchToRegister();
-  }
+  // --- SWITCH FORMS ---
+  if (registerBtn) registerBtn.onclick = () => switchToRegister();
+  if (loginSwitchBtn) loginSwitchBtn.onclick = () => switchToLogin();
 
-  // Switch vers Connexion
-  if (loginSwitchBtn) {
-    loginSwitchBtn.onclick = () => switchToLogin();
-  }
-
-  // Gestion Formulaire Login
+  // --- LOGIN FORM ---
   if (loginForm) {
-    loginForm.onsubmit = (e) => {
+    loginForm.onsubmit = async (e) => {
       e.preventDefault();
-      const authData = new FormData(loginForm);
-      console.log(
-        "Login JS :",
-        authData.get("username"),
-        authData.get("password"),
-      );
+      const data = Object.fromEntries(new FormData(loginForm).entries());
+
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+          credentials: "include",
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          alert("Connexion réussie !");
+          window.location.reload();
+        } else {
+          alert(result.message || "Erreur de connexion");
+        }
+      } catch (err) {
+        console.error("Erreur réseau :", err);
+      }
     };
   }
 
-  // Gestion Formulaire Register
+  // --- REGISTER FORM ---
   if (registerForm) {
     registerForm.onsubmit = async (e) => {
-      // Ajout de async pour fetch
       e.preventDefault();
-      const formData = new FormData(registerForm);
-
-      // Conversion FormData en objet simple
-      const data = Object.fromEntries(formData.entries());
+      const data = Object.fromEntries(new FormData(registerForm).entries());
 
       try {
         const response = await fetch("/api/register", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data), // On envoie le JSON
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
         });
 
         if (response.ok) {
-          const result = await response.json();
           alert("Inscription réussie !");
-          document.getElementById("auth-popup").classList.add("is-hidden");
+          popup.classList.add("is-hidden");
         } else {
-          const error = await response.text();
-          alert("Erreur : " + error);
+          alert("Erreur : " + (await response.text()));
         }
       } catch (err) {
         console.error("Erreur réseau :", err);
@@ -157,5 +192,5 @@ function setupInteractions() {
 
 export function initAuth() {
   injectpopupHTML();
-  switchToLogin(); // On initialise avec la vue login par défaut
+  switchToLogin();
 }
