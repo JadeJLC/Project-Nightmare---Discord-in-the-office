@@ -11,17 +11,6 @@ Créer un forum officiel pour la licence Project Nightmare. Le forum doit :
 - Posséder une base de données SQlite
 - Avoir un serveur en Go et un front en JS, HTML et CSS
 
-### Inscription et connexion
-
-Données d'inscriptions demandées :
-
-- Pseudo
-- Âge et genre
-- Prénom et nom de famille
-- Adresse mail
-- Mot de passe
-  Il doit être possible de se connecter en utilisant le pseudo ou l'adresse mail
-
 ### Sujets et messages
 
 Comme dans le premier forum, il faut pouvoir :

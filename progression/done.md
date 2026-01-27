@@ -33,3 +33,14 @@
 
 - Header
 - Sélecteur de thème
+
+### Inscription et connexion
+
+Données d'inscriptions demandées :
+
+- Pseudo
+- Âge et genre
+- Prénom et nom de famille
+- Adresse mail
+- Mot de passe
+  Il doit être possible de se connecter en utilisant le pseudo ou l'adresse mail
