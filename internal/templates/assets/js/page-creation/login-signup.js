@@ -24,11 +24,11 @@ function switchToLogin() {
         <form id="login-form">
             <div class="form-group">
                 <label>Identifiant</label>
-                <input type="text" name="username" placeholder="Pseudo ou mail" required>
+                <input type="text" name="username" placeholder="Pseudo ou mail" autocomplete="username" required>
             </div>
             <div class="form-group">
                 <label>Mot de passe</label>
-                <input type="password" name="password" required>
+                <input type="password" name="password" autocomplete="current-password" required>
             </div>
             <button type="submit">Se connecter</button>
         </form>

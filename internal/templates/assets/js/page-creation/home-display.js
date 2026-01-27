@@ -2,12 +2,17 @@ import { buttonMove } from "../theme-switch.js";
 import { isLogged } from "../variables/page-data.js";
 import { displayCategories } from "./categories.js";
 import { displayFeed } from "./feed.js";
+import { clearPages } from "./profile.js";
 
 const usernameHeader = document.getElementById("header-username");
 let displayType = "categ";
 
 // Création de la page d'accueil
 export function displayHome() {
+  clearPages("home");
+  const homeBtn = document.getElementById("go-home");
+  homeBtn.style.display = "none";
+
   usernameHeader.innerHTML = "";
   if (!isLogged) {
     usernameHeader.innerHTML = "Bienvenue ! <br /> Pensez à vous connecter !";
