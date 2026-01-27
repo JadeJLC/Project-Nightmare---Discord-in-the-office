@@ -23,7 +23,7 @@ func main() {
     router := handlers.Router(userService)
 
     // Lancement serveur
-    addr := ":5005"
+    addr := ":5006"
     log.Printf("Server start → http://localhost%s\n", addr)
 
     if err := http.ListenAndServe(addr, router); err != nil {

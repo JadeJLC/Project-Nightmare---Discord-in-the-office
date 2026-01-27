@@ -83,20 +83,60 @@ function setupInteractions() {
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
 
-  if (loginBtn) loginBtn.onclick = () => popup.classList.remove("is-hidden");
+  if (!loginBtn) return;
+
+  // --- LOGIN / LOGOUT BUTTON ---
+  loginBtn.onclick = async () => {
+    if (SessionData.isLogged) {
+      // Déconnexion
+      try {
+        const response = await fetch("/api/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+
+        // Si la route n'existe pas ou renvoie du texte → éviter JSON.parse
+        if (!response.ok) {
+          const text = await response.text();
+          console.error("Erreur logout :", text);
+          alert("Erreur logout : " + text);
+          return;
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert("Déconnexion réussie !");
+          SessionData.isLogged = false;
+          window.location.reload();
+        } else {
+          alert(result.message || "Erreur lors de la déconnexion");
+        }
+      } catch (err) {
+        console.error("Erreur réseau :", err);
+      }
+      return;
+    }
+
+    // Sinon → ouvrir la popup de connexion
+    popup.classList.remove("is-hidden");
+  };
+
+  // --- POPUP CLOSE ---
   if (closeBtn) closeBtn.onclick = () => popup.classList.add("is-hidden");
 
   popup.onclick = (e) => {
     if (e.target === popup) popup.classList.add("is-hidden");
   };
 
+  // --- SWITCH FORMS ---
   if (registerBtn) registerBtn.onclick = () => switchToRegister();
   if (loginSwitchBtn) loginSwitchBtn.onclick = () => switchToLogin();
 
+  // --- LOGIN FORM ---
   if (loginForm) {
     loginForm.onsubmit = async (e) => {
       e.preventDefault();
-
       const data = Object.fromEntries(new FormData(loginForm).entries());
 
       try {
@@ -121,10 +161,10 @@ function setupInteractions() {
     };
   }
 
+  // --- REGISTER FORM ---
   if (registerForm) {
     registerForm.onsubmit = async (e) => {
       e.preventDefault();
-
       const data = Object.fromEntries(new FormData(registerForm).entries());
 
       try {

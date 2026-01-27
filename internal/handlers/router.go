@@ -14,10 +14,12 @@ func Router(userService *services.UserService) http.Handler {
     registerHandler := NewRegisterHandler(userService)
     homeHandler := NewHomeHandler()
 	meHandler := NewMeHandler(userService)
+    logoutHandler := NewLogoutHandler(userService)
 
     // Routes
     mux.Handle("/", homeHandler)
     mux.Handle("/api/login", loginHandler)
+    mux.Handle("/api/logout", logoutHandler)
     mux.Handle("/api/register", registerHandler)
 	mux.Handle("/api/me", meHandler)
 
