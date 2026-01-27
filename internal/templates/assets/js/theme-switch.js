@@ -27,7 +27,7 @@ export function initTheme() {
     console.error("Theme switch button (#theme-selector) not found in DOM.");
   }
 }
-/*
+
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initTheme);
 } else {
@@ -35,20 +35,23 @@ if (document.readyState === "loading") {
 }
 
 // Fonction pour déplacer les boutons "Afficher sous forme de catégories / feed" au scroll"
-window.addEventListener("scroll", () => {
-  const button = document.querySelector(".front-page-buttons");
-  const scrollValue = window.scrollY;
+function buttonMove() {
+  window.addEventListener("scroll", () => {
+    const button = document.getElementById("front-page-buttons");
+    const scrollValue = window.scrollY;
 
-  const scrollDuration = 500;
-  let progress = Math.min(scrollValue / scrollDuration, 1);
+    const scrollDuration = 500;
+    let progress = Math.min(scrollValue / scrollDuration, 1);
 
-  const distanceToEdge = window.innerWidth / 2 - button.offsetWidth / 2;
+    const distanceToEdge = window.innerWidth / 2 - button.offsetWidth / 2;
 
-  const xMove = progress * (distanceToEdge + 10) * -1;
+    const xMove = progress * (distanceToEdge + 10) * -1;
 
-  button.style.transform = `translateX(${xMove}px)`;
+    button.style.transform = `translateX(${xMove}px)`;
 
-  button.style.opacity = 0.8 + progress * 0.2;
-  button.style.scale = 1 - progress * 0.1;
-});
-}*/
+    button.style.opacity = 0.8 + progress * 0.2;
+    button.style.scale = 1 - progress * 0.1;
+  });
+}
+
+export { buttonMove };
