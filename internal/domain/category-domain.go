@@ -8,4 +8,5 @@ type Category struct {
 
 type CategoryRepo interface {
 	GetCategoryFromID(catID int) (*Category, error)
+	GetAllCategories() ([]*Category, error)
 }

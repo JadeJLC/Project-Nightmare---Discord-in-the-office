@@ -9,4 +9,6 @@ type Reaction struct {
 type ReactionRepo interface {
 	Add(postID, userID int, reaction string) error
 	Delete(postID, userID int) error
+	GetPostReactions(postID int) ([]*Reaction, error)
+	GetUserReactions(userID int) ([]*Reaction, error)
 }
