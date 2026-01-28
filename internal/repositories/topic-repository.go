@@ -23,10 +23,10 @@ func (r *topicRepo) Create(category, title string, authorId int) error {
     return err
 }
 
-func (r *topicRepo) Delete(title string) error {
+func (r *topicRepo) Delete(topicID int) error {
     _, err := r.db.Exec(`
-        DELETE FROM topics WHERE title = ?
-    `, title)
+        DELETE FROM topics WHERE topic_id = ?
+    `, topicID)
     return err
 }
 

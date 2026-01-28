@@ -1,12 +1,5 @@
 package domain
 
-
-type Category struct {
-	ID int64 `json:"id"`
-	Name string `json:"name"`
-	Description string `json:"description"`
-}
-
 type Topic struct {
 	ID int64 `json:"topic_id"`
 	CatID int64 `json:"category"`
@@ -15,18 +8,11 @@ type Topic struct {
 	Author int `json:"author"`
 }
 
-type Message struct {
-	ID int64 `json:"post_id"`
-	TopicID int64 `json:"topic_id"`
-	Author int `json:"author"`
-	Content string `json:"content"`
-	Time string `json:"created_on"`
-	Reactions string `json:"reactions"`
-}
-
 type TopicRepo interface {
+	Create(category, title string, authorId int) error
 	GetTopicsByCategory(cat_id int) ([]*Topic, error)
-	GetTopicsByAuthor(cat_id int) ([]*Topic, error)
+	GetTopicsByAuthor(author int) ([]*Topic, error)
 	GetTopicById(id int) (*Topic, error)
 	GetTopicByTitle(title string) (*Topic, error)
+	Delete(topic_ID int) error
 }
