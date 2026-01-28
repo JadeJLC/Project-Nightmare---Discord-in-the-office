@@ -1,8 +1,8 @@
 package domain
 
 type Reaction struct {
-	PostID int64 `json:"post_id"`
-	UserID int64 `json:"user_id"`
+	PostID int `json:"post_id"`
+	UserID int `json:"user_id"`
 	Type string `json:"reaction_type"`
 }
 

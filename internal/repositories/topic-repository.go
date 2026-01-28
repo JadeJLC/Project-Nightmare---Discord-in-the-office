@@ -6,15 +6,15 @@ import (
 	"time"
 )
 
-type topicRepo struct {
+type TopicRepo struct {
 	db *sql.DB
 }
 
 func NewTopicRepo(db *sql.DB) domain.TopicRepo{
-	return &topicRepo{db: db}
+	return &TopicRepo{db: db}
 }
 
-func (r *topicRepo) Create(category, title string, authorId int) error {
+func (r *TopicRepo) Create(category int, title string, authorId int) error {
 	currentTime := time.Now()
 	_, err := r.db.Exec(`
         INSERT INTO topics (category, title, created_on, author)
@@ -23,17 +23,17 @@ func (r *topicRepo) Create(category, title string, authorId int) error {
     return err
 }
 
-func (r *topicRepo) Delete(topicID int) error {
+func (r *TopicRepo) Delete(topicID int) error {
     _, err := r.db.Exec(`
         DELETE FROM topics WHERE topic_id = ?
     `, topicID)
     return err
 }
 
-func (r *topicRepo) GetTopicById(id int) (*domain.Topic, error) {
+func (r *TopicRepo) GetTopicById(topicID int) (*domain.Topic, error) {
 	row := r.db.QueryRow(`
         SELECT category, title, created_on, author
-        FROM topics WHERE id = ?`, id)
+        FROM topics WHERE id = ?`, topicID)
 
     topic := &domain.Topic{}
     err := row.Scan(&topic.CatID, &topic.Title, &topic.Time, &topic.Author)
@@ -43,7 +43,7 @@ func (r *topicRepo) GetTopicById(id int) (*domain.Topic, error) {
     return topic, nil
 }
 
-func (r *topicRepo) GetTopicByTitle(title string) (*domain.Topic, error) {
+func (r *TopicRepo) GetTopicByTitle(title string) (*domain.Topic, error) {
 	row := r.db.QueryRow(`
         SELECT id, category, created_on, author
         FROM topics WHERE title = ?`, title)
@@ -56,7 +56,7 @@ func (r *topicRepo) GetTopicByTitle(title string) (*domain.Topic, error) {
     return topic, nil
 }
 
-func (r *topicRepo) GetTopicsByAuthor(authorID int) ([]*domain.Topic, error) {
+func (r *TopicRepo) GetTopicsByAuthor(authorID int) ([]*domain.Topic, error) {
 	rows, err := r.db.Query(`SELECT topic_id, title, created_on 
     FROM topics 
     WHERE author = ?`, authorID)
@@ -77,7 +77,7 @@ func (r *topicRepo) GetTopicsByAuthor(authorID int) ([]*domain.Topic, error) {
     return topics, nil
 }
 
-func (r *topicRepo) GetTopicsByCategory(catID int) ([]*domain.Topic, error) {
+func (r *TopicRepo) GetTopicsByCategory(catID int) ([]*domain.Topic, error) {
 	rows, err := r.db.Query(`SELECT topic_id, title, created_on, author 
     FROM topics 
     WHERE author = ?`, catID)
