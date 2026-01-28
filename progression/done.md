@@ -29,10 +29,12 @@
 - Role 2 : Membre
 - Role 3 : Banni
 
-## Affichage
+### Affichage
 
 - Header
 - Sélecteur de thème
+- Feed / Catégories
+- Profil
 
 ### Inscription et connexion
 
@@ -44,3 +46,11 @@ Données d'inscriptions demandées :
 - Adresse mail
 - Mot de passe
   Il doit être possible de se connecter en utilisant le pseudo ou l'adresse mail
+
+### Profil utilisateur
+
+Affichage :
+
+- Nom et infos personnelles sur son propre profil
+- Liste des messages postés, liste des sujets ouverts et liste des réactions
+- Image de profil

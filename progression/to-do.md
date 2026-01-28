@@ -49,14 +49,6 @@ Format des messages :
 
 ## Aspect des pages
 
-### A intégrer au minimum
-
-- Une catégorie "Règles de la communauté ✔
-- Une catégorie "News développeur" pour indiquer les mises à jour et les prochains jeux ✔
-- Une catégorie "Suggestions" pour les joueurs ✔
-- Une catégorie "Discussion" ✔
-- Une catégorie par jeu Project Nightmare pour discuter du jeu ✔
-
 ### Profil utilisateur
 
 - Nom et infos personnelles sur son propre profil / _Uniquement nom d'utilisateur et âge/genre sur le profil des autres_
