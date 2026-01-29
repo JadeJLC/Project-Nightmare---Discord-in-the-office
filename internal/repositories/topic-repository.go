@@ -99,7 +99,7 @@ func (r *TopicRepo) GetTopicsByCategory(catID int) ([]*domain.Topic, error) {
     return topics, nil
 }
 
-func (r *TopicRepo) GetTopicsByMostRecent() ([]*domain.LastPost, error) {
+func (r *TopicRepo) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error) {
 	rows, err := r.db.Query(`SELECT
             m.post_id,
             m.topic_id,
@@ -111,7 +111,7 @@ func (r *TopicRepo) GetTopicsByMostRecent() ([]*domain.LastPost, error) {
         JOIN topics t ON m.topic_id = t.topic_id 
 		JOIN users u ON m.author = u.user_id
         ORDER BY m.created_on DESC
-		LIMIT 10`)
+		LIMIT 10 OFFSET ?`, offset)
 
 
 	if err != nil {

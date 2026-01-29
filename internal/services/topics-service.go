@@ -37,6 +37,6 @@ func (s *TopicService) GetTopicsByCategory(catID int) ([]*domain.Topic, error) {
 	return s.repo.GetTopicsByCategory(catID)
 }
 
-func (s *TopicService) GetTopicsByMostRecent() ([]*domain.LastPost, error) {
-	return s.repo.GetTopicsByMostRecent()
+func (s *TopicService) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error) {
+	return s.repo.GetTopicsByMostRecent(offset)
 }
