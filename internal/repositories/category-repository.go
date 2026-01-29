@@ -5,15 +5,15 @@ import (
 	"real-time-forum/internal/domain"
 )
 
-type categRepo struct {
+type CategoryRepo struct {
 	db *sql.DB
 }
 
 func NewCategRepo(db *sql.DB) domain.CategoryRepo {
-	return &categRepo {db:db}
+	return &CategoryRepo {db:db}
 }
 
-func (r *categRepo) GetCategoryFromID(catID int) (*domain.Category, error) {
+func (r *CategoryRepo) GetCategoryFromID(catID int) (*domain.Category, error) {
 row := r.db.QueryRow(`SELECT name, description
     FROM categories
     WHERE cat_id = ?`, catID)
@@ -26,7 +26,7 @@ row := r.db.QueryRow(`SELECT name, description
     return category, nil
 }
 
-func (r *categRepo) GetAllCategories() ([]*domain.Category, error) {
+func (r *CategoryRepo) GetAllCategories() ([]*domain.Category, error) {
 	rows, err := r.db.Query(`SELECT cat_id, name, description 
     FROM categories`)
 	if err != nil {
