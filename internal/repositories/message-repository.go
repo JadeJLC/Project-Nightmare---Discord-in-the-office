@@ -1,0 +1,94 @@
+package repositories
+
+import (
+	"database/sql"
+	"real-time-forum/internal/domain"
+	"time"
+)
+
+type MessageRepo struct {
+	db *sql.DB
+}
+
+func NewMessageRepo(db *sql.DB) domain.MessageRepo {
+	return &MessageRepo {db:db}
+}
+
+func (r *MessageRepo) Create(topicID int, content string, author int) error {
+	currentTime := time.Now()
+	_, err := r.db.Exec(`
+	INSERT INTO messages (topic_id, author, content, created_on)
+	VALUES (?, ?, ?, ?)
+	`, topicID, author, content, currentTime)
+	return err
+}
+
+func (r *MessageRepo) Delete(postID int) error {
+    _, err := r.db.Exec(`
+        DELETE FROM messages WHERE post_id = ?
+    `, postID)
+    return err
+}
+
+func (r *MessageRepo) Edit(postID int, newMessage string) error {
+	_, err := r.db.Exec(`
+	UPDATE messages SET content = ?
+	WHERE post_id = ?
+	`, newMessage, postID)
+	return err
+}
+
+func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error) {
+	rows, err := r.db.Query(`SELECT post_id, author, content, created_on, reactions 
+    FROM messages
+    WHERE topic_id = ?`, topicID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+    var messages = []*domain.Message{}
+	message := &domain.Message{}
+	for rows.Next() {
+		if err := rows.Scan(&message.ID, &message.Author, &message.Content, &message.Time, &message.Reactions); err != nil {
+			return nil, err
+		}
+		messages = append(messages, message)
+	}
+   
+    return messages, nil
+}
+
+func (r *MessageRepo) GetMessagesByAuthor(author int) ([]*domain.Message, error) {
+	rows, err := r.db.Query(`SELECT post_id, topic_id, content, created_on, reactions 
+    FROM messages
+    WHERE author = ?`, author)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+    var messages = []*domain.Message{}
+	message := &domain.Message{}
+	for rows.Next() {
+		if err := rows.Scan(&message.ID, &message.TopicID, &message.Content, &message.Time, &message.Reactions); err != nil {
+			return nil, err
+		}
+		messages = append(messages, message)
+	}
+   
+    return messages, nil
+}
+
+func (r *MessageRepo) GetMessageByID(postID int) (*domain.Message, error) {
+	row := r.db.QueryRow(`SELECT topic_id, author, content, created_on, reactions 
+    FROM messages
+    WHERE post_id = ?`, postID)
+
+    message := &domain.Message{}
+    err := row.Scan(&message.TopicID, &message.Author, &message.Content, &message.Time, &message.Reactions)
+    if err != nil {
+        return nil, err
+    }
+    return message, nil
+}
