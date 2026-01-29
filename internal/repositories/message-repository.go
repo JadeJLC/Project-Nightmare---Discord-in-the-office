@@ -6,15 +6,15 @@ import (
 	"time"
 )
 
-type messageRepo struct {
+type MessageRepo struct {
 	db *sql.DB
 }
 
 func NewMessageRepo(db *sql.DB) domain.MessageRepo {
-	return &messageRepo {db:db}
+	return &MessageRepo {db:db}
 }
 
-func (r *messageRepo) Create(topicID int, content string, author int) error {
+func (r *MessageRepo) Create(topicID int, content string, author int) error {
 	currentTime := time.Now()
 	_, err := r.db.Exec(`
 	INSERT INTO messages (topic_id, author, content, created_on)
@@ -23,14 +23,14 @@ func (r *messageRepo) Create(topicID int, content string, author int) error {
 	return err
 }
 
-func (r *messageRepo) Delete(postID int) error {
+func (r *MessageRepo) Delete(postID int) error {
     _, err := r.db.Exec(`
         DELETE FROM messages WHERE post_id = ?
     `, postID)
     return err
 }
 
-func (r *messageRepo) Edit(postID int, newMessage string) error {
+func (r *MessageRepo) Edit(postID int, newMessage string) error {
 	_, err := r.db.Exec(`
 	UPDATE messages SET content = ?
 	WHERE post_id = ?
@@ -38,7 +38,7 @@ func (r *messageRepo) Edit(postID int, newMessage string) error {
 	return err
 }
 
-func (r *messageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error) {
+func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error) {
 	rows, err := r.db.Query(`SELECT post_id, author, content, created_on, reactions 
     FROM messages
     WHERE topic_id = ?`, topicID)
@@ -59,7 +59,7 @@ func (r *messageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
     return messages, nil
 }
 
-func (r *messageRepo) GetMessagesByAuthor(author int) ([]*domain.Message, error) {
+func (r *MessageRepo) GetMessagesByAuthor(author int) ([]*domain.Message, error) {
 	rows, err := r.db.Query(`SELECT post_id, topic_id, content, created_on, reactions 
     FROM messages
     WHERE author = ?`, author)
@@ -80,7 +80,7 @@ func (r *messageRepo) GetMessagesByAuthor(author int) ([]*domain.Message, error)
     return messages, nil
 }
 
-func (r *messageRepo) GetMessageByID(postID int) (*domain.Message, error) {
+func (r *MessageRepo) GetMessageByID(postID int) (*domain.Message, error) {
 	row := r.db.QueryRow(`SELECT topic_id, author, content, created_on, reactions 
     FROM messages
     WHERE post_id = ?`, postID)
