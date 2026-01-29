@@ -10,7 +10,7 @@ type TopicRepo struct {
 	db *sql.DB
 }
 
-func NewTopicRepo(db *sql.DB) domain.TopicRepo{
+func NewTopicRepo(db *sql.DB) *TopicRepo{
 	return &TopicRepo{db: db}
 }
 

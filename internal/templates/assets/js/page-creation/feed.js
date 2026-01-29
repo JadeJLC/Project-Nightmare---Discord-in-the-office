@@ -24,25 +24,32 @@ function getLastPosts() {
   return topicList;
 }
 
-function displayFeed() {
-  const topicList = getLastPosts();
-  let feedContainer = document.getElementById("feed");
+async function displayFeed() {
+  try {
+    const response = await fetch("/?mode=feed");
+    const topicList = await response.json();
 
-  if (!feedContainer) {
-    let addedContainer = `<div id="feed"></div>`;
-    document.body.insertAdjacentHTML("beforeend", addedContainer);
-    feedContainer = document.getElementById("feed");
+    let feedContainer = document.getElementById("feed");
+    const frontPageContainer = document.getElementById("front-page");
+
+    if (!feedContainer) {
+      feedContainer = document.createElement("div");
+      feedContainer.id = "feed";
+      frontPageContainer.appendChild(feedContainer);
+    }
+
+    feedContainer.innerHTML = `<h2 class="feed-title">Derniers messages postés sur le forum</h2>`;
+
+    topicList.forEach((topic) => {
+      const topicBloc = buildTopic(topic);
+      feedContainer.appendChild(topicBloc);
+    });
+
+    let categoriesContainer = document.getElementById("categories");
+    if (categoriesContainer) categoriesContainer.remove();
+  } catch (error) {
+    console.log("Erreur dans la récupération du feed : ", error);
   }
-
-  feedContainer.innerHTML = `<h2 class="feed-title">Derniers messages postés sur le forum</h2>`;
-
-  topicList.forEach((topic) => {
-    const topicBloc = buildTopic(topic);
-    feedContainer.appendChild(topicBloc);
-  });
-
-  let categoriesContainer = document.getElementById("categories");
-  if (categoriesContainer) categoriesContainer.remove();
 }
 
 function buildTopic(topic) {
