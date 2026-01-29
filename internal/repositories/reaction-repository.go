@@ -5,15 +5,15 @@ import (
 	"real-time-forum/internal/domain"
 )
 
-type reactionRepo struct {
+type ReactionRepo struct {
 	db *sql.DB
 }
 
 func NewReactionRepo(db *sql.DB) domain.ReactionRepo {
-	return &reactionRepo {db:db}
+	return &ReactionRepo {db:db}
 }
 
-func (r *reactionRepo) Add(postID, userID int, reaction string) error {
+func (r *ReactionRepo) Add(postID, userID int, reaction string) error {
 	_, err := r.db.Exec(`
 	INSERT INTO reactions (post_id, user_id, reaction_type)
 	VALUES (?, ?, ?)
@@ -21,14 +21,14 @@ func (r *reactionRepo) Add(postID, userID int, reaction string) error {
 	return err
 }
 
-func (r *reactionRepo) Delete(postID, userID int) error {
+func (r *ReactionRepo) Delete(postID, userID int) error {
     _, err := r.db.Exec(`
         DELETE FROM reaction WHERE post_id = ? AND user_id ) ?
     `, postID, userID)
     return err
 }
 
-func (r *reactionRepo) GetPostReactions(postID int) ([]*domain.Reaction, error) {
+func (r *ReactionRepo) GetPostReactions(postID int) ([]*domain.Reaction, error) {
 	rows, err := r.db.Query(`SELECT user_id, reaction_type 
     FROM reactions
     WHERE post_id = ?`, postID)
@@ -49,7 +49,7 @@ func (r *reactionRepo) GetPostReactions(postID int) ([]*domain.Reaction, error) 
     return reactions, nil
 }
 
-func (r *reactionRepo) GetUserReactions(userID int) ([]*domain.Reaction, error) {
+func (r *ReactionRepo) GetUserReactions(userID int) ([]*domain.Reaction, error) {
 	rows, err := r.db.Query(`SELECT post_id, reaction_type 
     FROM reactions
     WHERE user_id = ?`, userID)
