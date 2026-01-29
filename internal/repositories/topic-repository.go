@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"log"
 	"real-time-forum/internal/domain"
 	"time"
 )
@@ -66,8 +67,8 @@ func (r *TopicRepo) GetTopicsByAuthor(authorID int) ([]*domain.Topic, error) {
 	defer rows.Close()
 
     var topics = []*domain.Topic{}
-	topic := &domain.Topic{}
 	for rows.Next() {
+	topic := &domain.Topic{}
 		if err := rows.Scan(&topic.ID, &topic.Title, &topic.Time); err != nil {
 			return nil, err
 		}
@@ -87,8 +88,8 @@ func (r *TopicRepo) GetTopicsByCategory(catID int) ([]*domain.Topic, error) {
 	defer rows.Close()
 
     var topics = []*domain.Topic{}
-	topic := &domain.Topic{}
 	for rows.Next() {
+	topic := &domain.Topic{}
 		if err := rows.Scan(&topic.ID, &topic.Title, &topic.Time, &topic.Author); err != nil {
 			return nil, err
 		}
@@ -96,4 +97,46 @@ func (r *TopicRepo) GetTopicsByCategory(catID int) ([]*domain.Topic, error) {
 	}
    
     return topics, nil
+}
+
+func (r *TopicRepo) GetTopicsByMostRecent() ([]*domain.LastPost, error) {
+	rows, err := r.db.Query(`SELECT
+            m.post_id,
+            m.topic_id,
+            m.content,
+            m.created_on,
+            u.username,
+            t.title
+        FROM messages m
+        JOIN topics t ON m.topic_id = t.topic_id 
+		JOIN users u ON m.author = u.user_id
+        ORDER BY m.created_on DESC
+		LIMIT 10`)
+
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+    var lastPosts = []*domain.LastPost{}
+
+	for rows.Next() {
+		lastPost := &domain.LastPost{}
+		err := rows.Scan(&lastPost.ID, &lastPost.TopicID, &lastPost.Content, &lastPost.Time, &lastPost.Author, &lastPost.TopicTitle); 
+
+		if err != nil {
+			return nil, err
+		}
+
+		lastPosts = append(lastPosts, lastPost)
+	}
+
+	if len(lastPosts) == 0 {
+		log.Print("Pas de messages")
+		lastPosts = append(lastPosts, &domain.LastPost{TopicTitle: "Aucun message"})
+	}
+	
+   
+    return lastPosts, nil
 }

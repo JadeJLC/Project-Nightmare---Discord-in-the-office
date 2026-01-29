@@ -36,3 +36,7 @@ func (s *TopicService) GetTopicsByAuthorID(authorID int) ([]*domain.Topic, error
 func (s *TopicService) GetTopicsByCategory(catID int) ([]*domain.Topic, error) {
 	return s.repo.GetTopicsByCategory(catID)
 }
+
+func (s *TopicService) GetTopicsByMostRecent() ([]*domain.LastPost, error) {
+	return s.repo.GetTopicsByMostRecent()
+}

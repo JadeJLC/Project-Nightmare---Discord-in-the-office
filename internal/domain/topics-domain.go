@@ -8,6 +8,7 @@ type Topic struct {
 	Author int `json:"author"`
 }
 
+
 type TopicRepo interface {
 	Create(category int, title string, authorId int) error
 	GetTopicsByCategory(cat_id int) ([]*Topic, error)

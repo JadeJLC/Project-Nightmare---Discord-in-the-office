@@ -1,22 +1,5 @@
 // Fonctions pour la création de la page d'accueil avec toutes les catégories du forum
 
-function getCategories() {
-  // Récupération des catégories dans la base de données
-
-  const catList = [
-    {
-      cat_id: 0,
-      name: "Règles et explications",
-      description:
-        "Toute communauté se doit d'avoir quelques règles pour la bonne entente et l'organisation. Vous pouvez consulter ici celles de Project Nightmare : Discord in the Office. Vous y trouverez aussi des informations sur la licence Project Nigthmare.",
-      lastpost: "Aucun message pour le moment",
-      image: "assets/images/cat_01.png",
-    },
-  ];
-
-  return catList;
-}
-
 async function displayCategories() {
   try {
     const response = await fetch("/?mode=categ");
@@ -55,11 +38,19 @@ function buildCategory(category) {
 
   let lastPostHTML;
   if (lastpost.topic_title === "Aucun message pour le moment") {
-    lastPostHTML = `<div class="cat-lastpost">${lastpost.topic_title}</div>`;
+    lastPostHTML = `<div class="cat-lastpost"><center>${lastpost.topic_title}</center></div>`;
   } else {
-    lastPostHTML = `<div class="cat-lastpost"><center>Dernier message</center>
-    <div>${lastpost.topic_title}</div>
-    <div class="last-post-date">le ${lastpost.created_on} par ${lastpost.author}</div>
+    lastPostHTML = `<div class="cat-lastpost"><button type="button" class="button-link link-right">
+                  <img
+                    src="assets/images/external-link.svg"
+                    alt="Voir le message"
+                    title="Voir le message"
+                  />
+                </button>
+                <center>Dernier message</center>
+    <div class="last-post-title">
+ ${lastpost.topic_title} </div>
+    <div class="last-post-date">• le ${lastpost.created_on} par ${lastpost.author}</div>
     </div>`;
   }
 

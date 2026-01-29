@@ -341,7 +341,7 @@ header {
 .cat-bloc {
   width: 85%;
   max-width: 1200px;
-  padding: 10px 3% 30px 3%;
+  padding: 10px 0 30px 3%;
   margin: 60px auto 20px auto;
   border-radius: 15px;
   border: 2px solid var(--neon);
@@ -376,14 +376,60 @@ header {
 }
 
 .cat-lastpost {
-  width: 30%;
+  width: 24%;
   text-align: center;
+  margin-top: -40px;
+  border-left: 2px dashed var(--neon-soft);
+  padding: 0 3%;
+}
+
+.cat-lastpost center {
+  font-weight: bold;
+  font-variant: small-caps;
+  font-size: 1.3em;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.last-post-title:hover {
+  font-style: italic;
+  cursor: pointer;
+}
+
+.last-post-date {
+  font-style: italic;
+  font-size: 0.8em;
+  margin-top: 15px;
+  margin-right: -5px;
+  text-align: right;
 }
 
 /* Affichage feed */
+.feed-notopic {
+  width: min(900px, 92vw);
+  padding: 16px;
+  margin: 60px auto 12px auto;
+  color: var(--text);
+  background: rgba(5, 10, 20, 0.75);
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  text-align: center;
+  position: relative;
+}
+
+.feed-notopic img {
+  position: absolute;
+  right: -30px;
+  top: -30px;
+}
+
 .feed-title {
   text-align: center;
   margin-top: 40px;
+}
+
+#feed hr {
+  margin: 35px 10% 15px 10%;
 }
 
 .topic-bloc,
@@ -475,7 +521,7 @@ header {
   font-size: 1.2em;
 }
 
-#profile-page hr {
+hr {
   border: 1px dashed var(--neon-soft);
   margin: 15px;
 }
@@ -535,6 +581,14 @@ header {
   background: transparent;
   border: none;
   cursor: pointer;
+}
+
+.link-right {
+  float: right;
+  position: relative;
+  z-index: 15;
+  left: -10px;
+  top: 2px;
 }
 
 .profile-preview h3 {

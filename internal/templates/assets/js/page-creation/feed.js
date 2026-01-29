@@ -1,28 +1,4 @@
 // Fonction pour la création de la page "derniers messages"
-function getLastPosts() {
-  // Récupération des messages dans la base de données
-
-  const topicList = [
-    {
-      topic_id: 0,
-      cat_id: 0,
-      title: "Règles du forum",
-      created_on: "01/01/2026",
-      last_message: "Dernier message posté sur ce sujet",
-      last_author: "Test1",
-    },
-    {
-      topic_id: 1,
-      cat_id: 0,
-      title: "A propos de la licence",
-      created_on: "01/01/2026",
-      last_message: "Dernier message posté sur ce sujet",
-      last_author: "Test1",
-    },
-  ];
-
-  return topicList;
-}
 
 async function displayFeed() {
   try {
@@ -38,7 +14,7 @@ async function displayFeed() {
       frontPageContainer.appendChild(feedContainer);
     }
 
-    feedContainer.innerHTML = `<h2 class="feed-title">Derniers messages postés sur le forum</h2>`;
+    feedContainer.innerHTML = `<hr/><h2 class="feed-title">Derniers messages postés sur le forum</h2>`;
 
     topicList.forEach((topic) => {
       const topicBloc = buildTopic(topic);
@@ -56,14 +32,29 @@ function buildTopic(topic) {
   const topicBloc = document.createElement("div");
   topicBloc.className = "topic-bloc";
 
-  let message = topic.last_message.slice(0, 100);
-  if (topic.last_message.length >= 100) message += "...";
+  const topicID = String(topic.topic_id).padStart(2, "0");
+  const postID = String(topic.post_id).padStart(2, "0");
 
-  topicBloc.innerHTML = `<h3 id="topic_${topic.topic_id}">Sujet : ${topic.title}</h3>
+  let message = topic.content.slice(0, 100);
+  if (topic.content.length >= 100) message += "...";
+
+  if (topic.topic_title === "Aucun message") {
+    topicBloc.className = "feed-notopic";
+    topicBloc.innerHTML = `<img src="/assets/icons/notopic.png"/> Aucun sujet correspondant à votre recherche n'a été trouvé`;
+  } else {
+    topicBloc.innerHTML = `<button type="button" class="button-link" style="float:right;padding-top:10px">
+                  <img
+                    src="assets/images/external-link.svg"
+                    alt="Voir le message"
+                    title="Voir le message"
+                  />
+                </button>
+                <h3 id="topic_${topicID}#post_${postID}">Sujet : ${topic.topic_title}</h3> 
  <div class="topic-content">   
-    <div class="topic-lastpost">${message}</div>
-    <div class="topic-lastinfo">posté le ${topic.created_on} par ${topic.last_author}</div>
+    <div class="topic-lastpost">${message} </div>
+    <div class="topic-lastinfo">posté le ${topic.created_on} par ${topic.author}</div>
  </div>`;
+  }
 
   return topicBloc;
 }
