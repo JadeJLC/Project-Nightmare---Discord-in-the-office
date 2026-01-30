@@ -3,6 +3,7 @@ import { initTheme } from "./theme-switch.js";
 import { initAuth } from "./page-creation/login-signup.js";
 import { checkLoginStatus } from "./session/check-login.js";
 import { displayProfile } from "./page-creation/profile.js";
+import { displayMailbox } from "./page-creation/chat.js";
 
 async function main() {
   await checkLoginStatus();
@@ -24,4 +25,7 @@ function setEventListeners() {
 
   const homeBtn = document.getElementById("go-home");
   homeBtn.addEventListener("click", displayHome);
+
+  const dmBtn = document.getElementById("display-mailbox");
+  dmBtn.addEventListener("click", displayMailbox);
 }
