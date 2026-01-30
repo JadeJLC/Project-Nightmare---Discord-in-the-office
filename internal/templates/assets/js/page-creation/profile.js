@@ -21,7 +21,7 @@ async function writeUserProfile(profile, logged) {
       <div class="profile-left">
         <div class="profile-user-info">
           <div class="profile-icon">
-            <img src="assets/images-avatar/${user.image}.png" alt="Image de profil - ${user.image}"/>
+            <img id="profile-image" src="assets/images-avatar/${user.image}.png" alt="Image de profil - ${user.image}"/>
           </div>
           <div class="profile-basics">
             <h3>
@@ -46,23 +46,30 @@ async function writeUserProfile(profile, logged) {
           `;
 
     if (user.email !== "Not Available") {
-      profilePageContainer.innerHTML += `<div class="profile-right"><button type="button" class="edit-content">
+      profilePageContainer.innerHTML += `<form class="profile-right" method="post" id="profile-form"><button type="button" class="edit-content" id="edit-infos">
+      <input type="hidden" name="username" value="${logged}">
           <img src="assets/images/tool.svg" />
           <span>Modifier mon profil</span>
+        </button>
+        <button type="submit" class="edit-content is-hidden" id="confirm-edit">
+          <img src="assets/images/check-circle.svg" />
+          <span>Valider les modifications</span>
         </button>
         <div class="profile-details">
           <span>Informations</span>
           <div class="profile-public">
             <p><span>Âge&nbsp;:</span> ${user.age}&nbsp;ans</p>
-            <p><span>Genre&nbsp;:</span> ${user.genre}</p>
+            <p><span>Genre&nbsp;:</span> <input class="is-hidden" type="text" name="genre" value="${user.genre}" id="profile-gender-input"><span id="profile-gender-span">${user.genre}</span></p>
           </div>
           <hr />
           <div class="profile-private">
-            <p><span>Email&nbsp;:</span> <span id="profile-email">${user.email}</span></p>
-            <p><span>Identité&nbsp;:</span> ${user.firstname} ${user.lastname}</p>
+            <p><span>Email&nbsp;:</span><input class="is-hidden" type="text" name="email" value="${user.email}" id="profile-email-input"> <span id="profile-email-span">${user.email}</span></p>
+            <p><span>Identité&nbsp:</span>
+            <input class="is-hidden" type="text" name="firstname" value="${user.firstname}" id="profile-first-input"><span id="profile-first-span"> ${user.firstname}</span>
+            <input class="is-hidden" type="text" name="lastname" value="${user.lastname}" id="profile-last-input"><span id="profile-last-span"> ${user.lastname}</span></p>
           </div>
         </div>
-      </div>`;
+      </form>`;
     } else {
       profilePageContainer.innerHTML += `<div class="profile-right">
         <div class="profile-details">
@@ -297,10 +304,18 @@ function setProfileButtons() {
   const topicBtn = document.getElementById("profile-mytopics");
   const messageBtn = document.getElementById("profile-mymessages");
   const reactionBtn = document.getElementById("profile-myreactions");
+  const editBtn = document.getElementById("edit-infos");
+  const profForm = document.getElementById("profile-form");
 
   topicBtn.addEventListener("click", switchToTopics);
   messageBtn.addEventListener("click", switchToMessages);
   reactionBtn.addEventListener("click", switchToReactions);
+  if (editBtn) editBtn.addEventListener("click", editProfile);
+  if (profForm)
+    profForm.onsubmit = async (e) => {
+      e.preventDefault();
+      editProfile("valider");
+    };
 
   const profileDisplay = localStorage.getItem("profileDisplay") || "topics";
   if (profileDisplay === "reactions") {
@@ -315,6 +330,55 @@ function setProfileButtons() {
     topicBtn.classList.add("active");
     reactionBtn.classList.remove("active");
     messageBtn.classList.remove("active");
+  }
+}
+
+// #endregion
+
+// #region ***** Modification du profil
+async function editProfile(mode) {
+  if (!SessionData.isLogged) {
+    console.log("Vous devez vous connecter pour ouvrir un profil");
+    const popup = document.getElementById("auth-popup");
+    popup.classList.remove("is-hidden");
+    displayHome();
+    return;
+  }
+
+  const profileName = SessionData.username;
+  const profForm = document.getElementById("profile-form");
+
+  document.getElementById("profile-gender-span").classList.toggle("is-hidden");
+  document.getElementById("profile-email-span").classList.toggle("is-hidden");
+  document.getElementById("profile-first-span").classList.toggle("is-hidden");
+  document.getElementById("profile-last-span").classList.toggle("is-hidden");
+  document.getElementById("edit-infos").classList.toggle("is-hidden");
+
+  document.getElementById("profile-gender-input").classList.toggle("is-hidden");
+  document.getElementById("profile-email-input").classList.toggle("is-hidden");
+  document.getElementById("profile-first-input").classList.toggle("is-hidden");
+  document.getElementById("profile-last-input").classList.toggle("is-hidden");
+  document.getElementById("confirm-edit").classList.toggle("is-hidden");
+
+  if (mode != "valider") return;
+
+  const data = Object.fromEntries(new FormData(profForm).entries());
+
+  try {
+    const response = await fetch("/api/register?mode=edit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      displayProfile(profileName);
+    } else {
+      alert("Erreur : " + (await response.text()));
+    }
+  } catch (err) {
+    console.log("Fuck you");
+    console.error("Erreur réseau :", err);
   }
 }
 

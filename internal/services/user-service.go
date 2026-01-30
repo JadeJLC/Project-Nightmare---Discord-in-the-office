@@ -3,6 +3,7 @@ package services
 
 import (
 	"errors"
+	"log"
 	"real-time-forum/internal/domain"
 	"strings"
 
@@ -60,4 +61,13 @@ func (s *UserService) GetProfile(searchedUser, loggedUser string) (*domain.User,
     }
 
     return user, nil
+}
+
+func (s *UserService) EditProfile(newInfo domain.User) error {
+    log.Print(newInfo)
+    user, err := s.repo.GetUserByUsername(newInfo.Username)
+    if err != nil {
+       return err
+    }
+    return s.repo.UpdateUserProfile(int(user.ID), &newInfo)
 }
