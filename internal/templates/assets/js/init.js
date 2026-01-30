@@ -4,6 +4,7 @@ import { initAuth } from "./page-creation/login-signup.js";
 import { checkLoginStatus } from "./session/check-login.js";
 import { displayProfile } from "./page-creation/profile.js";
 import { displayMailbox } from "./page-creation/chat.js";
+import { connectWebSocket } from "./websockets/connect.js";
 
 async function main() {
   await checkLoginStatus();
@@ -11,6 +12,7 @@ async function main() {
   displayHome();
   initAuth();
   setEventListeners();
+  connectWebSocket();
 }
 
 if (document.readyState === "loading") {

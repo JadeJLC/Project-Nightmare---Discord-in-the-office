@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+	"net/http"
 	"real-time-forum/internal/repositories"
 	"time"
 )
@@ -25,4 +27,20 @@ func (s *SessionService) DeleteSession(token string) error {
 
 func (s *SessionService) GetUserID(token string) (int, error) {
     return s.repo.GetUserIDByToken(token)
+}
+
+func (s *SessionService) GetUserIDFromRequest(r *http.Request) (int, error) {
+    // 1. Récupérer le cookie
+    cookie, err := r.Cookie("auth_token")
+    if err != nil {
+        return 0, fmt.Errorf("no session cookie")
+    }
+
+    // 2. Utiliser ta fonction existante dans le repo
+    userID, err := s.repo.GetUserIDByToken(cookie.Value)
+    if err != nil {
+        return 0, fmt.Errorf("invalid session token")
+    }
+
+    return userID, nil
 }
