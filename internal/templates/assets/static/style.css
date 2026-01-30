@@ -521,6 +521,21 @@ header {
   font-size: 1.2em;
 }
 
+#profile-email {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  font-variant: normal;
+  font-size: 1em;
+}
+
+#profile-email::-webkit-scrollbar {
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  background: transparent;
+  height: 5px;
+}
+
 hr {
   border: 1px dashed var(--neon-soft);
   margin: 15px;

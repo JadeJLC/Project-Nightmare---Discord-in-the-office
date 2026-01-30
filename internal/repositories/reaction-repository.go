@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"log"
 	"real-time-forum/internal/domain"
 )
 
@@ -9,7 +10,7 @@ type ReactionRepo struct {
 	db *sql.DB
 }
 
-func NewReactionRepo(db *sql.DB) domain.ReactionRepo {
+func NewReactionRepo(db *sql.DB) *ReactionRepo {
 	return &ReactionRepo {db:db}
 }
 
@@ -50,12 +51,26 @@ func (r *ReactionRepo) GetPostReactions(postID int) ([]*domain.Reaction, error) 
 }
 
 func (r *ReactionRepo) GetUserReactions(userID int) ([]*domain.Reaction, error) {
-	rows, err := r.db.Query(`SELECT post_id, reaction_type 
-    FROM reactions
-    WHERE user_id = ?`, userID)
+	rows, err := r.db.Query(`SELECT
+			r.post_id,
+			r.reaction_type,
+            m.topic_id,
+            m.content,
+            m.created_on,
+			m.reactions,
+			u.username,
+            t.title
+        FROM reactions r
+		JOIN messages m ON r.post_id = m.post_id
+        JOIN users u ON m.author = u.user_id
+		JOIN topics t ON m.topic_id = t.topic_id
+		WHERE r.user_id = ?`, userID)
 	if err != nil {
+		log.Print(err)
 		return nil, err
 	}
+
+	
 	defer rows.Close()
 
     var reactions = []*domain.Reaction{}

@@ -10,7 +10,7 @@ type MessageRepo struct {
 	db *sql.DB
 }
 
-func NewMessageRepo(db *sql.DB) domain.MessageRepo {
+func NewMessageRepo(db *sql.DB) *MessageRepo {
 	return &MessageRepo {db:db}
 }
 
@@ -60,18 +60,24 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
 }
 
 func (r *MessageRepo) GetMessagesByAuthor(author int) ([]*domain.Message, error) {
-	rows, err := r.db.Query(`SELECT post_id, topic_id, content, created_on, reactions 
-    FROM messages
-    WHERE author = ?`, author)
+	rows, err := r.db.Query(`SELECT
+            m.post_id,
+            m.topic_id,
+            m.content,
+            m.created_on,
+			m.reactions,
+            t.title
+        FROM messages m
+        JOIN topics t ON m.topic_id = t.topic_id `, author)
 	if err != nil {
 		return nil, err
-	}
+	}	
 	defer rows.Close()
 
     var messages = []*domain.Message{}
-	message := &domain.Message{}
 	for rows.Next() {
-		if err := rows.Scan(&message.ID, &message.TopicID, &message.Content, &message.Time, &message.Reactions); err != nil {
+	message := &domain.Message{}
+		if err := rows.Scan(&message.ID, &message.TopicID, &message.Content, &message.Time, &message.Reactions, &message.TopicTitle); err != nil {
 			return nil, err
 		}
 		messages = append(messages, message)

@@ -6,6 +6,10 @@ type Reaction struct {
 	Type string `json:"reaction_type"`
 }
 
+type ReactionDisplay struct {
+	
+}
+
 type ReactionRepo interface {
 	Add(postID, userID int, reaction string) error
 	Delete(postID, userID int) error
