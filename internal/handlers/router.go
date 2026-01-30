@@ -6,7 +6,7 @@ import (
 	"real-time-forum/internal/services"
 )
 
-func Router(userService *services.UserService, sessionService *services.SessionService, categService *services.CategoryService, topicService *services.TopicService) http.Handler {
+func Router(userService *services.UserService, sessionService *services.SessionService, categService *services.CategoryService, topicService *services.TopicService, messageService *services.MessageService, reactionService *services.ReactionService) http.Handler {
     mux := http.NewServeMux()
 
     // Handlers instanciés proprement
@@ -15,6 +15,7 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     homeHandler := NewHomeHandler(categService, topicService)
 	meHandler := NewMeHandler(userService)
     logoutHandler := NewLogoutHandler(userService, sessionService)
+    profileHandler := NewProfileHandler(userService, messageService, reactionService, topicService)
 
     // Routes
     mux.Handle("/", homeHandler)
@@ -22,6 +23,7 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     mux.Handle("/api/logout", logoutHandler)
     mux.Handle("/api/register", registerHandler)
 	mux.Handle("/api/me", meHandler)
+    mux.Handle("/api/profile", profileHandler)
 
     // Assets
     fs := http.FileServer(http.Dir("./internal/templates/assets"))

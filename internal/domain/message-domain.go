@@ -7,6 +7,7 @@ type Message struct {
 	Content string `json:"content"`
 	Time string `json:"created_on"`
 	Reactions string `json:"reactions"`
+	TopicTitle string `json:"topic_title"`
 }
 
 type LastPost struct {

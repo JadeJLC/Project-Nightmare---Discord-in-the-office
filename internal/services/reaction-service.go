@@ -25,6 +25,6 @@ func (s *ReactionService) GetPostReactions(postID int) ([]*domain.Reaction, erro
 	return s.repo.GetPostReactions(postID)
 }
 
-func (s *ReactionService) GetUserReactions(userID int) ([]*domain.Reaction, error) {
+func (s *ReactionService) GetUserReactions(userID int) ([]*domain.ReactionDisplay, error) {
 	return s.repo.GetUserReactions(userID)
 }

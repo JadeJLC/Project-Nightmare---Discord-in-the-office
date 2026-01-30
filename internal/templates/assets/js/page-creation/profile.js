@@ -2,46 +2,33 @@
 
 import { SessionData } from "../variables/session-data.js";
 import { displayHome } from "./home-display.js";
+import { clearPages } from "./clear-pages.js";
 
-// Manque : récupération des variables dans la base de données
-export function displayProfile() {
-  clearPages("profile");
-  const homeBtn = document.getElementById("go-home");
-  homeBtn.style.display = "block";
+async function writeUserProfile(profile, logged) {
+  try {
+    const response = await fetch(
+      `/api/profile?profile=${profile}&user=${logged}`,
+    );
+    if (!response.ok) {
+      throw new Error(`Server returned status ${response.status}`);
+    }
 
-  const usernameHeader = document.getElementById("header-username");
-  usernameHeader.innerHTML = "";
-  if (!SessionData.isLogged) {
-    // Seul les membres connectés peuvent accéder aux profils
-    console.log("Vous devez vous connecter pour ouvrir un profil");
-    const popup = document.getElementById("auth-popup");
-    popup.classList.remove("is-hidden");
-    displayHome();
-    return;
-  } else {
-    usernameHeader.innerHTML = "Visualiser un profil<br /> (Nom))";
-  }
+    const user = await response.json();
 
-  let profilePageContainer = document.getElementById("profile-page");
+    const profilePageContainer = document.getElementById("profile-page");
 
-  if (!profilePageContainer) {
-    let addedContainer = `<div id="profile-page"></div>`;
-    document.body.insertAdjacentHTML("beforeend", addedContainer);
-    profilePageContainer = document.getElementById("profile-page");
-  }
-
-  profilePageContainer.innerHTML = `
+    profilePageContainer.innerHTML = `
       <div class="profile-left">
         <div class="profile-user-info">
           <div class="profile-icon">
-            <img src="assets/images/cat_01.png" alt="Image de profil" />
+            <img src="assets/images-avatar/${user.image}.png" alt="Image de profil - ${user.image}"/>
           </div>
           <div class="profile-basics">
             <h3>
-              <span class="profile-status online" alt="En ligne"></span>
-              Pseudo
+              <!-- <span class="profile-status online" alt="En ligne"></span> -->
+              ${user.username}
             </h3>
-            <span class="profile-signup">Inscrit.e le DD/MM/YYYY</span>
+            <span class="profile-signup">Inscrit.e le ${user.inscription}</span>
           </div>
         </div>
         <br />
@@ -55,82 +42,119 @@ export function displayProfile() {
           <div id="profile-display-posts"></div>
         </div>
       </div>
-      <div class="profile-right">
-        <button type="button" class="edit-content">
+      
+          `;
+
+    if (user.email !== "Not Available") {
+      profilePageContainer.innerHTML += `<div class="profile-right"><button type="button" class="edit-content">
           <img src="assets/images/tool.svg" />
           <span>Modifier mon profil</span>
         </button>
         <div class="profile-details">
           <span>Informations</span>
           <div class="profile-public">
-            <p><span>Âge&nbsp;:</span> AA&nbsp;ans</p>
-            <p><span>Genre&nbsp;:</span> F</p>
+            <p><span>Âge&nbsp;:</span> ${user.age}&nbsp;ans</p>
+            <p><span>Genre&nbsp;:</span> ${user.genre}</p>
           </div>
           <hr />
           <div class="profile-private">
-            <p><span>Né.e le&nbsp;:</span> DD/MM/YYYY</p>
-            <p><span>Identité&nbsp;:</span> Prénom nom</p>
+            <p><span>Email&nbsp;:</span> <span id="profile-email">${user.email}</span></p>
+            <p><span>Identité&nbsp;:</span> ${user.firstname} ${user.lastname}</p>
           </div>
         </div>
-      </div>
-   
-         `;
+      </div>`;
+    } else {
+      profilePageContainer.innerHTML += `<div class="profile-right">
+        <div class="profile-details">
+          <span>Informations</span>
+          <div class="profile-public">
+            <p><span>Âge&nbsp;:</span> ${user.age}&nbsp;ans</p>
+            <p><span>Genre&nbsp;:</span> ${user.genre}</p>
+          </div>
+        </div>
+      </div>`;
+    }
 
-  setProfileButtons();
+    setProfileButtons();
 
-  const profileDisplay = localStorage.getItem("profileDisplay") || "topics";
-  if (profileDisplay === "reactions") {
-    displayProfileReactions();
-  } else if (profileDisplay === "messages") {
-    displayProfileMessages();
+    const profileDisplay = localStorage.getItem("profileDisplay") || "topics";
+    if (profileDisplay === "reactions") {
+      displayProfileReactions(profile);
+    } else if (profileDisplay === "messages") {
+      displayProfileMessages(profile);
+    } else {
+      displayProfileTopics(profile);
+    }
+  } catch (error) {
+    console.log("Erreur dans la récupération du profil : ", error);
+  }
+}
+
+// Manque : récupération des variables dans la base de données
+export function displayProfile(profileName) {
+  clearPages("profile");
+  const homeBtn = document.getElementById("go-home");
+  homeBtn.style.display = "block";
+
+  const usernameHeader = document.getElementById("header-username");
+  usernameHeader.innerHTML = "";
+
+  if (!SessionData.isLogged) {
+    // Seul les membres connectés peuvent accéder aux profils
+    console.log("Vous devez vous connecter pour ouvrir un profil");
+    const popup = document.getElementById("auth-popup");
+    popup.classList.remove("is-hidden");
+    displayHome();
+    return;
   } else {
-    displayProfileTopics();
+    if (typeof profileName !== "string" || !profileName)
+      profileName = SessionData.username;
+
+    usernameHeader.innerHTML = `Profil de ${profileName}`;
   }
+
+  let profilePageContainer = document.getElementById("profile-page");
+
+  if (!profilePageContainer) {
+    let addedContainer = `<div id="profile-page"></div>`;
+    document.body.insertAdjacentHTML("beforeend", addedContainer);
+  }
+
+  writeUserProfile(profileName, SessionData.username);
 }
 
-export function clearPages(current) {
-  if (current != "home") {
-    const frontPageContainer = document.getElementById("front-page");
-    if (frontPageContainer) frontPageContainer.remove();
+async function displayProfileMessages(profileName) {
+  try {
+    const response = await fetch(
+      `/api/profile?profile=${profileName}&mode=message`,
+    );
+    if (!response.ok) {
+      throw new Error(`Server returned status ${response.status}`);
+    }
 
-    const categories = document.getElementById("categories");
-    if (categories) categories.remove();
+    const allMessages = await response.json();
 
-    const feed = document.getElementById("feed");
-    if (feed) feed.remove();
-  }
+    const container = document.getElementById("profile-display-posts");
+    container.innerHTML = ``;
 
-  if (current != "profile") {
-    let profilePageContainer = document.getElementById("profile-page");
-    if (profilePageContainer) profilePageContainer.remove();
-  }
-}
-
-function displayProfileMessages() {
-  let allReactions = [
-    {
-      topic_id: 0,
-      topic_name: "Nom du sujet",
-      post_id: 0,
-      post_content: "Contenu du message",
-      post_date: "01/01/2026",
-    },
-  ];
-
-  const container = document.getElementById("profile-display-posts");
-  container.innerHTML = ``;
-
-  allReactions.forEach((message) => {
-    const newMsg = document.createElement("div");
-    newMsg.classList.add("profile-preview");
-    newMsg.classList.add("preview-message");
-    newMsg.innerHTML = `
-            <h3 id="topic_${message.topic_id} message_${message.post_id}">Sur le sujet : ${message.topic_name}</h3>
+    allMessages.forEach((message) => {
+      if (message.content === "Nothing to Display") {
+        console.log("Aucun message");
+        const noTopic = document.createElement("div");
+        noTopic.className = "feed-notopic";
+        noTopic.innerHTML = `Aucun sujet correspondant à votre recherche n'a été trouvé`;
+        container.appendChild(noTopic);
+      } else {
+        const newMsg = document.createElement("div");
+        newMsg.classList.add("profile-preview");
+        newMsg.classList.add("preview-message");
+        newMsg.innerHTML = `
+            <h3>Sur le sujet : ${message.topic_title}</h3>
             <div class="topic-content">
-              <div class="topic-lastpost"> ${message.post_content} </div>
+              <div class="topic-lastpost"> ${message.content} </div>
               <div class="topic-lastinfo">
-                posté le ${message.post_date}
-                <button type="button" class="button-link">
+                posté le ${message.created_on}
+                <button type="button" class="button-link" id="topic_${message.topic_id} message_${message.post_id}">
                   <img
                     src="assets/images/external-link.svg"
                     alt="Voir le message"
@@ -140,32 +164,42 @@ function displayProfileMessages() {
               </div>
             </div>
           </div>`;
-    container.appendChild(newMsg);
-  });
+        container.appendChild(newMsg);
+      }
+    });
+  } catch (error) {
+    console.log("Erreur dans la récupération des messages : ", error);
+  }
 }
 
-function displayProfileReactions() {
-  let allReactions = [
-    {
-      reaction_image: "Juan.png",
-      reaction_name: "Nom de la réaction",
-      topic_id: 0,
-      topic_name: "Nom du sujet",
-      post_id: 0,
-      post_content: "Contenu du message",
-      post_author: "[pseudo]",
-      post_date: "01/01/2026",
-    },
-  ];
+async function displayProfileReactions(profileName) {
+  try {
+    const response = await fetch(
+      `/api/profile?profile=${profileName}&mode=reactions`,
+    );
+    if (!response.ok) {
+      throw new Error(`Server returned status ${response.status}`);
+    }
 
-  const container = document.getElementById("profile-display-posts");
-  container.innerHTML = ``;
+    const allReactions = await response.json();
 
-  allReactions.forEach((message) => {
-    const newMsg = document.createElement("div");
-    newMsg.classList.add("profile-preview");
-    newMsg.classList.add("preview-message");
-    newMsg.innerHTML = `
+    const container = document.getElementById("profile-display-posts");
+    container.innerHTML = ``;
+
+    console.log(allReactions);
+
+    allReactions.forEach((message) => {
+      if (message.topic_title === "Nothing to Display") {
+        console.log("Aucun message");
+        const noTopic = document.createElement("div");
+        noTopic.className = "feed-notopic";
+        noTopic.innerHTML = `Aucun sujet correspondant à votre recherche n'a été trouvé`;
+        container.appendChild(noTopic);
+      } else {
+        const newMsg = document.createElement("div");
+        newMsg.classList.add("profile-preview");
+        newMsg.classList.add("preview-message");
+        newMsg.innerHTML = `
             <h3 id="topic_${message.topic_id} message_${message.post_id}">Sur le sujet : ${message.topic_name}</h3>
             <div class="preview-reaction">
               <img src="assets/avatars/${message.reaction_image}" alt="Réaction"/>
@@ -185,30 +219,42 @@ function displayProfileReactions() {
               </div>
             </div>
           </div>`;
-    container.appendChild(newMsg);
-  });
+        container.appendChild(newMsg);
+      }
+    });
+  } catch (error) {
+    console.log("Erreur dans la récupération des messages : ", error);
+  }
 }
 
-function displayProfileTopics() {
-  let allTopics = [
-    {
-      topic_id: 0,
-      topic_name: "Nom du sujet",
-      post_content: "Contenu du message",
-      post_date: "01/01/2026",
-    },
-  ];
+async function displayProfileTopics(profileName) {
+  try {
+    const response = await fetch(
+      `/api/profile?profile=${profileName}&mode=topics`,
+    );
+    if (!response.ok) {
+      throw new Error(`Server returned status ${response.status}`);
+    }
 
-  const container = document.getElementById("profile-display-posts");
-  container.innerHTML = ``;
+    const allTopics = await response.json();
 
-  allTopics.forEach((topic) => {
-    const newMsg = document.createElement("div");
-    newMsg.classList.add("profile-preview");
-    newMsg.classList.add("preview-topic");
-    newMsg.innerHTML = `
+    const container = document.getElementById("profile-display-posts");
+    container.innerHTML = ``;
+
+    allTopics.forEach((topic) => {
+      if (topic.title === "Nothing to Display") {
+        console.log("Aucun message");
+        const noTopic = document.createElement("div");
+        noTopic.className = "feed-notopic";
+        noTopic.innerHTML = `Aucun sujet correspondant à votre recherche n'a été trouvé`;
+        container.appendChild(noTopic);
+      }
+      const newMsg = document.createElement("div");
+      newMsg.classList.add("profile-preview");
+      newMsg.classList.add("preview-topic");
+      newMsg.innerHTML = `
             <h3 id="topic_${topic.topic_id}">
-              ${topic.topic_name}
+              ${topic.title}
               <button type="button" class="button-link">
                 <img
                   src="assets/images/external-link.svg"
@@ -219,13 +265,16 @@ function displayProfileTopics() {
             </h3>
             <div class="topic-content">
               <div class="topic-lastpost">
-                ${topic.post_content}
+                ${topic.content}
               </div>
-              <div class="topic-lastinfo">ouvert le ${topic.post_date}</div>
+              <div class="topic-lastinfo">ouvert le ${topic.created_on}</div>
             </div>
            `;
-    container.appendChild(newMsg);
-  });
+      container.appendChild(newMsg);
+    });
+  } catch (error) {
+    console.log("Erreur dans la récupération des messages : ", error);
+  }
 }
 
 // #region ***** Mise en place des boutons

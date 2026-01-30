@@ -2,7 +2,7 @@ import { buttonMove } from "../theme-switch.js";
 import { SessionData } from "../variables/session-data.js";
 import { displayCategories } from "./categories.js";
 import { displayFeed } from "./feed.js";
-import { clearPages } from "./profile.js";
+import { clearPages } from "./clear-pages.js";
 
 const usernameHeader = document.getElementById("header-username");
 const logButton = document.getElementById("log-in-text");

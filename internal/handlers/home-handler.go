@@ -31,7 +31,7 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         var err error
 
         if mode == "feed" {
-            data, err = h.topicService.GetTopicsByMostRecent()
+            data, err = h.topicService.GetTopicsByMostRecent(0)
             log.Print(data)
         } else {
             data, err = h.categoryService.GetAllCategories()

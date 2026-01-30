@@ -6,7 +6,9 @@ type Topic struct {
 	Title string `json:"title"`
 	Time string `json:"created_on"`
 	Author int `json:"author"`
+	FirstPost string `json:"content"`
 }
+
 
 
 type TopicRepo interface {
