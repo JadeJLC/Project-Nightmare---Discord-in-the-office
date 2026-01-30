@@ -25,11 +25,12 @@ func (r *userRepository) Create(user *domain.User) error {
     }
 
     date := time.Now()
+    formattedTime := date.Format("02/01/2006")
 
     res, err := r.db.Exec(`
         INSERT INTO users (username, email, password, age, gender, firstname, lastname, image, inscription)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", date,
+        user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", formattedTime,
     )
     if err != nil {
         return err

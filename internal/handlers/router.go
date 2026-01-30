@@ -11,7 +11,7 @@ func Router(userService *services.UserService, sessionService *services.SessionS
 
     // Handlers instanciés proprement
     loginHandler := NewLoginHandler(userService, sessionService)
-    registerHandler := NewRegisterHandler(userService)
+    registerHandler := NewRegisterHandler(userService, sessionService)
     homeHandler := NewHomeHandler(categService, topicService)
 	meHandler := NewMeHandler(userService)
     logoutHandler := NewLogoutHandler(userService, sessionService)
