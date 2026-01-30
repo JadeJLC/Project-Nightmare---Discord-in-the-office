@@ -2,4 +2,8 @@
 
 const themeBox = document.getElementById("theme-style");
 
-export { themeBox };
+const pageData = {
+  ShowingOnlineMembers: false,
+};
+
+export { themeBox, pageData };
