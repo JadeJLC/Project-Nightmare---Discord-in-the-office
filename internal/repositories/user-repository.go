@@ -4,6 +4,7 @@ package repositories
 import (
 	"database/sql"
 	"real-time-forum/internal/domain"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,10 +22,13 @@ func (r *userRepository) Create(user *domain.User) error {
     if err != nil {
         return err
     }
+
+    date := time.Now()
+
     res, err := r.db.Exec(`
-        INSERT INTO users (username, email, password, age, gender, firstname, lastname)
-        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname,
+        INSERT INTO users (username, email, password, age, gender, firstname, lastname, image, inscription)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", date,
     )
     if err != nil {
         return err
@@ -52,12 +56,12 @@ func (r *userRepository) GetUserByEmail(email string) (*domain.User, error) {
 
 func (r *userRepository) GetUserByUsername(username string) (*domain.User, error) {
     row := r.db.QueryRow(`
-        SELECT user_id, username, email, password, age, gender, firstname, lastname
+        SELECT user_id, username, email, password, age, gender, firstname, lastname, image, inscription
         FROM users WHERE username = ?`, username)
 
     user := &domain.User{}
     err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password,
-        &user.Age, &user.Gender, &user.Firstname, &user.Lastname)
+        &user.Age, &user.Gender, &user.Firstname, &user.Lastname, &user.Image, &user.Inscription)
     if err != nil {
         return nil, err
     }

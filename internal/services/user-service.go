@@ -26,6 +26,7 @@ func (s *UserService) Register(user *domain.User) error {
     return s.repo.Create(user)
 }
 
+
 func (s *UserService) Authenticate(authenticator, password string) (*domain.User, error) {
     var user *domain.User
     var err error
@@ -36,11 +37,26 @@ func (s *UserService) Authenticate(authenticator, password string) (*domain.User
         user, err = s.repo.GetUserByUsername(authenticator)
     }
     if err != nil {
-        return nil, errors.New("invalid credentials")
+        return nil, errors.New("invalid credentials 2")
     }
 
     if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
         return nil, errors.New("invalid credentials")
+    }
+
+    return user, nil
+}
+
+func (s *UserService) GetProfile(searchedUser, loggedUser string) (*domain.User, error) {
+    user, err := s.repo.GetUserByUsername(searchedUser)
+    if err != nil {
+        return &domain.User{Username: "No User Found"}, nil
+    }
+
+    user.Password = ""
+
+    if searchedUser != loggedUser {
+        user.Email = "Not Available"
     }
 
     return user, nil
