@@ -1,3 +1,5 @@
+import { updateOnlineUsers } from "../page-creation/online-members.js";
+
 export function connectWebSocket() {
   fetch("/api/me")
     .then((res) => {

@@ -3,4 +3,8 @@
 const themeBox = document.getElementById("theme-style");
 let userList = [];
 
-export { themeBox, userList };
+const pageData = {
+  ShowingOnlineMembers: false,
+};
+
+export { themeBox, pageData };

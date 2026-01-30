@@ -16,7 +16,7 @@ func Router(userService *services.UserService, sessionService *services.SessionS
 	meHandler := NewMeHandler(userService)
     logoutHandler := NewLogoutHandler(userService, sessionService)
     chatHandler := NewChatHandler(sessionService, chatService)
-    wsHandler := NewWebSocketHandler(sessionService, chatService)
+    wsHandler := NewWebSocketHandler(sessionService, chatService, userService)
 
     
 

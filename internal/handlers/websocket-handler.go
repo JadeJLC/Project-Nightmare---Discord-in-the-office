@@ -16,13 +16,15 @@ var wsMutex sync.Mutex
 type WebSocketHandler struct {
     sessionService *services.SessionService
     chatService    *services.ChatService
+	userService *services.UserService
     upgrader       websocket.Upgrader
 }
 
-func NewWebSocketHandler(ss *services.SessionService, cs *services.ChatService) *WebSocketHandler {
+func NewWebSocketHandler(ss *services.SessionService, cs *services.ChatService, us *services.UserService) *WebSocketHandler {
     return &WebSocketHandler{
         sessionService: ss,
         chatService:    cs,
+		userService: us,
         upgrader: websocket.Upgrader{
             ReadBufferSize:  1024,
             WriteBufferSize: 1024,
@@ -92,23 +94,30 @@ func (h *WebSocketHandler) broadcastPresence() {
     wsMutex.Lock()
     defer wsMutex.Unlock()
 
-    // Construire la liste des utilisateurs connectés
-    users := make([]int, 0, len(wsClients))
+    users := make([]map[string]interface{}, 0)
+
     for userID := range wsClients {
-        users = append(users, userID)
+        user, err := h.userService.GetUserByID(userID)
+        if err != nil {
+            continue
+        }
+
+        users = append(users, map[string]interface{}{
+            "id":       user.ID,
+            "username": user.Username,
+        })
     }
 
-    // Construire le message
     msg := map[string]interface{}{
-        "type": "presence_update",
+        "type":  "presence_update",
         "users": users,
     }
 
-    // Diffuser à tous
     for _, conn := range wsClients {
         conn.WriteJSON(msg)
     }
 }
+
 
 
 func (h *WebSocketHandler) handlePrivateMessage(from, to int, content string) {
