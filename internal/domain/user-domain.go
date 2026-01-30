@@ -19,4 +19,5 @@ type UserRepository interface {
 	GetUserByUsername(username string) (*User, error)
 	GetUserByToken(token string) (*User, error)
 	GetUserByID(id int) (*User, error)
+	UpdateUserProfile(userID int, user *User) error
 }

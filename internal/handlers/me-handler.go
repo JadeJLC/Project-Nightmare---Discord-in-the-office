@@ -45,7 +45,6 @@ func (h *MeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     }
 
     // Réponse
-	println("ME HANDLER CALLED")
     json.NewEncoder(w).Encode(map[string]any{
         "logged":   true,
         "username": user.Username,

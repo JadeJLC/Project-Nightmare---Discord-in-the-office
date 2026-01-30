@@ -3,6 +3,7 @@ package repositories
 
 import (
 	"database/sql"
+	"log"
 	"real-time-forum/internal/domain"
 	"time"
 
@@ -87,4 +88,14 @@ func (r *userRepository) GetUserByID(id int) (*domain.User, error) {
         return nil, err
     }
     return user, nil 
+}
+
+func (r *userRepository) UpdateUserProfile(userID int, user *domain.User) error {
+    log.Print(user)
+    _, err := r.db.Exec(`
+	UPDATE users SET email = ?, gender = ?, firstname = ?, lastname = ?
+	WHERE user_id = ?
+	`, user.Email, user.Gender, user.Firstname, user.Lastname, userID)
+
+    return err
 }

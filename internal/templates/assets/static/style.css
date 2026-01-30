@@ -496,6 +496,10 @@ header {
   padding-bottom: 0px;
 }
 
+.profile-details input {
+  width: 90% !important;
+}
+
 .edit-content {
   float: right;
   height: 38px;
@@ -503,8 +507,18 @@ header {
   padding-top: 4px;
 }
 
-.edit-content img {
+.edit-content img,
+#edit-avatar img {
   width: 100%;
+}
+
+#edit-avatar {
+  height: 30px;
+  width: 32px;
+  padding-top: 4px;
+  position: relative;
+  top: -15px;
+  right: -15px;
 }
 
 .profile-details > span {
@@ -525,13 +539,13 @@ header {
   margin-block-start: 0em;
 }
 
-.profile-private p span,
-.profile-public p span {
+.profile-private p span:first-child,
+.profile-public p span:first-child {
   font-variant: small-caps;
   font-size: 1.2em;
 }
 
-#profile-email {
+#profile-email-span {
   display: block;
   width: 100%;
   overflow: auto;
@@ -539,7 +553,7 @@ header {
   font-size: 1em;
 }
 
-#profile-email::-webkit-scrollbar {
+#profile-email-span::-webkit-scrollbar {
   border-top-right-radius: 15px;
   border-bottom-right-radius: 15px;
   background: transparent;
@@ -708,7 +722,8 @@ hr {
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.profile-right input {
   width: 100%;
   max-width: 350px;
   padding: 5px;
@@ -718,7 +733,8 @@ hr {
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.profile-right input:focus {
   border: 2px solid var(--neon);
   box-shadow: 0 0 12px var(--neon-soft);
 }
