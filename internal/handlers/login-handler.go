@@ -48,7 +48,7 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         Value:    token,
         Path:     "/",
         HttpOnly: true,
-        MaxAge:   86400,
+        MaxAge:   3600,
 		Secure: false,
     })
 
