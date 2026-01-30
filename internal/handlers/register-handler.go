@@ -32,13 +32,13 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     mode := r.URL.Query().Get("mode")
 
     if mode == "edit" {
-        log.Print("Mode édition")
         if err := h.userService.EditProfile(newUser); err != nil {
             log.Print(err)
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
-    }
+        }
     } else if err := h.userService.Register(&newUser); err != nil {
+        log.Print(err)
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
     }

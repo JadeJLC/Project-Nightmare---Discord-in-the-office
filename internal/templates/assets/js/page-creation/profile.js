@@ -4,6 +4,7 @@ import { SessionData } from "../variables/session-data.js";
 import { displayHome } from "./home-display.js";
 import { clearPages } from "./clear-pages.js";
 
+// #region ***** Affichage des informations utilisateur
 async function writeUserProfile(profile, logged) {
   try {
     const response = await fetch(
@@ -22,6 +23,11 @@ async function writeUserProfile(profile, logged) {
         <div class="profile-user-info">
           <div class="profile-icon">
             <img id="profile-image" src="assets/images-avatar/${user.image}.png" alt="Image de profil - ${user.image}"/>
+            <button type="button" class="edit-content is-hidden" id="edit-avatar">
+          <img src="assets/images/tool.svg" />
+          <span>Changer d'image</span>
+        </button>
+            
           </div>
           <div class="profile-basics">
             <h3>
@@ -46,8 +52,9 @@ async function writeUserProfile(profile, logged) {
           `;
 
     if (user.email !== "Not Available") {
-      profilePageContainer.innerHTML += `<form class="profile-right" method="post" id="profile-form"><button type="button" class="edit-content" id="edit-infos">
+      profilePageContainer.innerHTML += `<form class="profile-right" method="post" id="profile-form">      
       <input type="hidden" name="username" value="${logged}">
+      <button type="button" class="edit-content" id="edit-infos">
           <img src="assets/images/tool.svg" />
           <span>Modifier mon profil</span>
         </button>
@@ -82,7 +89,7 @@ async function writeUserProfile(profile, logged) {
       </div>`;
     }
 
-    setProfileButtons();
+    setProfileButtons(user.email);
 
     const profileDisplay = localStorage.getItem("profileDisplay") || "topics";
     if (profileDisplay === "reactions") {
@@ -97,7 +104,6 @@ async function writeUserProfile(profile, logged) {
   }
 }
 
-// Manque : récupération des variables dans la base de données
 export function displayProfile(profileName) {
   clearPages("profile");
   const homeBtn = document.getElementById("go-home");
@@ -130,6 +136,9 @@ export function displayProfile(profileName) {
   writeUserProfile(profileName, SessionData.username);
 }
 
+// #endregion
+
+// #region ***** Affichage des messages
 async function displayProfileMessages(profileName) {
   try {
     const response = await fetch(
@@ -284,6 +293,8 @@ async function displayProfileTopics(profileName) {
   }
 }
 
+// #region
+
 // #region ***** Mise en place des boutons
 function switchToReactions() {
   localStorage.setItem("profileDisplay", "reactions");
@@ -300,12 +311,13 @@ function switchToTopics() {
   displayProfile();
 }
 
-function setProfileButtons() {
+function setProfileButtons(status) {
   const topicBtn = document.getElementById("profile-mytopics");
   const messageBtn = document.getElementById("profile-mymessages");
   const reactionBtn = document.getElementById("profile-myreactions");
   const editBtn = document.getElementById("edit-infos");
   const profForm = document.getElementById("profile-form");
+  const avaBtn = document.getElementById("edit-avatar");
 
   topicBtn.addEventListener("click", switchToTopics);
   messageBtn.addEventListener("click", switchToMessages);
@@ -316,6 +328,7 @@ function setProfileButtons() {
       e.preventDefault();
       editProfile("valider");
     };
+  if (avaBtn && status != "Not Available") avaBtn.classList.remove("is-hidden");
 
   const profileDisplay = localStorage.getItem("profileDisplay") || "topics";
   if (profileDisplay === "reactions") {
