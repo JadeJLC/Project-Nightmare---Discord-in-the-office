@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"database/sql"
-	"log"
 	"real-time-forum/internal/domain"
 )
 
@@ -50,14 +49,13 @@ func (r *ReactionRepo) GetPostReactions(postID int) ([]*domain.Reaction, error) 
     return reactions, nil
 }
 
-func (r *ReactionRepo) GetUserReactions(userID int) ([]*domain.Reaction, error) {
+func (r *ReactionRepo) GetUserReactions(userID int) ([]*domain.ReactionDisplay, error) {
 	rows, err := r.db.Query(`SELECT
 			r.post_id,
 			r.reaction_type,
             m.topic_id,
             m.content,
             m.created_on,
-			m.reactions,
 			u.username,
             t.title
         FROM reactions r
@@ -66,17 +64,16 @@ func (r *ReactionRepo) GetUserReactions(userID int) ([]*domain.Reaction, error) 
 		JOIN topics t ON m.topic_id = t.topic_id
 		WHERE r.user_id = ?`, userID)
 	if err != nil {
-		log.Print(err)
 		return nil, err
 	}
 
 	
 	defer rows.Close()
 
-    var reactions = []*domain.Reaction{}
-	reaction := &domain.Reaction{}
+    var reactions = []*domain.ReactionDisplay{}
+	reaction := &domain.ReactionDisplay{}
 	for rows.Next() {
-		if err := rows.Scan(&reaction.PostID, &reaction.Type); err != nil {
+		if err := rows.Scan(&reaction.PostID, &reaction.Type, &reaction.TopicID, &reaction.Content, &reaction.Time, &reaction.Author, &reaction.TopicTitle); err != nil {
 			return nil, err
 		}
 		reactions = append(reactions, reaction)

@@ -406,7 +406,8 @@ header {
 
 /* Affichage feed */
 .feed-notopic {
-  width: min(900px, 92vw);
+  width: 85%;
+  max-width: 1200px;
   padding: 16px;
   margin: 60px auto 12px auto;
   color: var(--text);
@@ -615,7 +616,7 @@ hr {
 }
 
 .preview-topic .topic-lastpost {
-  font-size: 0.9em;
+  font-size: 0.7em;
   margin-bottom: 20px;
 }
 
@@ -628,7 +629,8 @@ hr {
   height: 17px;
 }
 
-#profile-messages:last-child .profile-preview {
+#profile-messages:last-child .profile-preview,
+#profile-messages:last-child .feed-notopic {
   margin-bottom: 0px;
 }
 

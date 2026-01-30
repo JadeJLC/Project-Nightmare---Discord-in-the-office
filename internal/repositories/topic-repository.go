@@ -58,9 +58,20 @@ func (r *TopicRepo) GetTopicByTitle(title string) (*domain.Topic, error) {
 }
 
 func (r *TopicRepo) GetTopicsByAuthor(authorID int) ([]*domain.Topic, error) {
-	rows, err := r.db.Query(`SELECT topic_id, title, created_on 
-    FROM topics 
-    WHERE author = ?`, authorID)
+	rows, err := r.db.Query(`SELECT 
+    t.topic_id, 
+    t.title, 
+    t.created_on,
+    m.content
+	FROM topics t
+	JOIN messages m ON m.topic_id = t.topic_id
+	WHERE t.author = ?
+  	AND m.post_id = (
+      SELECT MIN(m2.post_id) 
+      FROM messages m2 
+      WHERE m2.topic_id = t.topic_id
+  	)
+	ORDER BY t.created_on DESC;`, authorID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +80,7 @@ func (r *TopicRepo) GetTopicsByAuthor(authorID int) ([]*domain.Topic, error) {
     var topics = []*domain.Topic{}
 	for rows.Next() {
 	topic := &domain.Topic{}
-		if err := rows.Scan(&topic.ID, &topic.Title, &topic.Time); err != nil {
+		if err := rows.Scan(&topic.ID, &topic.Title, &topic.Time, &topic.FirstPost); err != nil {
 			return nil, err
 		}
 		topics = append(topics, topic)

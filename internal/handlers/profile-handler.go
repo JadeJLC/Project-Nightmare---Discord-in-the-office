@@ -45,8 +45,8 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     case "reactions":
         list, err := h.reactionService.GetUserReactions(int(data.ID))
-        if err != nil {
-            list = []*domain.Reaction{{Type: "Nothing to Display"}}
+        if err != nil || len(list) == 0 {
+            list = []*domain.ReactionDisplay{{TopicTitle: "Nothing to Display"}}
         }
         json.NewEncoder(w).Encode(list)
         return

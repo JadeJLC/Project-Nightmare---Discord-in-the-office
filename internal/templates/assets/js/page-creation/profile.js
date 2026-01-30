@@ -175,7 +175,7 @@ async function displayProfileMessages(profileName) {
 async function displayProfileReactions(profileName) {
   try {
     const response = await fetch(
-      `/api/profile?profile=${profileName}&mode=message`,
+      `/api/profile?profile=${profileName}&mode=reactions`,
     );
     if (!response.ok) {
       throw new Error(`Server returned status ${response.status}`);
@@ -186,8 +186,10 @@ async function displayProfileReactions(profileName) {
     const container = document.getElementById("profile-display-posts");
     container.innerHTML = ``;
 
+    console.log(allReactions);
+
     allReactions.forEach((message) => {
-      if (message.reaction_type === "Nothing to Display") {
+      if (message.topic_title === "Nothing to Display") {
         console.log("Aucun message");
         const noTopic = document.createElement("div");
         noTopic.className = "feed-notopic";
@@ -225,26 +227,34 @@ async function displayProfileReactions(profileName) {
   }
 }
 
-function displayProfileTopics(profileName) {
-  let allTopics = [
-    {
-      topic_id: 0,
-      topic_name: "Nom du sujet",
-      post_content: "Contenu du message",
-      post_date: "01/01/2026",
-    },
-  ];
+async function displayProfileTopics(profileName) {
+  try {
+    const response = await fetch(
+      `/api/profile?profile=${profileName}&mode=topics`,
+    );
+    if (!response.ok) {
+      throw new Error(`Server returned status ${response.status}`);
+    }
 
-  const container = document.getElementById("profile-display-posts");
-  container.innerHTML = ``;
+    const allTopics = await response.json();
 
-  allTopics.forEach((topic) => {
-    const newMsg = document.createElement("div");
-    newMsg.classList.add("profile-preview");
-    newMsg.classList.add("preview-topic");
-    newMsg.innerHTML = `
+    const container = document.getElementById("profile-display-posts");
+    container.innerHTML = ``;
+
+    allTopics.forEach((topic) => {
+      if (topic.title === "Nothing to Display") {
+        console.log("Aucun message");
+        const noTopic = document.createElement("div");
+        noTopic.className = "feed-notopic";
+        noTopic.innerHTML = `Aucun sujet correspondant à votre recherche n'a été trouvé`;
+        container.appendChild(noTopic);
+      }
+      const newMsg = document.createElement("div");
+      newMsg.classList.add("profile-preview");
+      newMsg.classList.add("preview-topic");
+      newMsg.innerHTML = `
             <h3 id="topic_${topic.topic_id}">
-              ${topic.topic_name}
+              ${topic.title}
               <button type="button" class="button-link">
                 <img
                   src="assets/images/external-link.svg"
@@ -255,13 +265,16 @@ function displayProfileTopics(profileName) {
             </h3>
             <div class="topic-content">
               <div class="topic-lastpost">
-                ${topic.post_content}
+                ${topic.content}
               </div>
-              <div class="topic-lastinfo">ouvert le ${topic.post_date}</div>
+              <div class="topic-lastinfo">ouvert le ${topic.created_on}</div>
             </div>
            `;
-    container.appendChild(newMsg);
-  });
+      container.appendChild(newMsg);
+    });
+  } catch (error) {
+    console.log("Erreur dans la récupération des messages : ", error);
+  }
 }
 
 // #region ***** Mise en place des boutons
