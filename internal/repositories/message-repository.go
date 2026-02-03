@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"log"
 	"real-time-forum/internal/domain"
 	"time"
 )
@@ -44,7 +45,6 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
 	u.username,
 	u.image,
 	u.age,
-	u.gender,
 	u.inscription,
 	m.content, 
 	m.created_on, 
@@ -54,6 +54,7 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
 	JOIN topics t ON m.topic_id = t.topic_id
     WHERE m.topic_id = ?`, topicID)
 	if err != nil {
+		log.Print("Erreur dans la récupération des messages du sujet : ", err)
 		return nil, err
 	}
 	defer rows.Close()

@@ -99,6 +99,7 @@ func (r *TopicRepo) GetTopicsByCategory(catID int) (*domain.TopicList, error) {
 	JOIN users u ON t.author = u.user_id
     WHERE category = ?`, catID)
 	if err != nil {
+		log.Print("Erreur dans la récupération des sujets de la catégorie : ", err)
 		return nil, err
 	}
 	defer rows.Close()

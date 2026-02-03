@@ -74,6 +74,7 @@ export function displayTopics(catID) {
 }
 
 function buildTopic(topic) {
+  console.log(topic);
   const topicBloc = document.createElement("div");
   topicBloc.className = "topic-bloc";
 

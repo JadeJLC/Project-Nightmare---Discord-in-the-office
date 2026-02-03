@@ -28,6 +28,15 @@ async function writePosts(topicID) {
 
       topicsPageContainer.appendChild(postHTML);
     });
+
+    topicsPageContainer.addEventListener("click", (event) => {
+      const author = event.target.closest(".post-author");
+      if (author) {
+        const username = author.getAttribute("data_id");
+        displayProfile(username);
+        return;
+      }
+    });
   } catch (error) {
     console.log("Erreur dans la récupération des sujets : ", error);
   }
