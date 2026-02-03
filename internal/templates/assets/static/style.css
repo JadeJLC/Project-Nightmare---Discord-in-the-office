@@ -268,7 +268,8 @@ header {
 
 /* #region ***** Page d'accueil */
 #front-page,
-#profile-page {
+#profile-page,
+#topics-page {
   margin-top: 100px !important;
 }
 
@@ -354,6 +355,7 @@ header {
   margin-bottom: 30px;
   margin-top: 5px;
   border-bottom: 1px dashed var(--neon-soft);
+  cursor: pointer;
 }
 
 .cat-content {
@@ -461,6 +463,22 @@ header {
   font-size: 0.7em;
   margin-top: 10px;
   text-align: right;
+  position: relative;
+}
+
+.topic-image {
+  width: 55px;
+  height: 55px;
+  border-radius: 100%;
+  overflow: hidden;
+  image-rendering: pixelated;
+  position: absolute;
+  top: -60px;
+  right: 40px;
+}
+
+.topic-image img {
+  width: 100%;
 }
 
 /* #endregion */
@@ -806,7 +824,8 @@ hr {
   }
 
   #front-page,
-  #profile-page {
+  #profile-page,
+  #topics-page {
     margin-top: 140px !important;
   }
 

@@ -14,4 +14,9 @@ export function clearPages(current) {
     let profilePageContainer = document.getElementById("profile-page");
     if (profilePageContainer) profilePageContainer.remove();
   }
+
+  if (current != "topicList") {
+    let topicsPageContainer = document.getElementById("topics-page");
+    if (topicsPageContainer) topicsPageContainer.remove();
+  }
 }

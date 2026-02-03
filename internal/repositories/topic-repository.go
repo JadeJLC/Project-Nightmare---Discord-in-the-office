@@ -89,14 +89,21 @@ func (r *TopicRepo) GetTopicsByAuthor(authorID int) ([]*domain.Topic, error) {
     return topics, nil
 }
 
-func (r *TopicRepo) GetTopicsByCategory(catID int) ([]*domain.Topic, error) {
-	rows, err := r.db.Query(`SELECT topic_id, title, created_on, author 
-    FROM topics 
-    WHERE author = ?`, catID)
+func (r *TopicRepo) GetTopicsByCategory(catID int) (*domain.TopicList, error) {
+	rows, err := r.db.Query(`SELECT 
+	t.topic_id, 
+	t.title, 
+	t.created_on,
+	u.username
+    FROM topics t
+	JOIN users u ON t.author = u.user_id
+    WHERE category = ?`, catID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+
+	var topiclist = domain.TopicList{}
 
     var topics = []*domain.Topic{}
 	for rows.Next() {
@@ -106,8 +113,10 @@ func (r *TopicRepo) GetTopicsByCategory(catID int) ([]*domain.Topic, error) {
 		}
 		topics = append(topics, topic)
 	}
-   
-    return topics, nil
+
+	topiclist.Topics = topics
+
+    return &topiclist, nil
 }
 
 func (r *TopicRepo) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error) {

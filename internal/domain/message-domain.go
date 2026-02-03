@@ -3,7 +3,8 @@ package domain
 type Message struct {
 	ID int `json:"post_id"`
 	TopicID int `json:"topic_id"`
-	Author int `json:"author"`
+	Author string `json:"author"`
+	Avatar string `json:"image"`
 	Content string `json:"content"`
 	Time string `json:"created_on"`
 	Reactions string `json:"reactions"`

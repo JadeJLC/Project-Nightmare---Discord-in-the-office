@@ -17,7 +17,7 @@ async function displayFeed() {
     feedContainer.innerHTML = `<hr/><h2 class="feed-title">Derniers messages postés sur le forum</h2>`;
 
     topicList.forEach((topic) => {
-      const topicBloc = buildTopic(topic);
+      const topicBloc = buildFeedTopic(topic);
       feedContainer.appendChild(topicBloc);
     });
 
@@ -28,7 +28,7 @@ async function displayFeed() {
   }
 }
 
-function buildTopic(topic) {
+function buildFeedTopic(topic) {
   const topicBloc = document.createElement("div");
   topicBloc.className = "topic-bloc";
 

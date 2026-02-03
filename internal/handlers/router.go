@@ -16,6 +16,7 @@ func Router(userService *services.UserService, sessionService *services.SessionS
 	meHandler := NewMeHandler(userService)
     logoutHandler := NewLogoutHandler(userService, sessionService)
     profileHandler := NewProfileHandler(userService, messageService, reactionService, topicService)
+    categoryHandler := NewCategoryHandler(userService, messageService, *categService, topicService)
 
     // Routes
     mux.Handle("/", homeHandler)
@@ -24,6 +25,7 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     mux.Handle("/api/register", registerHandler)
 	mux.Handle("/api/me", meHandler)
     mux.Handle("/api/profile", profileHandler)
+    mux.Handle("/api/topics", categoryHandler)
 
     // Assets
     fs := http.FileServer(http.Dir("./internal/templates/assets"))

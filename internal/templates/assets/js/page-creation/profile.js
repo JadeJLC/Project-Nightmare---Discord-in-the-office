@@ -113,8 +113,6 @@ export function displayProfile(profileName) {
   usernameHeader.innerHTML = "";
 
   if (!SessionData.isLogged) {
-    // Seul les membres connectés peuvent accéder aux profils
-    console.log("Vous devez vous connecter pour ouvrir un profil");
     const popup = document.getElementById("auth-popup");
     popup.classList.remove("is-hidden");
     displayHome();

@@ -1,7 +1,7 @@
 import { buttonMove } from "../theme-switch.js";
 import { SessionData } from "../variables/session-data.js";
-import { displayCategories } from "./categories.js";
-import { displayFeed } from "./feed.js";
+import { displayCategories } from "./home-categories.js";
+import { displayFeed } from "./home-feed.js";
 import { clearPages } from "./clear-pages.js";
 
 const usernameHeader = document.getElementById("header-username");

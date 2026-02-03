@@ -2,13 +2,18 @@ package domain
 
 type Topic struct {
 	ID int `json:"topic_id"`
-	CatID int `json:"category"`
-	Title string `json:"title"`
+	CatID int `json:"cat_id"`
+	Title string `json:"topic_title"`
 	Time string `json:"created_on"`
-	Author int `json:"author"`
+	Author string `json:"author"`
+	PostList []*Message `json:"post_list"`
 	FirstPost string `json:"content"`
 }
 
+type TopicList struct {
+	CatName string `json:"cat_name"`
+	Topics []*Topic `json:"topic_list"`
+}
 
 
 type TopicRepo interface {

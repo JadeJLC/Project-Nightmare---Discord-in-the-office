@@ -39,18 +39,27 @@ func (r *MessageRepo) Edit(postID int, newMessage string) error {
 }
 
 func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error) {
-	rows, err := r.db.Query(`SELECT post_id, author, content, created_on, reactions 
-    FROM messages
-    WHERE topic_id = ?`, topicID)
+	rows, err := r.db.Query(`SELECT 
+	m.post_id, 
+	u.username,
+	u.image,
+	m.content, 
+	m.created_on, 
+	m.reactions
+    FROM messages m
+	JOIN users u ON m.author = u.user_id
+    WHERE topic_id = ?
+	ORDER BY created_on ASC`, topicID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
+
     var messages = []*domain.Message{}
 	message := &domain.Message{}
 	for rows.Next() {
-		if err := rows.Scan(&message.ID, &message.Author, &message.Content, &message.Time, &message.Reactions); err != nil {
+		if err := rows.Scan(&message.ID, &message.Author, &message.Avatar, &message.Content, &message.Time, &message.Reactions); err != nil {
 			return nil, err
 		}
 		messages = append(messages, message)
