@@ -4,30 +4,32 @@ import { clearPages } from "./clear-pages.js";
 import { SessionData } from "../variables/session-data.js";
 import { displayHome } from "./home-display.js";
 import { displayProfile } from "./profile.js";
+import { displayPosts } from "./topic.js";
 
 // Liste des sujets avec le dernier message posté sur chaque sujet + la date d'ouverture du sujet
 async function writeTopics(catID) {
   try {
-    const response = await fetch(`/api/topics?catID=${catID}`);
+    const response = await fetch(`/api/category?catID=${catID}`);
     const category = await response.json();
 
-    const topicsPageContainer = document.getElementById("topics-page");
+    const categPageContainer = document.getElementById("category-topics");
+    categPageContainer.innerHTML = "";
     const catTitle = document.createElement("h2");
     catTitle.innerHTML = `${category.cat_name}`;
-    topicsPageContainer.appendChild(catTitle);
+    categPageContainer.appendChild(catTitle);
 
     const topicList = category.topic_list;
+
     topicList.forEach((topic) => {
       const topicHTML = buildTopic(topic);
-      topicsPageContainer.appendChild(topicHTML);
+      categPageContainer.appendChild(topicHTML);
     });
 
-    topicsPageContainer.addEventListener("click", (event) => {
+    categPageContainer.addEventListener("click", (event) => {
       const title = event.target.closest(".topic-title");
       if (title) {
-        const topicID = title.getAttribute("data_id");
-        console.log("Opening topic ID:", topicID);
-        // displayTopicContent(id);
+        const topicID = parseInt(title.getAttribute("data_id"));
+        displayPosts(topicID);
         return;
       }
 
@@ -52,9 +54,7 @@ async function writeTopics(catID) {
 }
 
 export function displayTopics(catID) {
-  clearPages("topicList");
-  const homeBtn = document.getElementById("go-home");
-  homeBtn.style.display = "block";
+  clearPages("category");
 
   if (!SessionData.isLogged) {
     const popup = document.getElementById("auth-popup");
@@ -63,10 +63,10 @@ export function displayTopics(catID) {
     return;
   }
 
-  let topicsPageContainer = document.getElementById("topics-page");
+  let categPageContainer = document.getElementById("category-topics");
 
-  if (!topicsPageContainer) {
-    let addedContainer = `<div id="topics-page"></div>`;
+  if (!categPageContainer) {
+    let addedContainer = `<div id="category-topics"></div>`;
     document.body.insertAdjacentHTML("beforeend", addedContainer);
   }
 
@@ -82,12 +82,9 @@ function buildTopic(topic) {
   const last = topic.post_list.length - 1;
   const lastPost = topic.post_list[last];
   const postID = String(lastPost.post_id).padStart(2, "0");
-
-  console.log(topic.post_list);
-
-  const lastPostAuthor = lastPost.author;
+  const lastPostAuthor = lastPost.author.username;
   const lastPostDate = lastPost.created_on;
-  const lastPostImage = lastPost.image;
+  const lastPostImage = lastPost.author.image;
 
   if (topic.topic_title === "Aucun message") {
     topicBloc.className = "feed-notopic";

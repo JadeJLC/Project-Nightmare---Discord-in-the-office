@@ -46,7 +46,6 @@ func (h *CategoryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for _, topic := range list.Topics {
 		topic.PostList, err = h.messageService.GetMessagesByTopic(topic.ID)	
-		
 	}
 
     json.NewEncoder(w).Encode(list)

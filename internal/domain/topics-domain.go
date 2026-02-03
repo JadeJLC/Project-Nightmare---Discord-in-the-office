@@ -8,6 +8,7 @@ type Topic struct {
 	Author string `json:"author"`
 	PostList []*Message `json:"post_list"`
 	FirstPost string `json:"content"`
+	CurrentPost int `json:"post_id"`
 }
 
 type TopicList struct {

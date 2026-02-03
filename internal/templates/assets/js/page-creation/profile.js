@@ -106,8 +106,6 @@ async function writeUserProfile(profile, logged) {
 
 export function displayProfile(profileName) {
   clearPages("profile");
-  const homeBtn = document.getElementById("go-home");
-  homeBtn.style.display = "block";
 
   const usernameHeader = document.getElementById("header-username");
   usernameHeader.innerHTML = "";

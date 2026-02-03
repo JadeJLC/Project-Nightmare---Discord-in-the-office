@@ -10,6 +10,9 @@ export function clearPages(current) {
 
     const feed = document.getElementById("feed");
     if (feed) feed.remove();
+
+    const homeBtn = document.getElementById("go-home");
+    homeBtn.style.display = "block";
   }
 
   if (current != "profile") {
@@ -17,8 +20,13 @@ export function clearPages(current) {
     if (profilePageContainer) profilePageContainer.remove();
   }
 
-  if (current != "topicList") {
-    let topicsPageContainer = document.getElementById("topics-page");
+  if (current != "category") {
+    let topicsPageContainer = document.getElementById("category-topics");
+    if (topicsPageContainer) topicsPageContainer.remove();
+  }
+
+  if (current != "topic") {
+    let topicsPageContainer = document.getElementById("topic-posts");
     if (topicsPageContainer) topicsPageContainer.remove();
   }
 }

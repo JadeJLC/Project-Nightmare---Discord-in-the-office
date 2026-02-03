@@ -43,12 +43,16 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
 	m.post_id, 
 	u.username,
 	u.image,
+	u.age,
+	u.gender,
+	u.inscription,
 	m.content, 
 	m.created_on, 
 	m.reactions
     FROM messages m
 	JOIN users u ON m.author = u.user_id
-    WHERE topic_id = ?`, topicID)
+	JOIN topics t ON m.topic_id = t.topic_id
+    WHERE m.topic_id = ?`, topicID)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +62,7 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
     var messages = []*domain.Message{}
 	for rows.Next() {
 	message := &domain.Message{}
-		if err := rows.Scan(&message.ID, &message.Author, &message.Avatar, &message.Content, &message.Time, &message.Reactions); err != nil {
+		if err := rows.Scan(&message.ID, &message.Author.Username, &message.Author.Image, &message.Author.Age, &message.Author.Inscription, &message.Content, &message.Time, &message.Reactions); err != nil {
 			return nil, err
 		}
 		messages = append(messages, message)

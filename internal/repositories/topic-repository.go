@@ -34,7 +34,7 @@ func (r *TopicRepo) Delete(topicID int) error {
 func (r *TopicRepo) GetTopicById(topicID int) (*domain.Topic, error) {
 	row := r.db.QueryRow(`
         SELECT category, title, created_on, author
-        FROM topics WHERE id = ?`, topicID)
+        FROM topics WHERE topic_id = ?`, topicID)
 
     topic := &domain.Topic{}
     err := row.Scan(&topic.CatID, &topic.Title, &topic.Time, &topic.Author)
