@@ -481,6 +481,27 @@ header {
   width: 100%;
 }
 
+.last-post-author {
+  display: inline;
+  cursor: pointer;
+}
+
+#topics-page h2 {
+  text-align: center;
+  font-size: 42px;
+  color: var(--neon);
+  text-shadow:
+    0 0 5px var(--neon),
+    0 0 15px var(--neon-soft);
+  margin: 0;
+}
+
+.topic-open {
+  text-indent: 30px;
+  font-size: 0.7em;
+  margin-top: -10px;
+}
+
 /* #endregion */
 
 /* #region ***** Affichage du profil */
@@ -841,6 +862,10 @@ hr {
   .header-buttons {
     width: fit-content;
     margin: auto;
+  }
+
+  .topic-lastinfo {
+    margin-top: 60px;
   }
 }
 

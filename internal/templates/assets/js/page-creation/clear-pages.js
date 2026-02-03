@@ -1,4 +1,6 @@
 export function clearPages(current) {
+  window.scrollTo(0, 0);
+
   if (current != "home") {
     const frontPageContainer = document.getElementById("front-page");
     if (frontPageContainer) frontPageContainer.remove();

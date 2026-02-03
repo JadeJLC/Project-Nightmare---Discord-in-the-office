@@ -53,7 +53,7 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     case "topics":
         list, err := h.topicService.GetTopicsByAuthorID(int(data.ID))
-        if err != nil {
+        if err != nil || len(list) == 0 {
             list = []*domain.Topic{{Title: "Nothing to Display"}}
         }
         json.NewEncoder(w).Encode(list)
