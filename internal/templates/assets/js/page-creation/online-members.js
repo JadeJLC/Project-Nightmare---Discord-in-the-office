@@ -1,5 +1,6 @@
 import { SessionData } from "../variables/session-data.js";
 import { state } from "../variables/state.js";
+import { displayProfile } from "./profile.js";
 
 const onlineMembersBtn = document.getElementById("online-members-btn");
 const onlineMembersList = document.getElementById("online-members-list");
@@ -30,6 +31,15 @@ function createUserCard(user) {
             <span class="status online">Online</span>
         </div>
     `;
+
+  card.addEventListener("click", (event) => {
+    const user = event.target.closest(".reduced-avatar");
+    if (user) {
+      const username = user.getAttribute("data_id");
+      displayProfile(username);
+      return;
+    }
+  });
 
   return card;
 }

@@ -467,6 +467,7 @@ header {
   margin-bottom: 20px;
   margin-top: 5px;
   border-bottom: 1px dashed var(--neon-soft);
+  cursor: pointer;
 }
 
 .topic-lastpost {
@@ -492,11 +493,33 @@ header {
 }
 
 .reduced-avatar {
-  width: 55px;
-  height: 55px;
-  border-radius: 100%;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   overflow: hidden;
+  position: relative;
+}
+
+.reduced-avatar img {
+  width: 100%; /* respecte le ratio naturel */
+  height: auto; /* évite toute déformation */
   image-rendering: pixelated;
+
+  /* Dézoom */
+  transform: scale(0.75);
+  transform-origin: top center;
+
+  /* Positionnement */
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+
+  /* Ajuste pour viser la tête */
+  top: 0px;
+}
+
+.reduced-avatar:hover {
+  cursor: pointer;
 }
 
 .post-content {
