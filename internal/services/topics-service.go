@@ -33,7 +33,7 @@ func (s *TopicService) GetTopicsByAuthorID(authorID int) ([]*domain.Topic, error
 	return s.repo.GetTopicsByAuthor(authorID)
 }
 
-func (s *TopicService) GetTopicsByCategory(catID int) ([]*domain.Topic, error) {
+func (s *TopicService) GetTopicsByCategory(catID int) (*domain.TopicList, error) {
 	return s.repo.GetTopicsByCategory(catID)
 }
 

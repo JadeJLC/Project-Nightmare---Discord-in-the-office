@@ -89,7 +89,7 @@ async function writeUserProfile(profile, logged) {
       </div>`;
     }
 
-    setProfileButtons(user.email);
+    setProfileButtons(user.email, profile);
 
     const profileDisplay = localStorage.getItem("profileDisplay") || "topics";
     if (profileDisplay === "reactions") {
@@ -106,15 +106,11 @@ async function writeUserProfile(profile, logged) {
 
 export function displayProfile(profileName) {
   clearPages("profile");
-  const homeBtn = document.getElementById("go-home");
-  homeBtn.style.display = "block";
 
   const usernameHeader = document.getElementById("header-username");
   usernameHeader.innerHTML = "";
 
   if (!SessionData.isLogged) {
-    // Seul les membres connectés peuvent accéder aux profils
-    console.log("Vous devez vous connecter pour ouvrir un profil");
     const popup = document.getElementById("auth-popup");
     popup.classList.remove("is-hidden");
     displayHome();
@@ -155,7 +151,6 @@ async function displayProfileMessages(profileName) {
 
     allMessages.forEach((message) => {
       if (message.content === "Nothing to Display") {
-        console.log("Aucun message");
         const noTopic = document.createElement("div");
         noTopic.className = "feed-notopic";
         noTopic.innerHTML = `Aucun sujet correspondant à votre recherche n'a été trouvé`;
@@ -202,11 +197,8 @@ async function displayProfileReactions(profileName) {
     const container = document.getElementById("profile-display-posts");
     container.innerHTML = ``;
 
-    console.log(allReactions);
-
     allReactions.forEach((message) => {
       if (message.topic_title === "Nothing to Display") {
-        console.log("Aucun message");
         const noTopic = document.createElement("div");
         noTopic.className = "feed-notopic";
         noTopic.innerHTML = `Aucun sujet correspondant à votre recherche n'a été trouvé`;
@@ -257,20 +249,22 @@ async function displayProfileTopics(profileName) {
     const container = document.getElementById("profile-display-posts");
     container.innerHTML = ``;
 
+    console.log(allTopics);
+
     allTopics.forEach((topic) => {
-      if (topic.title === "Nothing to Display") {
-        console.log("Aucun message");
+      if (topic.topic_title === "Nothing to Display") {
         const noTopic = document.createElement("div");
         noTopic.className = "feed-notopic";
         noTopic.innerHTML = `Aucun sujet correspondant à votre recherche n'a été trouvé`;
         container.appendChild(noTopic);
+        return;
       }
       const newMsg = document.createElement("div");
       newMsg.classList.add("profile-preview");
       newMsg.classList.add("preview-topic");
       newMsg.innerHTML = `
             <h3 id="topic_${topic.topic_id}">
-              ${topic.title}
+              ${topic.topic_title}
               <button type="button" class="button-link">
                 <img
                   src="assets/images/external-link.svg"
@@ -296,22 +290,22 @@ async function displayProfileTopics(profileName) {
 // #region
 
 // #region ***** Mise en place des boutons
-function switchToReactions() {
+function switchToReactions(profileName) {
   localStorage.setItem("profileDisplay", "reactions");
-  displayProfile();
+  displayProfile(profileName);
 }
 
-function switchToMessages() {
+function switchToMessages(profileName) {
   localStorage.setItem("profileDisplay", "messages");
-  displayProfile();
+  displayProfile(profileName);
 }
 
-function switchToTopics() {
+function switchToTopics(profileName) {
   localStorage.setItem("profileDisplay", "topics");
-  displayProfile();
+  displayProfile(profileName);
 }
 
-function setProfileButtons(status) {
+function setProfileButtons(status, profileName) {
   const topicBtn = document.getElementById("profile-mytopics");
   const messageBtn = document.getElementById("profile-mymessages");
   const reactionBtn = document.getElementById("profile-myreactions");
@@ -319,9 +313,15 @@ function setProfileButtons(status) {
   const profForm = document.getElementById("profile-form");
   const avaBtn = document.getElementById("edit-avatar");
 
-  topicBtn.addEventListener("click", switchToTopics);
-  messageBtn.addEventListener("click", switchToMessages);
-  reactionBtn.addEventListener("click", switchToReactions);
+  topicBtn.addEventListener("click", function () {
+    switchToTopics(profileName);
+  });
+  messageBtn.addEventListener("click", function () {
+    switchToMessages(profileName);
+  });
+  reactionBtn.addEventListener("click", function () {
+    switchToReactions(profileName);
+  });
   if (editBtn) editBtn.addEventListener("click", editProfile);
   if (profForm)
     profForm.onsubmit = async (e) => {
@@ -390,7 +390,6 @@ async function editProfile(mode) {
       alert("Erreur : " + (await response.text()));
     }
   } catch (err) {
-    console.log("Fuck you");
     console.error("Erreur réseau :", err);
   }
 }

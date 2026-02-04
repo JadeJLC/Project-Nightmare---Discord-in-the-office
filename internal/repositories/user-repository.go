@@ -25,11 +25,12 @@ func (r *userRepository) Create(user *domain.User) error {
     }
 
     date := time.Now()
+    formattedTime := date.Format("02/01/2006")
 
     res, err := r.db.Exec(`
         INSERT INTO users (username, email, password, age, gender, firstname, lastname, image, inscription)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", date,
+        user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", formattedTime,
     )
     if err != nil {
         return err
@@ -71,7 +72,7 @@ func (r *userRepository) GetUserByUsername(username string) (*domain.User, error
 
 func (r *userRepository) GetUserByToken(token string) (*domain.User, error) { 
 	user := &domain.User{}
-	err := r.db.QueryRow(`SELECT id, username FROM users WHERE token = ?`, token).Scan(&user.ID, &user.Username) 
+	err := r.db.QueryRow(`SELECT id, username, image FROM users WHERE token = ?`, token).Scan(&user.ID, &user.Username, &user.Image) 
 	if err != nil {
         return nil, err
     }
@@ -81,8 +82,8 @@ func (r *userRepository) GetUserByToken(token string) (*domain.User, error) {
 func (r *userRepository) GetUserByID(id int) (*domain.User, error) { 
     user := &domain.User{}
     err := r.db.QueryRow(`
-        SELECT user_id, username FROM users WHERE user_id = ?`, id).
-        Scan(&user.ID, &user.Username)
+        SELECT user_id, username, image FROM users WHERE user_id = ?`, id).
+        Scan(&user.ID, &user.Username, &user.Image)
 
     if err != nil {
         return nil, err

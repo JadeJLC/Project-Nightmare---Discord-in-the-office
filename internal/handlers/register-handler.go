@@ -11,9 +11,10 @@ import (
 
 type RegisterHandler struct {
     userService *services.UserService
+    sessionService *services.SessionService
 }
 
-func NewRegisterHandler(us *services.UserService) *RegisterHandler {
+func NewRegisterHandler(us *services.UserService, ss *services.SessionService) *RegisterHandler {
     return &RegisterHandler{userService: us}
 }
 
@@ -37,10 +38,13 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
         }
-    } else if err := h.userService.Register(&newUser); err != nil {
+    } else  {
+        if err := h.userService.Register(&newUser); err != nil {
         log.Print(err)
         http.Error(w, err.Error(), http.StatusBadRequest)
+   
         return
+    }
     }
 
     

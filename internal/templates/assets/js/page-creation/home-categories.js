@@ -1,5 +1,7 @@
 // Fonctions pour la création de la page d'accueil avec toutes les catégories du forum
 
+import { displayTopics } from "./category-topics.js";
+
 async function displayCategories() {
   try {
     const response = await fetch("/?mode=categ");
@@ -18,6 +20,14 @@ async function displayCategories() {
     catList.forEach((category) => {
       const catBloc = buildCategory(category);
       categoriesContainer.appendChild(catBloc);
+    });
+
+    categoriesContainer.addEventListener("click", (event) => {
+      const title = event.target.closest(".cat-title");
+      if (title) {
+        const catId = title.dataset.id;
+        displayTopics(catId);
+      }
     });
 
     let feedContainer = document.getElementById("feed");
@@ -54,7 +64,7 @@ function buildCategory(category) {
     </div>`;
   }
 
-  catBloc.innerHTML = `<h3 id="cat_${catID}">${category.name}</h3>
+  catBloc.innerHTML = `<h3 data-id="${catID}" class="cat-title">${category.name}</h3>
  <div class="cat-content">   
     <div class="cat-description">${category.description}</div>
     <div class="cat-image"><img src="${image}"/></div>

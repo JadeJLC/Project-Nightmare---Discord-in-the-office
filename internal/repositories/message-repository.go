@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"log"
 	"real-time-forum/internal/domain"
 	"time"
 )
@@ -39,18 +40,30 @@ func (r *MessageRepo) Edit(postID int, newMessage string) error {
 }
 
 func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error) {
-	rows, err := r.db.Query(`SELECT post_id, author, content, created_on, reactions 
-    FROM messages
-    WHERE topic_id = ?`, topicID)
+	rows, err := r.db.Query(`SELECT 
+	m.post_id, 
+	u.username,
+	u.image,
+	u.age,
+	u.inscription,
+	m.content, 
+	m.created_on, 
+	m.reactions
+    FROM messages m
+	JOIN users u ON m.author = u.user_id
+	JOIN topics t ON m.topic_id = t.topic_id
+    WHERE m.topic_id = ?`, topicID)
 	if err != nil {
+		log.Print("Erreur dans la récupération des messages du sujet : ", err)
 		return nil, err
 	}
 	defer rows.Close()
 
+
     var messages = []*domain.Message{}
-	message := &domain.Message{}
 	for rows.Next() {
-		if err := rows.Scan(&message.ID, &message.Author, &message.Content, &message.Time, &message.Reactions); err != nil {
+	message := &domain.Message{}
+		if err := rows.Scan(&message.ID, &message.Author.Username, &message.Author.Image, &message.Author.Age, &message.Author.Inscription, &message.Content, &message.Time, &message.Reactions); err != nil {
 			return nil, err
 		}
 		messages = append(messages, message)
@@ -68,7 +81,8 @@ func (r *MessageRepo) GetMessagesByAuthor(author int) ([]*domain.Message, error)
 			m.reactions,
             t.title
         FROM messages m
-        JOIN topics t ON m.topic_id = t.topic_id `, author)
+        JOIN topics t ON m.topic_id = t.topic_id
+		WHERE m.author = ? `, author)
 	if err != nil {
 		return nil, err
 	}	

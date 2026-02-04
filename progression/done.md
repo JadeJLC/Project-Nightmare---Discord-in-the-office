@@ -35,6 +35,7 @@
 - Sélecteur de thème
 - Feed / Catégories
 - Profil
+- Sujets / Messages
 
 ### Inscription et connexion
 
@@ -49,8 +50,33 @@ Données d'inscriptions demandées :
 
 ### Profil utilisateur
 
-Affichage :
-
-- Nom et infos personnelles sur son propre profil
+- Nom et infos personnelles sur son propre profil / Uniquement nom d'utilisateur et âge/genre sur le profil des autres
 - Liste des messages postés, liste des sujets ouverts et liste des réactions
 - Image de profil
+- Cliquer sur le nom d'un utilisateur permet d'accéder à son profil
+- Possibilité d modifier ses informations personnelles
+
+### Sujets et messages
+
+- Titre du sujet, contenu du premier message
+- Nom et avatar de la personne ayant posté le message
+- Contenu des réponses en dessous
+
+### Page d'accueil
+
+- Liste des sujets du forum rangés par catégorie (visuel de base)
+- Accès à un visuel feed qui affiche les derniers sujets ayant reçu des réponses avec date et posteur du dernier message
+
+### Barre de navigation
+
+- Bouton connexion/déconnexion
+- Bouton "voir mon profil"
+
+### Back
+
+- Gestion des cookies et des sessions
+- Création et organisation de la base de données
+
+### Front
+
+- Formulaire d'inscription / connexion

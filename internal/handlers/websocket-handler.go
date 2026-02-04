@@ -105,6 +105,7 @@ func (h *WebSocketHandler) broadcastPresence() {
         users = append(users, map[string]interface{}{
             "id":       user.ID,
             "username": user.Username,
+            "image": user.Image,
         })
     }
 

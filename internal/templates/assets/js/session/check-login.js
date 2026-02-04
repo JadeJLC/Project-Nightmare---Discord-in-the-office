@@ -12,13 +12,16 @@ export async function checkLoginStatus() {
     if (data.logged) {
       SessionData.isLogged = true;
       SessionData.username = data.username;
+      SessionData.image = data.image;
     } else {
       SessionData.isLogged = false;
       SessionData.username = null;
+      SessionData.image = null;
     }
   } catch (err) {
     console.error("Erreur lors de la vérification de session :", err);
     SessionData.isLogged = false;
     SessionData.username = null;
+    SessionData.image = null;
   }
 }
