@@ -1,4 +1,5 @@
 import { updateOnlineUsers } from "../page-creation/online-members.js";
+import { handleIncomingDM } from "./private-message.js";
 
 export function connectWebSocket() {
   fetch("/api/me")
@@ -17,9 +18,18 @@ export function connectWebSocket() {
       };
 
       ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === "presence_update") {
-          updateOnlineUsers(data.users);
+        const msg = JSON.parse(event.data);
+
+        switch (msg.type) {
+          case "private_message":
+            handleIncomingDM(msg);
+            break;
+
+          case "presence_update":
+            updateOnlineUsers(msg.users);
+            break;
+
+          // futures fonctionnalités comme les notifications
         }
       };
 

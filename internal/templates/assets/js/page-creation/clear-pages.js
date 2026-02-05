@@ -29,4 +29,8 @@ export function clearPages(current) {
     let topicsPageContainer = document.getElementById("topic-posts");
     if (topicsPageContainer) topicsPageContainer.remove();
   }
+  if (current != "dm") {
+    let dmPageContainer = document.getElementById("dm-page");
+    if (dmPageContainer) dmPageContainer.remove();
+  }
 }

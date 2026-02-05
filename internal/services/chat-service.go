@@ -13,6 +13,18 @@ func NewChatService(repo *repositories.ChatRepo) *ChatService {
 	return &ChatService{repo}
 }
 
-func (s *ChatService) GetMessages(userID, otherID, offset, limit int) ([]domain.DM, error) {
+func (s *ChatService) GetDms(userID, otherID, offset, limit int) ([]domain.DM, error) {
 	return s.repo.GetDMs(userID, otherID, offset, limit)
+}
+
+func (s *ChatService) SaveDM(msg domain.DM) error {
+	return s.repo.SaveDM(msg)
+}
+
+func (s *ChatService) UpdateConversation(user1, user2 int) error {
+	return s.repo.UpdateConversation(user1, user2)
+}
+
+func (s *ChatService) GetConversations(userID int) ([]domain.Conversation, error) {
+    return s.repo.GetConversations(userID)
 }

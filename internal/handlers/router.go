@@ -16,6 +16,7 @@ func Router(userService *services.UserService, sessionService *services.SessionS
 	meHandler := NewMeHandler(userService)
     logoutHandler := NewLogoutHandler(userService, sessionService)
     chatHandler := NewChatHandler(sessionService, chatService)
+    conversationHandler := NewConversationHandler(sessionService, chatService, userService)
     wsHandler := NewWebSocketHandler(sessionService, chatService, userService)
 
     
@@ -30,7 +31,9 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     mux.Handle("/api/logout", logoutHandler)
     mux.Handle("/api/register", registerHandler)
 	mux.Handle("/api/me", meHandler)
-    mux.Handle("/messages", chatHandler)
+    mux.Handle("/api/dm", chatHandler)
+    mux.Handle("/api/conversations", conversationHandler)
+
     mux.Handle("/api/profile", profileHandler)
     mux.Handle("/api/category", categoryHandler)
     mux.Handle("/api/topic", topicHandler)

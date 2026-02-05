@@ -39,7 +39,7 @@ func (h *ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     }
 
     // 3. Récupérer les messages via le service
-    messages, err := h.chatService.GetMessages(userID, otherID, offset, limit)
+    messages, err := h.chatService.GetDms(userID, otherID, offset, limit)
     if err != nil {
         http.Error(w, "Error loading messages", http.StatusInternalServerError)
         return

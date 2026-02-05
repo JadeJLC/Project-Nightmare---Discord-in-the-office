@@ -3,8 +3,10 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -122,9 +124,44 @@ func (h *WebSocketHandler) broadcastPresence() {
 
 
 func (h *WebSocketHandler) handlePrivateMessage(from, to int, content string) {
-    // Ici on fera :
-    // 1. Sauvegarde en DB
-    // 2. Update conversation
-    // 3. Envoi temps réel au destinataire
-    // 4. Envoi temps réel à l’expéditeur
+    // 1. Construire le message
+    dm := domain.DM{
+        SenderID:   from,
+        ReceiverID: to,
+        Content:    content,
+        CreatedAt:  time.Now(),
+    }
+
+    // 2. Sauvegarde en DB
+    if err := h.chatService.SaveDM(dm); err != nil {
+        fmt.Println("Error saving DM:", err)
+        return
+    }
+
+    // 3. Mise à jour de la conversation
+    if err := h.chatService.UpdateConversation(from, to); err != nil {
+        fmt.Println("Error updating conversation:", err)
+    }
+
+    // 4. Construire le message WebSocket sortant
+    outgoing := map[string]interface{}{
+        "type":       "private_message",
+        "from":       from,
+        "to":         to,
+        "content":    content,
+        "created_at": dm.CreatedAt,
+    }
+
+    // 5. Envoi temps réel au destinataire
+    wsMutex.Lock()
+    if conn, ok := wsClients[to]; ok {
+        conn.WriteJSON(outgoing)
+    }
+
+    // 6. Envoi temps réel à l’expéditeur
+    if conn, ok := wsClients[from]; ok {
+        conn.WriteJSON(outgoing)
+    }
+    wsMutex.Unlock()
 }
+
