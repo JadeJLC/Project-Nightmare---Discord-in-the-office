@@ -4,6 +4,7 @@ import { ws } from "./connect.js";
 import { loadConversationsList } from "../page-creation/chat.js";
 
 let currentDMUserId = null;
+let lastSenderId = null;
 
 export function handleIncomingDM(msg) {
   console.log("WS message reçu :", msg);
@@ -95,21 +96,49 @@ export async function openConversation(otherUserId) {
 }
 
 export function displayDM(msg) {
+  console.log(msg);
   const container = document.getElementById("dm-messages");
 
   const div = document.createElement("div");
   div.classList.add("dm-message");
 
-  const isMine = msg.sender_id === SessionData.userID;
+  const senderId = msg.sender_id;
+  const username = msg.sender_username;
+  const isMine = senderId === SessionData.userID;
+
   div.classList.add(isMine ? "mine" : "theirs");
 
-  div.innerHTML = `
-        <p class="dm-author">${msg.sender_username}</p>
-        <p class="dm-content">${msg.content}</p>
-        <span class="dm-time">${new Date(msg.created_at).toLocaleTimeString()}</span>
-    `;
+  // Déterminer si on doit afficher le header (nom + avatar)
+  const showHeader = lastSenderId !== senderId;
 
-  container.insertBefore(div, document.querySelector(".dm-input"));
+  div.innerHTML = `
+    ${
+      showHeader
+        ? `
+      <div class="dm-header">
+        <div class="reduced-avatar">
+              <img src="assets/images-avatar/${msg.sender_image}.png">
+            </div>
+        <p class="dm-author">${username}</p>
+      </div>
+    `
+        : ""
+    }
+    
+    <p class="dm-content">${msg.content}</p>
+    <span class="dm-time">${new Date(msg.created_at).toLocaleTimeString()}</span>
+  `;
+
+  // Mettre à jour le dernier sender
+  lastSenderId = senderId;
+
+  // Insérer avant la barre d’input
+  const inputBar = document.querySelector(".dm-input");
+  if (inputBar) {
+    container.insertBefore(div, inputBar);
+  } else {
+    container.appendChild(div);
+  }
 
   container.scrollTop = container.scrollHeight;
 }

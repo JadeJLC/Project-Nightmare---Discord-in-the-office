@@ -28,8 +28,10 @@ func (r *ChatRepo) GetDMs(user1, user2, offset, limit int) ([]domain.DM, error) 
             d.id,
             d.sender_id,
             sender.username AS sender_username,
+            sender.image AS sender_image,
             d.receiver_id,
             receiver.username AS receiver_username,
+            receiver.image AS receiver_image,
             d.content,
             d.created_at
         FROM dms d
@@ -54,8 +56,10 @@ func (r *ChatRepo) GetDMs(user1, user2, offset, limit int) ([]domain.DM, error) 
             &m.ID,
             &m.SenderID,
             &m.SenderName,
+            &m.SenderImage,
             &m.ReceiverID,
             &m.ReceiverName,
+            &m.ReceiverImage,
             &m.Content,
             &m.CreatedAt,
         )
@@ -67,6 +71,7 @@ func (r *ChatRepo) GetDMs(user1, user2, offset, limit int) ([]domain.DM, error) 
 
     return dms, nil
 }
+
 
 
 func (r *ChatRepo) UpdateConversation(user1, user2 int) error {

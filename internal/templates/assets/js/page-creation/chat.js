@@ -62,14 +62,13 @@ export async function loadConversationsList() {
 
     div.innerHTML = `
             <div class="reduced-avatar">
-              <img src="assets/images-avatar/${conv.otherUser.image}.png" class="reduced-avatar">
-              </div>
+              <img src="assets/images-avatar/${conv.otherUser.image}.png">
+            </div>
             <span>${conv.otherUser.username}</span>
         `;
 
     div.addEventListener("click", () => {
       openConversation(conv.otherUser.id);
-      console.log(conv.otherUser.id);
     });
     container.appendChild(div);
   });
