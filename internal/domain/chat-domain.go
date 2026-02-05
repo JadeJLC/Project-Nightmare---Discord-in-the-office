@@ -3,14 +3,15 @@ package domain
 import "time"
 
 type DM struct {
-    ID           int       `json:"id"`
-    SenderID       int       `json:"from_id"`
-    SenderName string    `json:"from_username"`
-    ReceiverID         int       `json:"to_id"`
-    ReceiverName   string    `json:"to_username"`
-    Content      string    `json:"content"`
-    CreatedAt    time.Time `json:"created_at"`
+    ID              int       `json:"id"`
+    SenderID        int       `json:"sender_id"`
+    SenderName  string    `json:"sender_username"`
+    ReceiverID      int       `json:"receiver_id"`
+    ReceiverName string   `json:"receiver_username"`
+    Content         string    `json:"content"`
+    CreatedAt       time.Time `json:"created_at"`
 }
+
 
 
 type Conversation struct {

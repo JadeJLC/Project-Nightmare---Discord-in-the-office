@@ -1,6 +1,8 @@
 import { updateOnlineUsers } from "../page-creation/online-members.js";
 import { handleIncomingDM } from "./private-message.js";
 
+export let ws = null;
+
 export function connectWebSocket() {
   fetch("/api/me")
     .then((res) => {
@@ -8,7 +10,7 @@ export function connectWebSocket() {
       return res.json();
     })
     .then((user) => {
-      const ws = new WebSocket("ws://localhost:5006/ws");
+      ws = new WebSocket("ws://localhost:5006/ws");
 
       ws.onopen = () => {
         console.log("WS connected");

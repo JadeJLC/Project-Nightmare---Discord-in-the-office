@@ -44,7 +44,7 @@ export function displayMailbox() {
   loadConversationsList();
 }
 
-async function loadConversationsList() {
+export async function loadConversationsList() {
   const res = await fetch("/api/conversations");
   const conversations = await res.json();
 

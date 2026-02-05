@@ -143,14 +143,20 @@ func (h *WebSocketHandler) handlePrivateMessage(from, to int, content string) {
         fmt.Println("Error updating conversation:", err)
     }
 
+    fromUser, _ := h.userService.GetUserByID(from)
+    toUser, _ := h.userService.GetUserByID(to)
+
     // 4. Construire le message WebSocket sortant
     outgoing := map[string]interface{}{
-        "type":       "private_message",
-        "from":       from,
-        "to":         to,
-        "content":    content,
-        "created_at": dm.CreatedAt,
-    }
+    "type":             "private_message",
+    "sender_id":        from,
+    "sender_username":  fromUser.Username,
+    "receiver_id":      to,
+    "receiver_username": toUser.Username,
+    "content":          content,
+    "created_at":       dm.CreatedAt,
+}
+
 
     // 5. Envoi temps réel au destinataire
     wsMutex.Lock()

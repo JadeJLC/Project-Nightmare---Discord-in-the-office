@@ -27,14 +27,14 @@ func (r *ChatRepo) GetDMs(user1, user2, offset, limit int) ([]domain.DM, error) 
         SELECT 
             d.id,
             d.sender_id,
-            u1.username AS sender_username,
+            sender.username AS sender_username,
             d.receiver_id,
-            u2.username AS receiver_username,
+            receiver.username AS receiver_username,
             d.content,
             d.created_at
         FROM dms d
-        JOIN users u1 ON u1.user_id = d.sender_id
-        JOIN users u2 ON u2.user_id = d.receiver_id
+        JOIN users sender ON sender.user_id = d.sender_id
+        JOIN users receiver ON receiver.user_id = d.receiver_id
         WHERE (d.sender_id = ? AND d.receiver_id = ?)
            OR (d.sender_id = ? AND d.receiver_id = ?)
         ORDER BY d.created_at DESC
