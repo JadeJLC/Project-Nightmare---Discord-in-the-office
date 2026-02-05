@@ -11,11 +11,13 @@ func Router(userService *services.UserService, sessionService *services.SessionS
 
     // Handlers instanciés proprement
     loginHandler := NewLoginHandler(userService, sessionService)
-    registerHandler := NewRegisterHandler(userService)
+    registerHandler := NewRegisterHandler(userService, sessionService)
     homeHandler := NewHomeHandler(categService, topicService)
 	meHandler := NewMeHandler(userService)
     logoutHandler := NewLogoutHandler(userService, sessionService)
     profileHandler := NewProfileHandler(userService, messageService, reactionService, topicService)
+    categoryHandler := NewCategoryHandler(userService, messageService, *categService, topicService)
+    topicHandler := NewTopicHandler(messageService, topicService)
 
     // Routes
     mux.Handle("/", homeHandler)
@@ -24,6 +26,8 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     mux.Handle("/api/register", registerHandler)
 	mux.Handle("/api/me", meHandler)
     mux.Handle("/api/profile", profileHandler)
+    mux.Handle("/api/category", categoryHandler)
+    mux.Handle("/api/topic", topicHandler)
 
     // Assets
     fs := http.FileServer(http.Dir("./internal/templates/assets"))

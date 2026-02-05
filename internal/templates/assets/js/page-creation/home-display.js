@@ -1,7 +1,7 @@
 import { buttonMove } from "../theme-switch.js";
 import { SessionData } from "../variables/session-data.js";
-import { displayCategories } from "./categories.js";
-import { displayFeed } from "./feed.js";
+import { displayCategories } from "./home-categories.js";
+import { displayFeed } from "./home-feed.js";
 import { clearPages } from "./clear-pages.js";
 
 const usernameHeader = document.getElementById("header-username");
@@ -17,9 +17,10 @@ export function displayHome() {
   usernameHeader.innerHTML = "";
 
   if (!SessionData.isLogged) {
-    usernameHeader.innerHTML = "Bienvenue ! <br /> Pensez à vous connecter !";
+    usernameHeader.innerHTML =
+      "Bienvenue&nbsp;! <br /> Pensez à vous connecter&nbsp;!";
   } else {
-    usernameHeader.innerHTML = `Bienvenue ${SessionData.username} ! <br /> Heureux de vous revoir !`;
+    usernameHeader.innerHTML = `Bienvenue ${SessionData.username}&nbsp;! <br /> Heureux de vous revoir&nbsp;!`;
   }
 
   if (!SessionData.isLogged) {

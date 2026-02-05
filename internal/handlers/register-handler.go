@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
@@ -10,9 +11,10 @@ import (
 
 type RegisterHandler struct {
     userService *services.UserService
+    sessionService *services.SessionService
 }
 
-func NewRegisterHandler(us *services.UserService) *RegisterHandler {
+func NewRegisterHandler(us *services.UserService, ss *services.SessionService) *RegisterHandler {
     return &RegisterHandler{userService: us}
 }
 
@@ -28,10 +30,24 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    if err := h.userService.Register(&newUser); err != nil {
+    mode := r.URL.Query().Get("mode")
+
+    if mode == "edit" {
+        if err := h.userService.EditProfile(newUser); err != nil {
+            log.Print(err)
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
+        }
+    } else  {
+        if err := h.userService.Register(&newUser); err != nil {
+        log.Print(err)
+        http.Error(w, err.Error(), http.StatusBadRequest)
+   
+        return
     }
+    }
+
+    
 
     json.NewEncoder(w).Encode(map[string]string{"status": "success"})
 }

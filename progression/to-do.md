@@ -15,10 +15,14 @@ Créer un forum officiel pour la licence Project Nightmare. Le forum doit :
 
 Comme dans le premier forum, il faut pouvoir :
 
-- Créer un nouveau sujet et y attribuer une (ou plusieurs 🙄) catégories
+- Créer un nouveau sujet et y attribuer une catégorie
 - Répondre à un sujet
 - Voir la liste des sujets récents sur la page d'accueil (ou une autre page dédiée)
 - _Like/dislike_
+
+### Interface utilisateur
+
+- Bouton retour arrière (ou arborescence) pour pouvoir revenir sur la page précédente
 
 ### Messages privés
 
@@ -51,30 +55,17 @@ Format des messages :
 
 ### Profil utilisateur
 
-- Nom et infos personnelles sur son propre profil / _Uniquement nom d'utilisateur et âge/genre sur le profil des autres_
-- Voir la liste des messages postés, la liste des sujets ouverts _et la liste des messages likés_
-- _Ajouter une image de profil si on ajoute un système d'image_
-- _Cliquer sur le nom d'un utilisateur permet d'accéder à son profil_
+- Possibilité de modifier son image de profil
 
 ### Sujets et messages
 
-- Titre du sujet, contenu du premier message
-- Nom _et avatar_ de la personne ayant posté le message
-- Contenu des réponses en dessous
 - _Possibilité d'envoyer des vidéos sur les messages (pour partager sa partie)_
 - _Section "streaming" pour partager son jeu en direct_
-
-### Page d'accueil
-
-- Liste des sujets du forum rangés par catégorie
-- Accès à une page "Sujets actifs" qui affiche les derniers sujets ayant reçu des réponses _avec date et posteur du dernier message_
 
 ### Barre de navigation
 
 - Bouton notifications
 - Bouton ouvrir/fermer la liste des utilisateurs en ligne (cliquer sur un utilisateur ouvre les messages privés)
-- Bouton connexion/déconnexion
-- Bouton "voir/modifier mon profil"
 
 ### _Panneau d'administration et modération_
 
@@ -95,15 +86,12 @@ Format des messages :
 
 ### Back
 
-- Gestion des cookies et des sessions
-- Création et organisation de la base de données ✔
 - Gestion des notifications
 - Affichage des nouveaux messages privés en temps réel
 - Détecter si un utilisateur est en ligne
 
 ### Front
 
-- Formulaire d'inscription / connexion
 - Design du forum (CSS)
 - Créer les différentes pages via le javascript
 - _Petites animations avec les personnages à divers endroits du forum_

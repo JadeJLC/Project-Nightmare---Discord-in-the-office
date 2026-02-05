@@ -3,6 +3,7 @@ package repositories
 
 import (
 	"database/sql"
+	"log"
 	"real-time-forum/internal/domain"
 	"time"
 
@@ -23,12 +24,13 @@ func (r *userRepository) Create(user *domain.User) error {
         return err
     }
 
-    date := time.Now
+    date := time.Now()
+    formattedTime := date.Format("02/01/2006")
 
     res, err := r.db.Exec(`
         INSERT INTO users (username, email, password, age, gender, firstname, lastname, image, inscription)
-        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", date,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", formattedTime,
     )
     if err != nil {
         return err
@@ -87,4 +89,14 @@ func (r *userRepository) GetUserByID(id int) (*domain.User, error) {
         return nil, err
     }
     return user, nil 
+}
+
+func (r *userRepository) UpdateUserProfile(userID int, user *domain.User) error {
+    log.Print(user)
+    _, err := r.db.Exec(`
+	UPDATE users SET email = ?, gender = ?, firstname = ?, lastname = ?
+	WHERE user_id = ?
+	`, user.Email, user.Gender, user.Firstname, user.Lastname, userID)
+
+    return err
 }
