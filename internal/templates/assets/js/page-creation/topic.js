@@ -2,12 +2,13 @@
 
 import { clearPages } from "../helpers/clear-pages.js";
 import { SessionData } from "../variables/session-data.js";
+import { displayTopics } from "./category-topics.js";
 import { displayHome } from "./home-display.js";
-import { newMessage } from "./new-message.js";
+import { newMessage, newTopic } from "./new-message.js";
 import { displayProfile } from "./profile.js";
 
 // Liste des messages dans le sujet
-async function writePosts(topicID, postID) {
+async function writePosts(catID, topicID, postID) {
   try {
     const response = await fetch(`/api/topic?topicID=${topicID}`);
     const topic = await response.json();
@@ -16,7 +17,13 @@ async function writePosts(topicID, postID) {
     topicsPageContainer.innerHTML = "";
     const topicTitle = document.createElement("h2");
     topicTitle.id = "topic-title";
-    topicTitle.innerHTML = `${topic.topic_title} <button class="new-message-button" id="new-message-button">Répondre au sujet</button>`;
+    topicTitle.innerHTML = `<button class="go-back" data_catid="${catID}" id="go-back">
+    <img src="/assets/images/arrow-left.svg"/><span>Retour à la catégorie</span></button>
+    ${topic.topic_title} 
+    <div class="topic-actions">
+    <button class="new-topic-button" id="new-topic-button">Ouvrir un nouveau sujet</button>
+    <button class="new-message-button" id="new-message-button">Répondre au sujet</button>
+    </div>`;
     topicsPageContainer.appendChild(topicTitle);
 
     const postList = topic.post_list;
@@ -44,10 +51,23 @@ async function writePosts(topicID, postID) {
         newMessage(topicID);
         return;
       }
+
+      const backToCat = event.target.closest(".go-back");
+      if (backToCat) {
+        const catID = document.getElementById("topic-posts").dataset.catid;
+        displayTopics(catID);
+        return;
+      }
+
+      const newTopicBtn = event.target.closest(".new-topic-button");
+      if (newTopicBtn) {
+        const catID = document.getElementById("topic-posts").dataset.catid;
+        displayTopics(catID, "newtopic");
+        return;
+      }
     });
 
     if (postID) {
-      console.log("Ouverture du post #", postID);
       document.getElementById(postID).scrollIntoView();
     }
   } catch (error) {
@@ -55,7 +75,7 @@ async function writePosts(topicID, postID) {
   }
 }
 
-export function displayPosts(topicID, postID) {
+export function displayPosts(catID, topicID, postID) {
   clearPages("topic");
 
   if (!SessionData.isLogged) {
@@ -68,15 +88,14 @@ export function displayPosts(topicID, postID) {
   let topicsPageContainer = document.getElementById("topic-posts");
 
   if (!topicsPageContainer) {
-    let addedContainer = `<div id="topic-posts"></div>`;
+    let addedContainer = `<div id="topic-posts" data-catid="${catID}"></div>`;
     document.body.insertAdjacentHTML("beforeend", addedContainer);
   }
 
-  writePosts(topicID, postID);
+  writePosts(catID, topicID, postID);
 }
 
 function buildPostList(post, index) {
-  console.log(post);
   const postBloc = document.createElement("div");
   postBloc.className = "post-bloc";
 

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
@@ -32,14 +31,12 @@ func (h *CategoryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	
 	catInfo, err := h.categoryService.GetCategoryFromID(catID)
 	if err != nil {
-		log.Print("Erreur dans la récupération de la catégorie :", err)
 		return
 	}
 
     list, err := h.topicService.GetTopicsByCategory(catID)
 	list.CatName = catInfo.Name
     if err != nil || len(list.Topics) == 0 {
-		log.Print("Erreur dans la récupération de la catégorie :", err)
 		    list.Topics = []*domain.Topic{{Title: "Nothing to Display"}}
 			json.NewEncoder(w).Encode(list)
 			return

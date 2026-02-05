@@ -211,7 +211,8 @@ header {
 
 .header-buttons button,
 .edit-content,
-.editor-button {
+.editor-button,
+.go-back {
   background-color: var(--bg-down);
   border-radius: 100%;
   width: 50px;
@@ -224,13 +225,15 @@ header {
 }
 
 [data-theme="light"] .header-buttons button,
-.edit-content {
+[data-theme="light"].edit-content,
+[data-theme="light"].go-back {
   background-color: var(--bg-dim);
 }
 
 .header-buttons button:hover,
 .edit-content:hover,
-.editor-button:hover {
+.editor-button:hover,
+.go-back:hover {
   box-shadow: 0 0 12px var(--neon-soft);
 }
 
@@ -250,7 +253,8 @@ header {
 .header-buttons button span,
 .edit-content span,
 .preview-reaction span,
-.editor-button span {
+.editor-button span,
+.go-back span {
   min-width: 2px;
   width: 2px;
   overflow: hidden;
@@ -272,7 +276,8 @@ header {
 .header-buttons button:hover span,
 .edit-content:hover span,
 .preview-reaction:hover span,
-.editor-button:hover span {
+.editor-button:hover span,
+.go-back:hover span {
   opacity: 1;
   transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   min-width: 90px;
@@ -283,7 +288,8 @@ header {
 #display-notifications:hover span,
 #log-in:hover span,
 #display-online-users:hover span,
-#MDswitch:hover span {
+#MDswitch:hover span,
+.go-back:hover span {
   min-width: 120px;
 }
 
@@ -457,6 +463,10 @@ header {
   position: absolute;
   right: -30px;
   top: -30px;
+}
+
+[data-theme="light"] .feed-notopic {
+  background-color: var(--bg);
 }
 
 .feed-title {
@@ -657,13 +667,23 @@ header {
 
 .edit-content {
   float: right;
+}
+
+.go-back,
+.edit-content {
   height: 38px;
   width: 40px;
   padding-top: 4px;
 }
 
+.go-back {
+  position: relative;
+  top: -5px;
+}
+
 .edit-content img,
-#edit-avatar img {
+#edit-avatar img,
+.go-back img {
   width: 100%;
 }
 
@@ -817,6 +837,11 @@ hr {
   top: -10px;
 }
 
+#profile-display-posts {
+  max-height: 400px;
+  overflow: auto;
+}
+
 /* #endregion */
 
 /* #region ***** Popups */
@@ -946,7 +971,8 @@ hr {
 }
 
 .editor-buttons,
-.editor-actions {
+.editor-actions,
+.topic-actions {
   width: fit-content;
   display: flex;
   margin: 20px auto;
@@ -989,7 +1015,8 @@ hr {
   min-height: 250px;
 }
 
-.editor-actions button {
+.editor-actions button,
+.topic-actions button {
   margin: 10px;
 }
 

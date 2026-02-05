@@ -8,7 +8,7 @@ import { displayPosts } from "./topic.js";
 import { newTopic } from "./new-message.js";
 
 // Liste des sujets avec le dernier message posté sur chaque sujet + la date d'ouverture du sujet
-async function writeTopics(catID) {
+async function writeTopics(catID, mode) {
   try {
     const response = await fetch(`/api/category?catID=${catID}`);
     const category = await response.json();
@@ -17,8 +17,14 @@ async function writeTopics(catID) {
     categPageContainer.innerHTML = "";
     const catTitle = document.createElement("h2");
     catTitle.id = "cat-title";
-    catTitle.innerHTML = `${category.cat_name} <button class="new-topic-button" id="new-topic-button">Ouvrir un nouveau sujet</button>`;
+    catTitle.innerHTML = `<button class="go-back" id="go-back"><img src="/assets/images/arrow-left.svg"/><span>Retour à l'accueil</span></button>
+    ${category.cat_name} <button class="new-topic-button" id="new-topic-button">Ouvrir un nouveau sujet</button>`;
     categPageContainer.appendChild(catTitle);
+
+    if (mode === "newtopic") {
+      newTopic(catID);
+      return;
+    }
 
     const topicList = category.topic_list;
 
@@ -37,7 +43,7 @@ async function writeTopics(catID) {
       const title = event.target.closest(".topic-title");
       if (title) {
         const topicID = parseInt(title.getAttribute("data_id"));
-        displayPosts(topicID);
+        displayPosts(catID, topicID);
         return;
       }
 
@@ -48,11 +54,18 @@ async function writeTopics(catID) {
         return;
       }
 
+      const backHome = event.target.closest(".go-back");
+      if (backHome) {
+        displayHome();
+        return;
+      }
+
       const msgBtn = event.target.closest(".button-link");
       if (msgBtn) {
         const topicID = msgBtn.getAttribute("data_topicid");
         const postId = msgBtn.getAttribute("data_postid");
-        displayPosts(topicID, postId);
+
+        displayPosts(catID, topicID, postId);
         return;
       }
     });
@@ -61,7 +74,7 @@ async function writeTopics(catID) {
   }
 }
 
-export function displayTopics(catID) {
+export function displayTopics(catID, mode) {
   clearPages("category");
 
   if (!SessionData.isLogged) {
@@ -78,7 +91,7 @@ export function displayTopics(catID) {
     document.body.insertAdjacentHTML("beforeend", addedContainer);
   }
 
-  writeTopics(catID);
+  writeTopics(catID, mode);
 }
 
 function buildTopic(topic) {
@@ -89,6 +102,7 @@ function buildTopic(topic) {
 
   if (topic.topic_title === "Nothing to Display" || !topic.post_list) {
     topicBloc.className = "feed-notopic";
+    topicBloc.id = "notopic";
     topicBloc.innerHTML = `<img src="/assets/icons/notopic.png"/> Cette catégorie ne contient pour l'instant aucun message`;
   } else {
     const last = topic.post_list.length - 1;

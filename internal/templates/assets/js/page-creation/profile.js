@@ -249,8 +249,6 @@ async function displayProfileTopics(profileName) {
     const container = document.getElementById("profile-display-posts");
     container.innerHTML = ``;
 
-    console.log(allTopics);
-
     allTopics.forEach((topic) => {
       if (topic.topic_title === "Nothing to Display") {
         const noTopic = document.createElement("div");

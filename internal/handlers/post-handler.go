@@ -39,7 +39,6 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var newTopic formData 
 
     if err := json.NewDecoder(r.Body).Decode(&newTopic); err != nil {
-		log.Print("Erreur dans la création du sujet : ", err)
         http.Error(w, "Données invalides", http.StatusBadRequest)
         return
     }
@@ -52,7 +51,6 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		topicData, err := h.topicService.GetTopicByTitle(newTopic.Title)
 
 		if err !=nil {
-		log.Print("Erreur dans la création du premier post :", err)
 		return
 		}
 		topicID = topicData.ID

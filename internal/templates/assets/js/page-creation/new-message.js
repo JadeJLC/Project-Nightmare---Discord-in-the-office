@@ -18,6 +18,15 @@ function createPostEditor(mode, sectionID, container) {
     MDon: true,
   };
 
+  const goBack = document.getElementById("go-back");
+  console.log(mode);
+  console.log(goBack);
+  if (goBack && mode === "newtopic") {
+    goBack.innerHTML = `<img src="/assets/images/arrow-left.svg"/><span>Retour à la catégorie</span>`;
+  } else if (goBack && mode === "reply") {
+    goBack.innerHTML = `<img src="/assets/images/arrow-left.svg"/><span>Retour au sujet</span>`;
+  }
+
   const postEdit = document.createElement("form");
   postEdit.className = "post-editor";
   postEdit.id = "post-form";
@@ -64,7 +73,17 @@ function createPostEditor(mode, sectionID, container) {
 
   container.appendChild(postEdit);
 
-  postEdit.addEventListener("click", (event) => {
+  container.addEventListener("click", (event) => {
+    const backToCat = event.target.closest(".go-back");
+    if (backToCat && mode === "newtopic") {
+      backToCat.innerHTML = "Retour à la catégorie";
+      displayTopics(sectionID);
+      return;
+    } else if (backToCat && mode === "reply") {
+      const catID = backToCat.getAttribute("data_catid");
+      displayPosts(catID, sectionID);
+      return;
+    }
     let editorBtn = event.target.closest(".editor-button");
 
     if (editorBtn) {

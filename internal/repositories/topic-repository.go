@@ -160,7 +160,6 @@ func (r *TopicRepo) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error
 	}
 
 	if len(lastPosts) == 0 {
-		log.Print("Pas de messages")
 		lastPosts = append(lastPosts, &domain.LastPost{TopicTitle: "Aucun message"})
 	}
 	

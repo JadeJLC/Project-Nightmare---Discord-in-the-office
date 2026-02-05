@@ -1,3 +1,5 @@
+import { displayHome } from "../page-creation/home-display.js";
+
 export function clearPages(destination) {
   window.scrollTo(0, 0);
 
@@ -20,12 +22,12 @@ export function clearPages(destination) {
     if (profilePageContainer) profilePageContainer.remove();
   }
 
-  if (destination != "category" && destination != "newtopic") {
+  if (destination != "newtopic") {
     const categoryTopics = document.getElementById("category-topics");
     if (categoryTopics) categoryTopics.remove();
   }
 
-  if (destination != "topic" && destination != "reply") {
+  if (destination != "reply") {
     const topicPosts = document.getElementById("topic-posts");
     if (topicPosts) topicPosts.remove();
   }
@@ -35,6 +37,8 @@ export function clearPages(destination) {
     if (newTopicBtn) newTopicBtn.remove();
 
     const catTitle = document.getElementById("cat-title");
+    if (!catTitle) displayHome();
+
     if (!catTitle.innerHTML.includes("nouveau sujet"))
       catTitle.innerHTML =
         "Ouvrir un nouveau sujet dans<br>" + catTitle.innerHTML;
@@ -43,6 +47,9 @@ export function clearPages(destination) {
     topicList.forEach((topic) => {
       topic.remove();
     });
+
+    const noTopic = document.getElementById("notopic");
+    if (noTopic) noTopic.remove();
   }
 
   if (destination === "reply") {
@@ -58,5 +65,8 @@ export function clearPages(destination) {
     postList.forEach((post) => {
       post.remove();
     });
+
+    const newTopicBtn = document.getElementById("new-topic-button");
+    if (newTopicBtn) newTopicBtn.remove();
   }
 }
