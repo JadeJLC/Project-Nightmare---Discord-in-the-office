@@ -1,8 +1,9 @@
 // Fonction pour l'affichage du contenu d'un sujet
 
-import { clearPages } from "./clear-pages.js";
+import { clearPages } from "../helpers/clear-pages.js";
 import { SessionData } from "../variables/session-data.js";
 import { displayHome } from "./home-display.js";
+import { newMessage } from "./new-message.js";
 import { displayProfile } from "./profile.js";
 
 // Liste des messages dans le sujet
@@ -14,7 +15,8 @@ async function writePosts(topicID, postID) {
     const topicsPageContainer = document.getElementById("topic-posts");
     topicsPageContainer.innerHTML = "";
     const topicTitle = document.createElement("h2");
-    topicTitle.innerHTML = `${topic.topic_title}`;
+    topicTitle.id = "topic-title";
+    topicTitle.innerHTML = `${topic.topic_title} <button class="new-message-button" id="new-message-button">Répondre au sujet</button>`;
     topicsPageContainer.appendChild(topicTitle);
 
     const postList = topic.post_list;
@@ -34,6 +36,12 @@ async function writePosts(topicID, postID) {
       if (author) {
         const username = author.getAttribute("data_id");
         displayProfile(username);
+        return;
+      }
+
+      const newPostBtn = event.target.closest(".new-message-button");
+      if (newPostBtn) {
+        newMessage(topicID);
         return;
       }
     });

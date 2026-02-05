@@ -1,10 +1,11 @@
 // Fonction pour l'affichage du contenu d'une catégorie :
 
-import { clearPages } from "./clear-pages.js";
+import { clearPages } from "../helpers/clear-pages.js";
 import { SessionData } from "../variables/session-data.js";
 import { displayHome } from "./home-display.js";
 import { displayProfile } from "./profile.js";
 import { displayPosts } from "./topic.js";
+import { newTopic } from "./new-message.js";
 
 // Liste des sujets avec le dernier message posté sur chaque sujet + la date d'ouverture du sujet
 async function writeTopics(catID) {
@@ -15,7 +16,8 @@ async function writeTopics(catID) {
     const categPageContainer = document.getElementById("category-topics");
     categPageContainer.innerHTML = "";
     const catTitle = document.createElement("h2");
-    catTitle.innerHTML = `${category.cat_name}`;
+    catTitle.id = "cat-title";
+    catTitle.innerHTML = `${category.cat_name} <button class="new-topic-button" id="new-topic-button">Ouvrir un nouveau sujet</button>`;
     categPageContainer.appendChild(catTitle);
 
     const topicList = category.topic_list;
@@ -26,6 +28,12 @@ async function writeTopics(catID) {
     });
 
     categPageContainer.addEventListener("click", (event) => {
+      const newTopicBtn = event.target.closest(".new-topic-button");
+      if (newTopicBtn) {
+        newTopic(catID);
+        return;
+      }
+
       const title = event.target.closest(".topic-title");
       if (title) {
         const topicID = parseInt(title.getAttribute("data_id"));
@@ -74,23 +82,22 @@ export function displayTopics(catID) {
 }
 
 function buildTopic(topic) {
-  console.log(topic);
   const topicBloc = document.createElement("div");
   topicBloc.className = "topic-bloc";
 
   const topicID = String(topic.topic_id).padStart(2, "0");
 
-  const last = topic.post_list.length - 1;
-  const lastPost = topic.post_list[last];
-  const postID = String(lastPost.post_id).padStart(2, "0");
-  const lastPostAuthor = lastPost.author.username;
-  const lastPostDate = lastPost.created_on;
-  const lastPostImage = lastPost.author.image;
-
-  if (topic.topic_title === "Aucun message") {
+  if (topic.topic_title === "Nothing to Display" || !topic.post_list) {
     topicBloc.className = "feed-notopic";
     topicBloc.innerHTML = `<img src="/assets/icons/notopic.png"/> Cette catégorie ne contient pour l'instant aucun message`;
   } else {
+    const last = topic.post_list.length - 1;
+    const lastPost = topic.post_list[last];
+    const postID = String(lastPost.post_id).padStart(2, "0");
+    const lastPostAuthor = lastPost.author.username;
+    const lastPostDate = lastPost.created_on;
+    const lastPostImage = lastPost.author.image;
+
     topicBloc.innerHTML = `
                 <h3 data_id="${topicID}" class="topic-title">${topic.topic_title}</h3> 
  <div class="topic-content">   

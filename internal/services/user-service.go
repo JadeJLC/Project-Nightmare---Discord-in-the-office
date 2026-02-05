@@ -22,6 +22,10 @@ func (s *UserService) GetUserByID(id int) (*domain.User, error) {
     return s.repo.GetUserByID(id) 
 }
 
+func (s *UserService) GetUserByUsername(username string) (*domain.User, error) { 
+    return s.repo.GetUserByUsername(username) 
+}
+
 func (s *UserService) Register(user *domain.User) error {
     // Ici tu peux ajouter des règles métier si besoin
     return s.repo.Create(user)

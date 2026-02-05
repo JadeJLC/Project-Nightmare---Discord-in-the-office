@@ -2,7 +2,7 @@
 
 import { SessionData } from "../variables/session-data.js";
 import { displayHome } from "./home-display.js";
-import { clearPages } from "./clear-pages.js";
+import { clearPages } from "../helpers/clear-pages.js";
 
 // #region ***** Affichage des informations utilisateur
 async function writeUserProfile(profile, logged) {

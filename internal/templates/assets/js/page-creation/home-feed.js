@@ -1,4 +1,7 @@
 // Fonction pour la création de la page "derniers messages"
+import { displayPosts } from "./topic.js";
+import { displayTopics } from "./category-topics.js";
+import { displayProfile } from "./profile.js";
 
 async function displayFeed() {
   try {
@@ -19,6 +22,29 @@ async function displayFeed() {
     topicList.forEach((topic) => {
       const topicBloc = buildFeedTopic(topic);
       feedContainer.appendChild(topicBloc);
+    });
+
+    feedContainer.addEventListener("click", (event) => {
+      const title = event.target.closest(".topic-title");
+      if (title) {
+        const topicID = title.getAttribute("data_id");
+        displayTopics(topicID);
+        return;
+      }
+
+      const lastPost = event.target.closest(".button-link");
+      if (lastPost) {
+        const topicID = lastPost.getAttribute("data_topicid");
+        const postID = lastPost.getAttribute("data_postid");
+        displayPosts(topicID, postID);
+        return;
+      }
+
+      const author = event.target.closest(".last-post-author");
+      if (author) {
+        const profile = author.getAttribute("data_id");
+        displayProfile(profile);
+      }
     });
 
     let categoriesContainer = document.getElementById("categories");
@@ -42,17 +68,17 @@ function buildFeedTopic(topic) {
     topicBloc.className = "feed-notopic";
     topicBloc.innerHTML = `<img src="/assets/icons/notopic.png"/> Aucun sujet correspondant à votre recherche n'a été trouvé`;
   } else {
-    topicBloc.innerHTML = `<button type="button" class="button-link" style="float:right;padding-top:10px">
+    topicBloc.innerHTML = `<button type="button" class="button-link" style="float:right;padding-top:10px" data_topicid="${topicID}" data_postid="${postID}">
                   <img
                     src="assets/images/external-link.svg"
                     alt="Voir le message"
                     title="Voir le message"
                   />
                 </button>
-                <h3 id="topic_${topicID}#post_${postID}">Sujet : ${topic.topic_title}</h3> 
+                <h3 class="topic-title" data_id="${topicID}">Sujet : ${topic.topic_title}</h3> 
  <div class="topic-content">   
     <div class="topic-lastpost">${message} </div>
-    <div class="topic-lastinfo">posté le ${topic.created_on} par ${topic.author}</div>
+    <div class="topic-lastinfo">posté le ${topic.created_on} par <span class="last-post-author" data_id="${topic.author}">${topic.author}</span></div>
  </div>`;
   }
 

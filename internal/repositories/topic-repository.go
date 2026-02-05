@@ -17,10 +17,11 @@ func NewTopicRepo(db *sql.DB) *TopicRepo{
 
 func (r *TopicRepo) Create(category int, title string, authorId int) error {
 	currentTime := time.Now()
+	formattedTime := currentTime.Format("02/01/2006 à 15:04:05")
 	_, err := r.db.Exec(`
         INSERT INTO topics (category, title, created_on, author)
         VALUES (?, ?, ?, ?)
-    `, category, title, currentTime, authorId)
+    `, category, title, formattedTime, authorId)
     return err
 }
 
@@ -46,7 +47,7 @@ func (r *TopicRepo) GetTopicById(topicID int) (*domain.Topic, error) {
 
 func (r *TopicRepo) GetTopicByTitle(title string) (*domain.Topic, error) {
 	row := r.db.QueryRow(`
-        SELECT id, category, created_on, author
+        SELECT topic_id, category, created_on, author
         FROM topics WHERE title = ?`, title)
 
     topic := &domain.Topic{}
@@ -121,18 +122,23 @@ func (r *TopicRepo) GetTopicsByCategory(catID int) (*domain.TopicList, error) {
 }
 
 func (r *TopicRepo) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error) {
-	rows, err := r.db.Query(`SELECT
-            m.post_id,
-            m.topic_id,
-            m.content,
-            m.created_on,
-            u.username,
-            t.title
-        FROM messages m
-        JOIN topics t ON m.topic_id = t.topic_id 
-		JOIN users u ON m.author = u.user_id
-        ORDER BY m.created_on DESC
-		LIMIT 10 OFFSET ?`, offset)
+	rows, err := r.db.Query(`SELECT post_id, topic_id, content, created_on, username, title
+	FROM (
+    	SELECT
+	        m.post_id,
+    	    m.topic_id,
+        	m.content,
+        	m.created_on,
+        	u.username,
+        	t.title,
+        	ROW_NUMBER() OVER(PARTITION BY m.topic_id ORDER BY m.created_on DESC) as rn
+    	FROM messages m
+    	JOIN topics t ON m.topic_id = t.topic_id 
+    	JOIN users u ON m.author = u.user_id
+		) t	
+	WHERE rn = 1
+	ORDER BY created_on DESC
+	LIMIT 10 OFFSET ?`, offset)
 
 
 	if err != nil {

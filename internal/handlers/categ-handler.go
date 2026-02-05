@@ -39,6 +39,7 @@ func (h *CategoryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     list, err := h.topicService.GetTopicsByCategory(catID)
 	list.CatName = catInfo.Name
     if err != nil || len(list.Topics) == 0 {
+		log.Print("Erreur dans la récupération de la catégorie :", err)
 		    list.Topics = []*domain.Topic{{Title: "Nothing to Display"}}
 			json.NewEncoder(w).Encode(list)
 			return

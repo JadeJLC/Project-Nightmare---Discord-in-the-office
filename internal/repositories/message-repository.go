@@ -17,10 +17,11 @@ func NewMessageRepo(db *sql.DB) *MessageRepo {
 
 func (r *MessageRepo) Create(topicID int, content string, author int) error {
 	currentTime := time.Now()
+	formattedTime := currentTime.Format("02/01/2006 à 15:04:05")
 	_, err := r.db.Exec(`
 	INSERT INTO messages (topic_id, author, content, created_on)
 	VALUES (?, ?, ?, ?)
-	`, topicID, author, content, currentTime)
+	`, topicID, author, content, formattedTime)
 	return err
 }
 

@@ -35,7 +35,7 @@ async function displayCategories() {
       const lastPostTitle = event.target.closest(".last-post-title");
 
       if (lastPostTitle) {
-        const topicID = lastPost.getAttribute("data_id");
+        const topicID = lastPostTitle.getAttribute("data_id");
         displayPosts(topicID);
         return;
       }
