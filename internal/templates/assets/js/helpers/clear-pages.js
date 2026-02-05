@@ -35,8 +35,9 @@ export function clearPages(destination) {
     if (newTopicBtn) newTopicBtn.remove();
 
     const catTitle = document.getElementById("cat-title");
-    catTitle.innerHTML =
-      "Ouvrir un nouveau sujet dans<br>" + catTitle.innerHTML;
+    if (!catTitle.innerHTML.includes("nouveau sujet"))
+      catTitle.innerHTML =
+        "Ouvrir un nouveau sujet dans<br>" + catTitle.innerHTML;
 
     const topicList = document.querySelectorAll(".topic-bloc");
     topicList.forEach((topic) => {
@@ -49,7 +50,9 @@ export function clearPages(destination) {
     if (newMessageBtn) newMessageBtn.remove();
 
     const topicTitle = document.getElementById("topic-title");
-    topicTitle.innerHTML = "Répondre au sujet : <br>" + topicTitle.innerHTML;
+
+    if (!topicTitle.innerHTML.includes("Répondre au sujet"))
+      topicTitle.innerHTML = "Répondre au sujet : <br>" + topicTitle.innerHTML;
 
     const postList = document.querySelectorAll(".post-bloc");
     postList.forEach((post) => {

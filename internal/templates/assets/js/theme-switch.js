@@ -38,6 +38,7 @@ if (document.readyState === "loading") {
 function buttonMove() {
   window.addEventListener("scroll", () => {
     const button = document.getElementById("front-page-buttons");
+    if (!button) return;
     const scrollValue = window.scrollY;
 
     const scrollDuration = 500;

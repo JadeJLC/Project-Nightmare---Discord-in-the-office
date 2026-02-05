@@ -52,7 +52,7 @@ function createPostEditor(mode, sectionID, container) {
 
 
   <button class="editor-button" data-type="BBswitch" style="margin-left:30px">[BB]<span>BBcode <br><b>ON</span></button>
-  <button class="editor-button" data-type="MDswitch" id="MDswitch">*T*<span>Saisie&nbsp;enrichie <br><b>ON"</span></button>
+  <button class="editor-button" data-type="MDswitch" id="MDswitch">*T*<span>Saisie&nbsp;enrichie <br><b>ON</span></button>
   </div>
   
   <textarea name="content" id="post-content" placeholder="Entrer ici le contenu de votre message" required></textarea>
