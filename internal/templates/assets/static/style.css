@@ -225,7 +225,8 @@ header {
 .header-buttons button,
 .edit-content,
 .editor-button,
-.go-back {
+.go-back,
+#dm-send-btn {
   background-color: var(--bg-down);
   border-radius: 100%;
   width: 50px;
@@ -239,14 +240,16 @@ header {
 
 [data-theme="light"] .header-buttons button,
 [data-theme="light"].edit-content,
-[data-theme="light"].go-back {
+[data-theme="light"].go-back,
+[data-theme="light"]#dm-send-btn {
   background-color: var(--bg-dim);
 }
 
 .header-buttons button:hover,
 .edit-content:hover,
 .editor-button:hover,
-.go-back:hover {
+.go-back:hover,
+#dm-send-button:hover {
   box-shadow: 0 0 12px var(--neon-soft);
 }
 
@@ -267,7 +270,8 @@ header {
 .edit-content span,
 .preview-reaction span,
 .editor-button span,
-.go-back span {
+.go-back span,
+#dm-send-btn span {
   min-width: 2px;
   width: 2px;
   overflow: hidden;
@@ -290,7 +294,8 @@ header {
 .edit-content:hover span,
 .preview-reaction:hover span,
 .editor-button:hover span,
-.go-back:hover span {
+.go-back:hover span,
+#dm-send-btn:hover span {
   opacity: 1;
   transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   min-width: 90px;
@@ -1299,10 +1304,14 @@ u {
 }
 
 .dm-message.mine {
-  margin-left: -8%;
+  margin-left: -5%;
   border-radius: 15px;
   border-bottom-left-radius: 0px;
   background-color: var(--fond-categ);
+}
+
+[data-theme="light"] .dm-message.mine {
+  background-color: var(--bg-down) !important;
 }
 
 .dm-header {
@@ -1311,6 +1320,7 @@ u {
 
 .dm-content {
   padding-left: 20px;
+  padding-bottom: 20px;
 }
 
 .dm-author {
@@ -1334,4 +1344,26 @@ u {
     0 0 5px var(--neon),
     0 0 15px var(--neon-soft);
   margin: 0;
+}
+
+.dm-input {
+  width: 90%;
+  max-width: 1500px;
+  margin: 20px auto;
+  padding: 20px;
+  text-align: center;
+  background: var(--bg);
+  border-radius: 15px;
+  box-shadow: 0 0 8px var(--shadow);
+}
+
+.dm-input input {
+  padding: 10px;
+  width: 60%;
+}
+
+#dm-send-btn img {
+  height: 26px;
+  margin-top: 4px;
+  margin-left: -2px;
 }

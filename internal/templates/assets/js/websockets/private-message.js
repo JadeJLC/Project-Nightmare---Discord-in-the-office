@@ -63,7 +63,7 @@ export async function openConversation(otherUserId) {
 
   div.innerHTML = `
   <input id="dm-input-text" type="text" placeholder="Écrire un message...">
-  <button id="dm-send-btn">Envoyer</button>
+  <button id="dm-send-btn"><img src="/assets/images/send.svg"/><span>Envoyer</span></button>
 `;
 
   const input = div.querySelector("#dm-input-text");
