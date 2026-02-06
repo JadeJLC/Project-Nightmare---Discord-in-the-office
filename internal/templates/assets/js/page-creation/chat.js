@@ -70,7 +70,7 @@ export async function loadConversationsList() {
         `;
 
     div.addEventListener("click", () => {
-      if (pageData.ShowingConversation) {
+      if (pageData.ConversationWith === `${conv.otherUser.id}`) {
         closeConversation();
       } else {
         openConversation(conv.otherUser.id);

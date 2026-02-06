@@ -92,13 +92,13 @@ export async function openConversation(otherUserId) {
   });
 
   msgContainer.appendChild(div);
-  pageData.ShowingConversation = true;
+  pageData.ConversationWith = `${otherUserId}`;
 }
 
 export function closeConversation() {
   const container = document.getElementById("dm-messages");
   container.innerHTML = "";
-  pageData.ShowingConversation = false;
+  pageData.ConversationWith = "none";
 }
 
 export function displayDM(msg) {
