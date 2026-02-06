@@ -69,6 +69,7 @@ func (r *ChatRepo) GetDMs(user1, user2, offset, limit int) ([]domain.DM, error) 
         dms = append(dms, m)
     }
 
+
     return dms, nil
 }
 

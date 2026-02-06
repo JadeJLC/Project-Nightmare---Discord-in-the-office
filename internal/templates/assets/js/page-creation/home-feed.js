@@ -36,7 +36,6 @@ async function displayFeed() {
   }
 }
 
-<<<<<<< HEAD
 /**
  * Place les "liens" accessibles depuis la page d'accueil en affichage feed : titre du sujet, dernier message, auteurs
  * @param {HTMLElement} feedPageContainer Le conteneur de la partie feed de la page
@@ -71,8 +70,6 @@ function setHomeFeedLinks(feedContainer) {
  * @param {object} topic Le sujet à récupérer et afficher
  * @returns {HTMLElement} L'élément HTML du sujet
  */
-=======
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
 function buildFeedTopic(topic) {
   const topicBloc = document.createElement("div");
   topicBloc.className = "topic-bloc";

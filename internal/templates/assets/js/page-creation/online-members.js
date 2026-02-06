@@ -1,5 +1,4 @@
-import { SessionData } from "../variables/session-data.js";
-import { state } from "../variables/state.js";
+import { state } from "../variables.js";
 import { displayProfile } from "./profile.js";
 
 const onlineMembersBtn = document.getElementById("online-members-btn");

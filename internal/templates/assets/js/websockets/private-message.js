@@ -1,5 +1,5 @@
 // Fonctions pour afficher la liste des utilisateurs en ligne et permettre de leur envoyer des messages
-import { SessionData } from "../variables/session-data.js";
+import { SessionData } from "../variables.js";
 import { ws } from "./connect.js";
 import { loadConversationsList } from "../page-creation/chat.js";
 
@@ -7,8 +7,6 @@ let currentDMUserId = null;
 let lastSenderId = null;
 
 export function handleIncomingDM(msg) {
-  console.log("WS message reçu :", msg);
-
   // 1. Si la conversation est ouverte → afficher le message
   if (
     currentDMUserId === msg.sender_id ||
@@ -96,7 +94,6 @@ export async function openConversation(otherUserId) {
 }
 
 export function displayDM(msg) {
-  console.log(msg);
   const container = document.getElementById("dm-messages");
 
   const div = document.createElement("div");
@@ -119,14 +116,15 @@ export function displayDM(msg) {
         <div class="reduced-avatar">
               <img src="assets/images-avatar/${msg.sender_image}.png">
             </div>
-        <p class="dm-author">${username}</p>
+        <div class="dm-author">${username}</div>
       </div>
     `
         : ""
     }
     
-    <p class="dm-content">${msg.content}</p>
     <span class="dm-time">${new Date(msg.created_at).toLocaleTimeString()}</span>
+    <div class="dm-content">${msg.content}</div>
+    
   `;
 
   // Mettre à jour le dernier sender

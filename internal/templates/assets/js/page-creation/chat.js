@@ -1,28 +1,24 @@
 // Fonctions pour la création de la page "messages privés" avec un utilisateur
 
-import { SessionData } from "../variables/session-data.js";
-import { clearPages } from "./clear-pages.js";
+import { SessionData } from "../variables.js";
+import { clearPages } from "../helpers/clear-pages.js";
 import { openConversation } from "../websockets/private-message.js";
+import { isUserLoggedIn } from "../helpers/check-log-status.js";
 
 export function displayMailbox() {
+  if (!isUserLoggedIn) return;
+  clearPages("dm");
   const usernameHeader = document.getElementById("header-username");
-  const homeBtn = document.getElementById("go-home");
+  usernameHeader.innerHTML = `Messagerie de ${SessionData.username}`;
 
-  if (SessionData.isLogged) {
-    usernameHeader.innerHTML = `Messagerie de ${SessionData.username}`;
+  let dmPage = document.getElementById("dm-page");
+
+  if (!dmPage) {
+    dmPage = document.createElement("div");
+    dmPage.id = "dm-page";
+    dmPage.classList.add("dm-container");
   }
 
-  homeBtn.style.display = "block";
-
-  // Efface toutes les autres pages
-  clearPages("dm");
-
-  // Crée la page DM comme une nouvelle div
-  const dmPage = document.createElement("div");
-  dmPage.id = "dm-page";
-  dmPage.classList.add("dm-container");
-
-  // Injecte le HTML de la messagerie
   dmPage.innerHTML = `
       <div id="dm-sidebar" class="dm-sidebar">
           <h3>Messages privés</h3>
@@ -37,10 +33,8 @@ export function displayMailbox() {
       </div>
   `;
 
-  // Ajoute la page DM à la fin du body
   document.body.appendChild(dmPage);
 
-  // Charge la liste des conversations
   loadConversationsList();
 }
 
@@ -58,13 +52,16 @@ export async function loadConversationsList() {
   conversations.forEach((conv) => {
     const div = document.createElement("div");
     div.classList.add("dm-conversation-item");
+    div.classList.add("user-card");
     div.dataset.userId = conv.otherUser.id;
 
     div.innerHTML = `
-            <div class="reduced-avatar">
-              <img src="assets/images-avatar/${conv.otherUser.image}.png">
-            </div>
-            <span>${conv.otherUser.username}</span>
+        <div class="reduced-avatar">
+            <img src="assets/images-avatar/${conv.otherUser.image}.png" alt="Image de profil - ${conv.otherUser.image}" />
+        </div>
+        <div class="info">
+            <span class="username">${conv.otherUser.username}</span> <span id="dm-arrow">↓</span>
+        </div>
         `;
 
     div.addEventListener("click", () => {

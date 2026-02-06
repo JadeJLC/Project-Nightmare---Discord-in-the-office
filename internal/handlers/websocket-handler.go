@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
@@ -38,11 +39,8 @@ func NewWebSocketHandler(ss *services.SessionService, cs *services.ChatService, 
 }
 
 func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("WS endpoint hit")
-    // 1. Authentifier l’utilisateur via le 
 	
     userID, err := h.sessionService.GetUserIDFromRequest(r)
-	fmt.Println("WS userID:", userID, "err:", err)
 
     if err != nil {
         http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -52,18 +50,17 @@ func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     // 2. Upgrade HTTP → WebSocket
     conn, err := h.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		fmt.Println("WS upgrade error:", err)
+		log.Print("WS upgrade error:", err)
 		http.Error(w, "WebSocket upgrade failed", http.StatusInternalServerError)
 		return
 	}
 
 
-    // 3. Stocker la connexion
     wsMutex.Lock()
     wsClients[userID] = conn
     wsMutex.Unlock()
 	h.broadcastPresence()
-    // 4. Lancer l’écoute des messages
+    
     go h.listen(userID, conn)
 }
 

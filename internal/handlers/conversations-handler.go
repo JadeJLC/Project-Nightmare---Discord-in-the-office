@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
@@ -27,6 +28,7 @@ func (h *ConversationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 	convs, err := h.chatService.GetConversations(userID)
 	if err != nil {
+		log.Print("Erreur dans le chargement de la conversation : ", err)
 		http.Error(w, "Error loading conversations", http.StatusInternalServerError)
 		return
 	}
@@ -52,6 +54,7 @@ func (h *ConversationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			LastAt:    c.LastMessageAt,
 		})
 	}
+
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)

@@ -13,3 +13,9 @@ export const typeMode = {
   BBcode: true,
   MDon: true,
 };
+
+export const state = { UserList: [] };
+
+export const pageData = {
+  ShowingOnlineMembers: false,
+};

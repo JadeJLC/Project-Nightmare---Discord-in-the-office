@@ -5,7 +5,6 @@ import { displayPosts } from "./topic.js";
 
 // #region ***** Affichage des informations utilisateur
 
-<<<<<<< HEAD
 /**
  * Fonction-mère pour la création du HTML de la page profil (conteneur, header, appel de fonction)
  * @param {string} profileName Nom de l'utilisateur dont on affiche le profil
@@ -37,9 +36,6 @@ export function displayProfile(profileName) {
  * @param {string} profile Nom de l'utilisateur dont on consulte le profil
  * @param {string} logged Nom de l'utilisateur connecté
  */
-=======
-// #region ***** Affichage des informations utilisateur
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
 async function writeUserProfile(profile, logged) {
   try {
     const response = await fetch(
@@ -114,7 +110,6 @@ function buildProfileHTML(user) {
           `;
 }
 
-<<<<<<< HEAD
 /**
  * Génère la partie "détails" quand on ouvre le profil d'un autre utilisateur
  * @param {object} user L'utilisateur dont on affiche le profil
@@ -140,11 +135,6 @@ function buildOtherDetails(user) {
 function buildSelfDetails(user) {
   return `<form class="profile-right" method="post" id="profile-form">      
       <input type="hidden" name="username" value="${user.username}">
-=======
-    if (user.email !== "Not Available") {
-      profilePageContainer.innerHTML += `<form class="profile-right" method="post" id="profile-form">      
-      <input type="hidden" name="username" value="${logged}">
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
       <button type="button" class="edit-content" id="edit-infos">
           <img src="assets/images/tool.svg" />
           <span>Modifier mon profil</span>
@@ -168,7 +158,6 @@ function buildSelfDetails(user) {
           </div>
         </div>
       </form>`;
-<<<<<<< HEAD
 }
 
 // #endregion
@@ -179,66 +168,6 @@ function buildSelfDetails(user) {
  * Génère la liste des messages postés par l'utilisateur sur le forum
  * @param {string} profileName Nom de l'utilisateur
  */
-=======
-    } else {
-      profilePageContainer.innerHTML += `<div class="profile-right">
-        <div class="profile-details">
-          <span>Informations</span>
-          <div class="profile-public">
-            <p><span>Âge&nbsp;:</span> ${user.age}&nbsp;ans</p>
-            <p><span>Genre&nbsp;:</span> ${user.genre}</p>
-          </div>
-        </div>
-      </div>`;
-    }
-
-    setProfileButtons(user.email, profile);
-
-    const profileDisplay = localStorage.getItem("profileDisplay") || "topics";
-    if (profileDisplay === "reactions") {
-      displayProfileReactions(profile);
-    } else if (profileDisplay === "messages") {
-      displayProfileMessages(profile);
-    } else {
-      displayProfileTopics(profile);
-    }
-  } catch (error) {
-    console.log("Erreur dans la récupération du profil : ", error);
-  }
-}
-
-export function displayProfile(profileName) {
-  clearPages("profile");
-
-  const usernameHeader = document.getElementById("header-username");
-  usernameHeader.innerHTML = "";
-
-  if (!SessionData.isLogged) {
-    const popup = document.getElementById("auth-popup");
-    popup.classList.remove("is-hidden");
-    displayHome();
-    return;
-  } else {
-    if (typeof profileName !== "string" || !profileName)
-      profileName = SessionData.username;
-
-    usernameHeader.innerHTML = `Profil de ${profileName}`;
-  }
-
-  let profilePageContainer = document.getElementById("profile-page");
-
-  if (!profilePageContainer) {
-    let addedContainer = `<div id="profile-page"></div>`;
-    document.body.insertAdjacentHTML("beforeend", addedContainer);
-  }
-
-  writeUserProfile(profileName, SessionData.username);
-}
-
-// #endregion
-
-// #region ***** Affichage des messages
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
 async function displayProfileMessages(profileName) {
   try {
     const response = await fetch(
@@ -253,7 +182,6 @@ async function displayProfileMessages(profileName) {
     const container = document.getElementById("profile-display-posts");
     container.innerHTML = ``;
 
-<<<<<<< HEAD
     if (
       allMessages.length === 0 ||
       allMessages[0].content === "Nothing to Display"
@@ -267,20 +195,6 @@ async function displayProfileMessages(profileName) {
         (message) =>
           `<div class="profile-preview preview-message">
             <h3 class="on-topic" data-catid=${message.cat_id} data-topicid="${message.topic_id}">Sur le sujet : ${message.topic_title}</h3>
-=======
-    allMessages.forEach((message) => {
-      if (message.content === "Nothing to Display") {
-        const noTopic = document.createElement("div");
-        noTopic.className = "feed-notopic";
-        noTopic.innerHTML = `Aucun sujet correspondant à votre recherche n'a été trouvé`;
-        container.appendChild(noTopic);
-      } else {
-        const newMsg = document.createElement("div");
-        newMsg.classList.add("profile-preview");
-        newMsg.classList.add("preview-message");
-        newMsg.innerHTML = `
-            <h3>Sur le sujet : ${message.topic_title}</h3>
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
             <div class="topic-content">
               <div class="topic-lastpost"> ${message.content} </div>
               <div class="topic-lastinfo">
@@ -321,7 +235,6 @@ async function displayProfileReactions(profileName) {
     const container = document.getElementById("profile-display-posts");
     container.innerHTML = ``;
 
-<<<<<<< HEAD
     if (
       allReactions.length === 0 ||
       allReactions[0].topic_title === "Nothing to Display"
@@ -335,20 +248,6 @@ async function displayProfileReactions(profileName) {
         (message) =>
           `<div class="profile-preview preview-message">
             <h3 class="on-topic" data-topicid="${message.topic_id}">Sur le sujet : ${message.topic_name}</h3>
-=======
-    allReactions.forEach((message) => {
-      if (message.topic_title === "Nothing to Display") {
-        const noTopic = document.createElement("div");
-        noTopic.className = "feed-notopic";
-        noTopic.innerHTML = `Aucun sujet correspondant à votre recherche n'a été trouvé`;
-        container.appendChild(noTopic);
-      } else {
-        const newMsg = document.createElement("div");
-        newMsg.classList.add("profile-preview");
-        newMsg.classList.add("preview-message");
-        newMsg.innerHTML = `
-            <h3 id="topic_${message.topic_id} message_${message.post_id}">Sur le sujet : ${message.topic_name}</h3>
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
             <div class="preview-reaction">
               <img src="assets/avatars/${message.reaction_image}" alt="Réaction"/>
               <span>${message.reaction_name}</span>
@@ -393,7 +292,6 @@ async function displayProfileTopics(profileName) {
     const container = document.getElementById("profile-display-posts");
     container.innerHTML = ``;
 
-<<<<<<< HEAD
     if (
       allTopics.length === 0 ||
       allTopics[0].topic_title === "Nothing to Display"
@@ -409,25 +307,6 @@ async function displayProfileTopics(profileName) {
              <h3 data-catid = "${topic.cat_id}" data-topicid="${topic.topic_id}" class="on-topic">
               ${topic.topic_title}
               <button type="button" class="button-link on-topic" data-topicid="${topic.topic_id}">
-=======
-    console.log(allTopics);
-
-    allTopics.forEach((topic) => {
-      if (topic.topic_title === "Nothing to Display") {
-        const noTopic = document.createElement("div");
-        noTopic.className = "feed-notopic";
-        noTopic.innerHTML = `Aucun sujet correspondant à votre recherche n'a été trouvé`;
-        container.appendChild(noTopic);
-        return;
-      }
-      const newMsg = document.createElement("div");
-      newMsg.classList.add("profile-preview");
-      newMsg.classList.add("preview-topic");
-      newMsg.innerHTML = `
-            <h3 id="topic_${topic.topic_id}">
-              ${topic.topic_title}
-              <button type="button" class="button-link">
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
                 <img
                   src="assets/images/external-link.svg"
                   alt="Voir le sujet"
@@ -452,43 +331,33 @@ async function displayProfileTopics(profileName) {
 // #region
 
 // #region ***** Mise en place des boutons
-<<<<<<< HEAD
 /**
  * Passe en affichage "liste des réactions"
  * @param {string} profileName Nom de l'utilisateur
  */
-=======
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
 function switchToReactions(profileName) {
   localStorage.setItem("profileDisplay", "reactions");
   displayProfile(profileName);
 }
 
-<<<<<<< HEAD
 /**
  * Passe en affichage "liste des messages"
  * @param {string} profileName Nom de l'utilisateur
  */
-=======
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
 function switchToMessages(profileName) {
   localStorage.setItem("profileDisplay", "messages");
   displayProfile(profileName);
 }
 
-<<<<<<< HEAD
 /**
  * Passe en affichage "liste des sujets"
  * @param {string} profileName Nom de l'utilisateur
  */
-=======
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
 function switchToTopics(profileName) {
   localStorage.setItem("profileDisplay", "topics");
   displayProfile(profileName);
 }
 
-<<<<<<< HEAD
 /**
  * Active les effets de clic sur les boutons du profil
  * @param {string} status Pour l'envoi à la fonction des boutons
@@ -557,33 +426,6 @@ function activateButton(status) {
   const reactionBtn = document.getElementById("profile-myreactions");
   const messageBtn = document.getElementById("profile-mymessages");
   const topicBtn = document.getElementById("profile-mytopics");
-=======
-function setProfileButtons(status, profileName) {
-  const topicBtn = document.getElementById("profile-mytopics");
-  const messageBtn = document.getElementById("profile-mymessages");
-  const reactionBtn = document.getElementById("profile-myreactions");
-  const editBtn = document.getElementById("edit-infos");
-  const profForm = document.getElementById("profile-form");
-  const avaBtn = document.getElementById("edit-avatar");
-
-  topicBtn.addEventListener("click", function () {
-    switchToTopics(profileName);
-  });
-  messageBtn.addEventListener("click", function () {
-    switchToMessages(profileName);
-  });
-  reactionBtn.addEventListener("click", function () {
-    switchToReactions(profileName);
-  });
-  if (editBtn) editBtn.addEventListener("click", editProfile);
-  if (profForm)
-    profForm.onsubmit = async (e) => {
-      e.preventDefault();
-      editProfile("valider");
-    };
-  if (avaBtn && status != "Not Available") avaBtn.classList.remove("is-hidden");
-
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
   const profileDisplay = localStorage.getItem("profileDisplay") || "topics";
   if (profileDisplay === "reactions") {
     topicBtn.classList.remove("active");
@@ -603,7 +445,6 @@ function setProfileButtons(status, profileName) {
 // #endregion
 
 // #region ***** Modification du profil
-<<<<<<< HEAD
 /**
  * Permet à l'utilisateur de modifier les détails de son profil (mail, noms, age, genre)
  * @param {string} mode Si indiqué : le mode "valider" envoie dans la base de données
@@ -616,34 +457,6 @@ async function editProfileDetails(mode) {
 
   const profileName = SessionData.username;
   const profForm = document.getElementById("profile-form");
-=======
-async function editProfile(mode) {
-  if (!SessionData.isLogged) {
-    console.log("Vous devez vous connecter pour ouvrir un profil");
-    const popup = document.getElementById("auth-popup");
-    popup.classList.remove("is-hidden");
-    displayHome();
-    return;
-  }
-
-  const profileName = SessionData.username;
-  const profForm = document.getElementById("profile-form");
-
-  document.getElementById("profile-gender-span").classList.toggle("is-hidden");
-  document.getElementById("profile-email-span").classList.toggle("is-hidden");
-  document.getElementById("profile-first-span").classList.toggle("is-hidden");
-  document.getElementById("profile-last-span").classList.toggle("is-hidden");
-  document.getElementById("edit-infos").classList.toggle("is-hidden");
-
-  document.getElementById("profile-gender-input").classList.toggle("is-hidden");
-  document.getElementById("profile-email-input").classList.toggle("is-hidden");
-  document.getElementById("profile-first-input").classList.toggle("is-hidden");
-  document.getElementById("profile-last-input").classList.toggle("is-hidden");
-  document.getElementById("confirm-edit").classList.toggle("is-hidden");
-
-  if (mode != "valider") return;
-
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
   const data = Object.fromEntries(new FormData(profForm).entries());
 
   try {
@@ -663,7 +476,6 @@ async function editProfile(mode) {
   }
 }
 
-<<<<<<< HEAD
 /**
  * Affiche ou masque les champs d'édition du profil quand on clique sur le bouton
  */
@@ -681,6 +493,4 @@ function displayEditForm() {
   document.getElementById("confirm-edit").classList.toggle("is-hidden");
 }
 
-=======
->>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
 // #endregion
