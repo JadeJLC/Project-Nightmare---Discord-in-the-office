@@ -22,6 +22,10 @@ type LoginRequest struct {
     Password      string `json:"password"`
 }
 
+/*
+* Gestion de la connexion
+* Réccupère le formulaire de connexion et créee un cookie dans la BDD des sessions
+*/
 func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     var req LoginRequest
     json.NewDecoder(r.Body).Decode(&req)

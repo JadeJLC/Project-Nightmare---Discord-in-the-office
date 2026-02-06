@@ -13,6 +13,9 @@ func NewReactionRepo(db *sql.DB) *ReactionRepo {
 	return &ReactionRepo {db:db}
 }
 
+/*
+* Ajoute une réaction à la base de données
+*/
 func (r *ReactionRepo) Add(postID, userID int, reaction string) error {
 	_, err := r.db.Exec(`
 	INSERT INTO reactions (post_id, user_id, reaction_type)
@@ -21,6 +24,9 @@ func (r *ReactionRepo) Add(postID, userID int, reaction string) error {
 	return err
 }
 
+/*
+* Supprime une réaction de la base de données
+*/
 func (r *ReactionRepo) Delete(postID, userID int) error {
     _, err := r.db.Exec(`
         DELETE FROM reaction WHERE post_id = ? AND user_id ) ?
@@ -28,6 +34,9 @@ func (r *ReactionRepo) Delete(postID, userID int) error {
     return err
 }
 
+/*
+* Récupère la liste de toutes les réactions sur un message particulier
+*/
 func (r *ReactionRepo) GetPostReactions(postID int) ([]*domain.Reaction, error) {
 	rows, err := r.db.Query(`SELECT user_id, reaction_type 
     FROM reactions
@@ -49,6 +58,9 @@ func (r *ReactionRepo) GetPostReactions(postID int) ([]*domain.Reaction, error) 
     return reactions, nil
 }
 
+/*
+* Récupère la liste de tous les messages auxquels l'utilisateur a réagi
+*/
 func (r *ReactionRepo) GetUserReactions(userID int) ([]*domain.ReactionDisplay, error) {
 	rows, err := r.db.Query(`SELECT
 			r.post_id,

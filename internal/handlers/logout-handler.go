@@ -15,6 +15,10 @@ func NewLogoutHandler(us *services.UserService, ss *services.SessionService) *Lo
     return &LogoutHandler{userService: us, sessionService: ss}
 }
 
+/*
+* Gestion de la déconnexion
+* Récupère les informations de l'utilisateur et supprime le cookie de la base de données
+*/
 func (h *LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	cookie, err := r.Cookie("auth_token") 

@@ -8,6 +8,9 @@ import (
 	"path/filepath"
 )
 
+/*
+* Affiche la page de base à partir du template
+ */
 func RenderTemplate(w http.ResponseWriter, tmpl string, datas any) {
     templates, _ := template.ParseGlob(filepath.Join("internal", "templates", "*.html"))
     err := templates.ExecuteTemplate(w, tmpl, datas)

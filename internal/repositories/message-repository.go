@@ -15,6 +15,9 @@ func NewMessageRepo(db *sql.DB) *MessageRepo {
 	return &MessageRepo {db:db}
 }
 
+/*
+* Ajoute un nouveau message dans la base de données
+*/
 func (r *MessageRepo) Create(topicID int, content string, author int) error {
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("02/01/2006 à 15:04:05")
@@ -25,6 +28,9 @@ func (r *MessageRepo) Create(topicID int, content string, author int) error {
 	return err
 }
 
+/*
+* Supprime le message demandé de la base de données
+*/
 func (r *MessageRepo) Delete(postID int) error {
     _, err := r.db.Exec(`
         DELETE FROM messages WHERE post_id = ?
@@ -32,6 +38,9 @@ func (r *MessageRepo) Delete(postID int) error {
     return err
 }
 
+/*
+* Modifie le contenu du message dans la base de données
+*/
 func (r *MessageRepo) Edit(postID int, newMessage string) error {
 	_, err := r.db.Exec(`
 	UPDATE messages SET content = ?
@@ -40,12 +49,16 @@ func (r *MessageRepo) Edit(postID int, newMessage string) error {
 	return err
 }
 
+
+/*
+* Récupère la liste complète des messages sur le sujet 
+* Pour chaque message, récupère les informations du posteur
+*/
 func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error) {
 	rows, err := r.db.Query(`SELECT 
 	m.post_id, 
 	u.username,
 	u.image,
-	u.age,
 	u.inscription,
 	m.content, 
 	m.created_on, 
@@ -64,7 +77,7 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
     var messages = []*domain.Message{}
 	for rows.Next() {
 	message := &domain.Message{}
-		if err := rows.Scan(&message.ID, &message.Author.Username, &message.Author.Image, &message.Author.Age, &message.Author.Inscription, &message.Content, &message.Time, &message.Reactions); err != nil {
+		if err := rows.Scan(&message.ID, &message.Author.Username, &message.Author.Image, &message.Author.Inscription, &message.Content, &message.Time, &message.Reactions); err != nil {
 			return nil, err
 		}
 		messages = append(messages, message)
@@ -73,6 +86,9 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
     return messages, nil
 }
 
+/*
+* Récupère la liste de tous les messages postés par un utilisateur particulier, sur quel sujet et dans quelle catégorie
+*/
 func (r *MessageRepo) GetMessagesByAuthor(author int) ([]*domain.Message, error) {
 	rows, err := r.db.Query(`SELECT
             m.post_id,
@@ -80,9 +96,11 @@ func (r *MessageRepo) GetMessagesByAuthor(author int) ([]*domain.Message, error)
             m.content,
             m.created_on,
 			m.reactions,
-            t.title
+            t.title,
+			c.cat_id
         FROM messages m
         JOIN topics t ON m.topic_id = t.topic_id
+		JOIN categories c ON t.category = c.cat_id
 		WHERE m.author = ? `, author)
 	if err != nil {
 		return nil, err
@@ -92,15 +110,19 @@ func (r *MessageRepo) GetMessagesByAuthor(author int) ([]*domain.Message, error)
     var messages = []*domain.Message{}
 	for rows.Next() {
 	message := &domain.Message{}
-		if err := rows.Scan(&message.ID, &message.TopicID, &message.Content, &message.Time, &message.Reactions, &message.TopicTitle); err != nil {
+		if err := rows.Scan(&message.ID, &message.TopicID, &message.Content, &message.Time, &message.Reactions, &message.TopicTitle, &message.CatID); err != nil {
 			return nil, err
 		}
 		messages = append(messages, message)
 	}
+
    
     return messages, nil
 }
 
+/*
+* Récupère un message particulier à partir de son ID
+*/
 func (r *MessageRepo) GetMessageByID(postID int) (*domain.Message, error) {
 	row := r.db.QueryRow(`SELECT topic_id, author, content, created_on, reactions 
     FROM messages

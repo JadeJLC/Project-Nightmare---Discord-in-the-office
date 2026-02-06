@@ -20,6 +20,10 @@ func NewCategoryHandler(us *services.UserService, ms *services.MessageService, c
     return &CategoryHandler{userService: us, messageService: ms, categoryService: cs, topicService: ts}
 }
 
+/*
+* Fonction appelée en cliquant sur le nom d'une catégorie
+* Récupère la liste des sujets présents dans la catégorie pour l'envoyer à la page
+*/
 func (h *CategoryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     catID, err := strconv.Atoi(r.URL.Query().Get("catID"))
 	if err != nil {

@@ -16,8 +16,11 @@ func NewMeHandler(userService *services.UserService) *MeHandler {
     return &MeHandler{userService: userService}
 }
 
+/*
+* Vérifie l'identité de l'utilisateur connecté pour créer et garder une session active
+* Lit le cookie, le compare au token et retrouve les informations utilisateur correspondante
+*/
 func (h *MeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    // Lire le cookie
     cookie, err := r.Cookie("auth_token")
     if err != nil {
         json.NewEncoder(w).Encode(map[string]any{
@@ -26,7 +29,6 @@ func (h *MeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Vérifier le token
     userID, err := auth.ExtractUserID(cookie.Value)
     if err != nil {
         json.NewEncoder(w).Encode(map[string]any{
@@ -35,7 +37,6 @@ func (h *MeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Récupérer l'utilisateur
     user, err := h.userService.GetUserByID(int(userID))
     if err != nil {
         json.NewEncoder(w).Encode(map[string]any{
@@ -44,7 +45,6 @@ func (h *MeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Réponse
     json.NewEncoder(w).Encode(map[string]any{
         "logged":   true,
         "username": user.Username,

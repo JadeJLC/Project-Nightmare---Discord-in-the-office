@@ -1,15 +1,19 @@
 import { displayHome } from "./page-creation/home-display.js";
 import { initTheme } from "./theme-switch.js";
-import { initAuth } from "./page-creation/login-signup.js";
-import { checkLoginStatus } from "./session/check-login.js";
+import { initAuth } from "./page-creation/register-login.js";
+import { checkLoginStatus } from "./helpers/check-log-status.js";
 import { displayProfile } from "./page-creation/profile.js";
+import { SessionData } from "./variables.js";
 
+/**
+ * Mise en place des fonctionnalités de la page
+ */
 async function main() {
   await checkLoginStatus();
   initTheme();
   displayHome();
   initAuth();
-  setEventListeners();
+  setHeaderListeners();
 }
 
 if (document.readyState === "loading") {
@@ -18,10 +22,17 @@ if (document.readyState === "loading") {
   main();
 }
 
-function setEventListeners() {
-  const profileBtn = document.getElementById("display-profile");
-  profileBtn.addEventListener("click", displayProfile);
+/**
+ * Installe les eventlisteners dans le header
+ */
+function setHeaderListeners() {
+  const header = document.getElementById("nav-header");
 
-  const homeBtn = document.getElementById("go-home");
-  homeBtn.addEventListener("click", displayHome);
+  header.addEventListener("click", (event) => {
+    const homeBtn = event.target.closest("#go-home");
+    if (homeBtn) displayHome();
+
+    const profileBtn = event.target.closest("#display-profile");
+    if (profileBtn) displayProfile(SessionData.username);
+  });
 }

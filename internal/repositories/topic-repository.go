@@ -15,6 +15,9 @@ func NewTopicRepo(db *sql.DB) *TopicRepo{
 	return &TopicRepo{db: db}
 }
 
+/*
+* Ouvre un nouveau sujet et l'ajoute dans la base de données
+*/
 func (r *TopicRepo) Create(category int, title string, authorId int) error {
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("02/01/2006 à 15:04:05")
@@ -25,6 +28,9 @@ func (r *TopicRepo) Create(category int, title string, authorId int) error {
     return err
 }
 
+/*
+* Supprime un sujet de la base de données
+*/
 func (r *TopicRepo) Delete(topicID int) error {
     _, err := r.db.Exec(`
         DELETE FROM topics WHERE topic_id = ?
@@ -32,6 +38,9 @@ func (r *TopicRepo) Delete(topicID int) error {
     return err
 }
 
+/*
+* Récupère les informations d'un sujet à partir de son ID
+*/
 func (r *TopicRepo) GetTopicById(topicID int) (*domain.Topic, error) {
 	row := r.db.QueryRow(`
         SELECT category, title, created_on, author
@@ -45,6 +54,9 @@ func (r *TopicRepo) GetTopicById(topicID int) (*domain.Topic, error) {
     return topic, nil
 }
 
+/*
+* Récupère les informations d'un sujet à partir de son titre
+*/
 func (r *TopicRepo) GetTopicByTitle(title string) (*domain.Topic, error) {
 	row := r.db.QueryRow(`
         SELECT topic_id, category, created_on, author
@@ -58,6 +70,9 @@ func (r *TopicRepo) GetTopicByTitle(title string) (*domain.Topic, error) {
     return topic, nil
 }
 
+/*
+* Récupère tous les sujets ouverts par un utilisateur
+*/
 func (r *TopicRepo) GetTopicsByAuthor(authorID int) ([]*domain.Topic, error) {
 	rows, err := r.db.Query(`SELECT 
     t.topic_id, 
@@ -90,6 +105,9 @@ func (r *TopicRepo) GetTopicsByAuthor(authorID int) ([]*domain.Topic, error) {
     return topics, nil
 }
 
+/*
+* Récupère tous les sujets d'une catégorie
+*/
 func (r *TopicRepo) GetTopicsByCategory(catID int) (*domain.TopicList, error) {
 	rows, err := r.db.Query(`SELECT 
 	t.topic_id, 
@@ -121,6 +139,9 @@ func (r *TopicRepo) GetTopicsByCategory(catID int) (*domain.TopicList, error) {
     return &topiclist, nil
 }
 
+/*
+* Récupère les 10 sujets les plus récents pour l'affichage du feed
+*/
 func (r *TopicRepo) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error) {
 	rows, err := r.db.Query(`SELECT post_id, topic_id, content, created_on, username, title
 	FROM (

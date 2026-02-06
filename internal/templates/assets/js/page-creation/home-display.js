@@ -1,34 +1,39 @@
 import { buttonMove } from "../theme-switch.js";
-import { SessionData } from "../variables/session-data.js";
 import { displayCategories } from "./home-categories.js";
 import { displayFeed } from "./home-feed.js";
 import { clearPages } from "../helpers/clear-pages.js";
 
-const usernameHeader = document.getElementById("header-username");
-const logButton = document.getElementById("log-in-text");
 let displayType = "categ";
 
-// Création de la page d'accueil
+/**
+ * Création de la page d'accueil. Appelle les fonctions de construction
+ */
 export function displayHome() {
   clearPages("home");
-  const homeBtn = document.getElementById("go-home");
-  homeBtn.style.display = "none";
 
-  usernameHeader.innerHTML = "";
+  const frontPageContainer = createHomeWelcome();
 
-  if (!SessionData.isLogged) {
-    usernameHeader.innerHTML =
-      "Bienvenue&nbsp;! <br /> Pensez à vous connecter&nbsp;!";
+  const buttonZone = document.getElementById("front-page-buttons");
+
+  const button = createHomeButtons();
+  buttonZone.appendChild(button);
+
+  frontPageContainer.appendChild(buttonZone);
+
+  const savedMode = localStorage.getItem("displaymode") || "categ";
+  if (savedMode === "feed") {
+    displayAsFeed();
   } else {
-    usernameHeader.innerHTML = `Bienvenue ${SessionData.username}&nbsp;! <br /> Heureux de vous revoir&nbsp;!`;
+    displayAsCats();
   }
+  buttonMove();
+}
 
-  if (!SessionData.isLogged) {
-    logButton.innerHTML = "Inscription/Connexion";
-  } else {
-    logButton.innerHTML = `Déconnexion`;
-  }
-
+/**
+ * Crée le conteneur principal de la page d'accueil
+ * @returns {HTMLElement} Le conteneur de la page d'accueil
+ */
+function createHomeWelcome() {
   let frontPageContainer = document.getElementById("front-page");
 
   if (!frontPageContainer) {
@@ -55,23 +60,15 @@ export function displayHome() {
         </span>
       </div>
       <div id="front-page-buttons"></div>`;
-  const buttonZone = document.getElementById("front-page-buttons");
 
-  const button = createHomeButtons();
-  buttonZone.appendChild(button);
-
-  frontPageContainer.appendChild(buttonZone);
-
-  const savedMode = localStorage.getItem("displaymode") || "categ";
-  if (savedMode === "feed") {
-    displayAsFeed();
-  } else {
-    displayAsCats();
-  }
-  buttonMove();
+  return frontPageContainer;
 }
 
-// Création du bouton de changement d'affichage
+/**
+ * Crée le bouton permettant de changer d'affichage entre catégorie et feed
+ * Récupère l'affichage de préférence dans le navigateur, affiche en catégories par défaut
+ * @returns {HTMLElement}
+ */
 function createHomeButtons() {
   const savedMode = localStorage.getItem("displaymode") || "categ";
   const button = document.createElement("button");
@@ -95,6 +92,9 @@ function createHomeButtons() {
   return button;
 }
 
+/**
+ * Affichage de la page d'accueil en mode "catégories" + stocke l'information dans le navigateur
+ */
 function displayAsCats() {
   displayType = "categ";
   localStorage.setItem("displaymode", "categ");
@@ -102,6 +102,9 @@ function displayAsCats() {
   displayCategories();
 }
 
+/**
+ * Affichage de la page d'accueil en mode "feed" + stocke l'information dans le navigateur
+ */
 function displayAsFeed() {
   displayType = "feed";
   localStorage.setItem("displaymode", "feed");

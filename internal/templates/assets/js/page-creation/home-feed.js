@@ -1,8 +1,11 @@
-// Fonction pour la création de la page "derniers messages"
 import { displayPosts } from "./topic.js";
 import { displayTopics } from "./category-topics.js";
 import { displayProfile } from "./profile.js";
 
+/**
+ * Affiche les derniers messages postés sous forme de feed avec les sujets.
+ * Si plusieurs message ont été posté sur le même sujet, le sujet n'apparaît qu'une fois.
+ */
 async function displayFeed() {
   try {
     const response = await fetch("/?mode=feed");
@@ -24,28 +27,7 @@ async function displayFeed() {
       feedContainer.appendChild(topicBloc);
     });
 
-    feedContainer.addEventListener("click", (event) => {
-      const title = event.target.closest(".topic-title");
-      if (title) {
-        const topicID = title.getAttribute("data_id");
-        displayTopics(topicID);
-        return;
-      }
-
-      const lastPost = event.target.closest(".button-link");
-      if (lastPost) {
-        const topicID = lastPost.getAttribute("data_topicid");
-        const postID = lastPost.getAttribute("data_postid");
-        displayPosts(topicID, postID);
-        return;
-      }
-
-      const author = event.target.closest(".last-post-author");
-      if (author) {
-        const profile = author.getAttribute("data_id");
-        displayProfile(profile);
-      }
-    });
+    setHomeFeedLinks(feedContainer);
 
     let categoriesContainer = document.getElementById("categories");
     if (categoriesContainer) categoriesContainer.remove();
@@ -54,6 +36,40 @@ async function displayFeed() {
   }
 }
 
+/**
+ * Place les "liens" accessibles depuis la page d'accueil en affichage feed : titre du sujet, dernier message, auteurs
+ * @param {HTMLElement} feedPageContainer Le conteneur de la partie feed de la page
+ */
+function setHomeFeedLinks(feedContainer) {
+  feedContainer.addEventListener("click", (event) => {
+    const title = event.target.closest(".topic-title");
+    if (title) {
+      const topicID = title.getAttribute("data_id");
+      displayTopics(topicID);
+      return;
+    }
+
+    const lastPost = event.target.closest(".button-link");
+    if (lastPost) {
+      const topicID = lastPost.getAttribute("data_topicid");
+      const postID = lastPost.getAttribute("data_postid");
+      displayPosts(topicID, postID);
+      return;
+    }
+
+    const author = event.target.closest(".last-post-author");
+    if (author) {
+      const profile = author.getAttribute("data_id");
+      displayProfile(profile);
+    }
+  });
+}
+
+/**
+ * Construit un sujet du feed à partir des informations de la BDD
+ * @param {object} topic Le sujet à récupérer et afficher
+ * @returns {HTMLElement} L'élément HTML du sujet
+ */
 function buildFeedTopic(topic) {
   const topicBloc = document.createElement("div");
   topicBloc.className = "topic-bloc";

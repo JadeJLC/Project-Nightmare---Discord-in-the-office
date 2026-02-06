@@ -19,12 +19,17 @@ func NewProfileHandler(us *services.UserService, ms *services.MessageService, rs
     return &ProfileHandler{userService: us, messageService: ms, reactionService: rs, topicService: ts}
 }
 
+
+/*
+* Affichage d'un profil utilisateur
+* Compare l'utilisateur en ligne et l'utilisateur connecté pour savoir si on regarde son propre profil ou un autre
+* Récupère les messages, les sujets ou les réactions selon le mode d'affichage
+*/
 func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     profileUser := r.URL.Query().Get("profile")
     loggedUser := r.URL.Query().Get("user")
     mode := r.URL.Query().Get("mode")
 
-    // 1. Get user data (Needed for the ID in all cases)
     data, err := h.userService.GetProfile(profileUser, loggedUser)
     if err != nil {
         http.Error(w, "User not found", http.StatusNotFound)
@@ -33,7 +38,6 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     w.Header().Set("Content-Type", "application/json")
 
-    // 2. Decide what to send based on mode
     switch mode {
     case "message":
         list, err := h.messageService.GetMessagesByAuthor(int(data.ID))
@@ -60,7 +64,6 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         return
 
     default:
-        // If no mode (or unknown mode), send the profile info for the header
         json.NewEncoder(w).Encode(data)
     }
 }

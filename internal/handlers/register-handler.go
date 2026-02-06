@@ -17,6 +17,10 @@ func NewRegisterHandler(us *services.UserService, ss *services.SessionService) *
     return &RegisterHandler{userService: us}
 }
 
+/*
+* Gestion de l'inscription d'un utilisateur ou de la modification d'un profil
+* Le mode "edit" permet de modifier un profil
+*/
 func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodPost {
         http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)

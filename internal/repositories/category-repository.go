@@ -13,6 +13,9 @@ func NewCategRepo(db *sql.DB) *CategoryRepo {
 	return &CategoryRepo {db:db}
 }
 
+/* 
+* Récupère le nom et la description de la catégorie à partir de son ID
+*/
 func (r *CategoryRepo) GetCategoryFromID(catID int) (*domain.Category, error) {
 row := r.db.QueryRow(`SELECT name, description
     FROM categories
@@ -31,6 +34,9 @@ row := r.db.QueryRow(`SELECT name, description
     return category, nil
 }
 
+/* 
+* Récupère la liste complète de toutes les catégories du forum (id, nom et description)
+*/
 func (r *CategoryRepo) GetAllCategories() ([]*domain.Category, error) {
 	rows, err := r.db.Query(`SELECT cat_id, name, description 
     FROM categories`)
@@ -56,6 +62,9 @@ func (r *CategoryRepo) GetAllCategories() ([]*domain.Category, error) {
     return categories, nil
 }
 
+/* 
+* Récupère le dernier post envoyé dans une catégorie, et le titre du sujet associé
+*/
 func (r *CategoryRepo) GetCatLastPost(catID int) (domain.LastPost, error) {
 	row := r.db.QueryRow(`
         SELECT

@@ -17,6 +17,9 @@ func NewUserRepository(db *sql.DB) domain.UserRepository {
     return &userRepository{db: db}
 }
 
+/*
+* Ajoute un utilisateur dans la base de données
+*/
 func (r *userRepository) Create(user *domain.User) error {
     hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
     if err != nil {
@@ -41,6 +44,9 @@ func (r *userRepository) Create(user *domain.User) error {
     return nil
 }
 
+/*
+* Récupère les informations d'un utilisateur à partir de son email
+*/
 func (r *userRepository) GetUserByEmail(email string) (*domain.User, error) {
     row := r.db.QueryRow(`
         SELECT user_id, username, email, password, age, gender, firstname, lastname
@@ -55,6 +61,9 @@ func (r *userRepository) GetUserByEmail(email string) (*domain.User, error) {
     return user, nil
 }
 
+/*
+* Récupère les informations d'un utilisateur à partir de son pseudo
+*/
 func (r *userRepository) GetUserByUsername(username string) (*domain.User, error) {
     row := r.db.QueryRow(`
         SELECT user_id, username, email, password, age, gender, firstname, lastname, image, inscription
@@ -69,6 +78,9 @@ func (r *userRepository) GetUserByUsername(username string) (*domain.User, error
     return user, nil
 }
 
+/*
+* Récupère les informations d'un utilisateur à partir des tokens de connexion
+*/
 func (r *userRepository) GetUserByToken(token string) (*domain.User, error) { 
 	user := &domain.User{}
 	err := r.db.QueryRow(`SELECT id, username FROM users WHERE token = ?`, token).Scan(&user.ID, &user.Username) 

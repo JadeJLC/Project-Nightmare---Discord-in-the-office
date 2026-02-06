@@ -17,6 +17,11 @@ func NewHomeHandler(cs *services.CategoryService, ts *services.TopicService) *Ho
     return &HomeHandler{categoryService: cs, topicService: ts,}
 }
 
+/*
+* Affichage de la page d'accueil
+* Récupère les derniers sujets ayant reçu un message si l'affichage est en mode "feed"
+* Récupère la liste complète des catégories si l'affichage est en mode "catégories"
+*/
 func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     if r.URL.Path != "/" {
         http.Error(w, "❌ not found", http.StatusNotFound)

@@ -6,6 +6,9 @@ import (
 	"real-time-forum/internal/services"
 )
 
+/*
+* Gestion des réponses et des éléments de serveur à appeler en fonction des requêtes API de la page javascript
+ */
 func Router(userService *services.UserService, sessionService *services.SessionService, categService *services.CategoryService, topicService *services.TopicService, messageService *services.MessageService, reactionService *services.ReactionService) http.Handler {
     mux := http.NewServeMux()
 

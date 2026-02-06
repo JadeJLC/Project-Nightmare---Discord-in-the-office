@@ -1,9 +1,10 @@
-// Fonctions pour la création de la page d'accueil avec toutes les catégories du forum
-
 import { displayTopics } from "./category-topics.js";
 import { displayProfile } from "./profile.js";
 import { displayPosts } from "./topic.js";
 
+/**
+ * Affiche la liste des catégories sur la page d'accueil
+ */
 async function displayCategories() {
   try {
     const response = await fetch("/?mode=categ");
@@ -24,39 +25,7 @@ async function displayCategories() {
       categoriesContainer.appendChild(catBloc);
     });
 
-    categoriesContainer.addEventListener("click", (event) => {
-      const title = event.target.closest(".cat-title");
-      if (title) {
-        const catID = title.dataset.id;
-        displayTopics(catID);
-        return;
-      }
-
-      const lastPostTitle = event.target.closest(".last-post-title");
-
-      if (lastPostTitle) {
-        const topicID = lastPostTitle.getAttribute("data_id");
-        const catID = lastPostTitle.getAttribute("data_catid");
-        displayPosts(catID, topicID);
-        return;
-      }
-
-      const lastPostBtn = event.target.closest(".button-link");
-
-      if (lastPostBtn) {
-        const topicID = lastPostBtn.getAttribute("data_topicid");
-        const postId = lastPostBtn.getAttribute("data_postid");
-        const catID = lastPostBtn.getAttribute("data_catid");
-        displayPosts(catID, topicID, postId);
-        return;
-      }
-
-      const author = event.target.closest(".last-post-author");
-      if (author) {
-        const profile = author.getAttribute("data_id");
-        displayProfile(profile);
-      }
-    });
+    setHomeCategoriesLinks(categoriesContainer);
 
     let feedContainer = document.getElementById("feed");
     if (feedContainer) feedContainer.remove();
@@ -65,6 +34,49 @@ async function displayCategories() {
   }
 }
 
+/**
+ * Place les "liens" accessibles depuis la page d'accueil en affichage catégories : titre de la catégorie, dernier message, auteurs
+ * @param {HTMLElement} categPageContainer Le conteneur de la partie catégorie de la page
+ */
+function setHomeCategoriesLinks(categoriesContainer) {
+  categoriesContainer.addEventListener("click", (event) => {
+    const title = event.target.closest(".cat-title");
+    if (title) {
+      const catID = title.dataset.id;
+      displayTopics(catID);
+      return;
+    }
+
+    const lastPostTitle = event.target.closest(".last-post-title");
+    if (lastPostTitle) {
+      const topicID = lastPostTitle.getAttribute("data_id");
+      const catID = lastPostTitle.getAttribute("data_catid");
+      displayPosts(catID, topicID);
+      return;
+    }
+
+    const lastPostBtn = event.target.closest(".button-link");
+    if (lastPostBtn) {
+      const topicID = lastPostBtn.getAttribute("data_topicid");
+      const postId = lastPostBtn.getAttribute("data_postid");
+      const catID = lastPostBtn.getAttribute("data_catid");
+      displayPosts(catID, topicID, postId);
+      return;
+    }
+
+    const author = event.target.closest(".last-post-author");
+    if (author) {
+      const profile = author.getAttribute("data_id");
+      displayProfile(profile);
+    }
+  });
+}
+
+/**
+ * Construit une catégorie à partir des informations de la BDD
+ * @param {object} category La catégorie à afficher
+ * @returns {HTMLElement} L'élément HTML de la catégorie
+ */
 function buildCategory(category) {
   const catBloc = document.createElement("div");
   catBloc.className = "cat-bloc";

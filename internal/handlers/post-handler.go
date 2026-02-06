@@ -19,6 +19,11 @@ func NewPostHandler(ms *services.MessageService, ts *services.TopicService, us *
     return &PostHandler{messageService: ms, topicService: ts, userService: us}
 }
 
+/*
+* Gère l'envoi d'un message par l'utilisateur
+* Mode "newtopic" : création d'un nouveau sujet dans la catégorie {sectionID} et ajout de son premier message à la BDD
+* Mode "reply" : retrouve le sujet {sectionID} et ajoute son nouveau message associé dans la BDD
+*/
 func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     mode := r.URL.Query().Get("mode")
 	sectionID, err := strconv.Atoi(r.URL.Query().Get("sectionID"))

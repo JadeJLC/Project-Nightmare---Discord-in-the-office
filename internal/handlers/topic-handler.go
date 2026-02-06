@@ -18,6 +18,10 @@ func NewTopicHandler(ms *services.MessageService, ts *services.TopicService) *To
     return &TopicHandler{messageService: ms, topicService: ts}
 }
 
+/*
+* Affichage d'un sujet
+* Récupère tous les messages associés au sujet dans la BDD pour les afficher
+*/
 func (h *TopicHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     topicID, err := strconv.Atoi(r.URL.Query().Get("topicID"))
 	postID, err2 := strconv.Atoi(r.URL.Query().Get("postID"))

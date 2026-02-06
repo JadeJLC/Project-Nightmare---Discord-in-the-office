@@ -1,13 +1,16 @@
-// Fonction pour l'affichage du contenu d'une catégorie :
-
 import { clearPages } from "../helpers/clear-pages.js";
-import { SessionData } from "../variables/session-data.js";
 import { displayHome } from "./home-display.js";
 import { displayProfile } from "./profile.js";
 import { displayPosts } from "./topic.js";
 import { newTopic } from "./new-message.js";
+import { isUserLoggedIn } from "../helpers/check-log-status.js";
 
-// Liste des sujets avec le dernier message posté sur chaque sujet + la date d'ouverture du sujet
+/**
+ * Affiche le titre et la liste des sujets d'une catégorie
+ * Si le mode est "newtopic", n'affiche que le titre de la catégorie
+ * @param {int} catID L'identifiant de la catégorie à afficher
+ * @param {string} mode vide ou "newtopic"
+ */
 async function writeTopics(catID, mode) {
   try {
     const response = await fetch(`/api/category?catID=${catID}`);
@@ -33,56 +36,66 @@ async function writeTopics(catID, mode) {
       categPageContainer.appendChild(topicHTML);
     });
 
-    categPageContainer.addEventListener("click", (event) => {
-      const newTopicBtn = event.target.closest(".new-topic-button");
-      if (newTopicBtn) {
-        newTopic(catID);
-        return;
-      }
-
-      const title = event.target.closest(".topic-title");
-      if (title) {
-        const topicID = parseInt(title.getAttribute("data_id"));
-        displayPosts(catID, topicID);
-        return;
-      }
-
-      const author = event.target.closest(".topic-author, .last-post-author");
-      if (author) {
-        const username = author.getAttribute("data_id");
-        displayProfile(username);
-        return;
-      }
-
-      const backHome = event.target.closest(".go-back");
-      if (backHome) {
-        displayHome();
-        return;
-      }
-
-      const msgBtn = event.target.closest(".button-link");
-      if (msgBtn) {
-        const topicID = msgBtn.getAttribute("data_topicid");
-        const postId = msgBtn.getAttribute("data_postid");
-
-        displayPosts(catID, topicID, postId);
-        return;
-      }
-    });
+    setCategoryLinks(categPageContainer, catID);
   } catch (error) {
     console.log("Erreur dans la récupération des sujets : ", error);
   }
 }
 
+/**
+ * Place les "liens" accessibles depuis la page catégorie : sujet, dernier post, profil des auteurs
+ * @param {HTMLElement} categPageContainer Le conteneur de la catégorie
+ * @param {int} catID L'identifiant de la catégorie
+ */
+function setCategoryLinks(categPageContainer, catID) {
+  categPageContainer.addEventListener("click", (event) => {
+    const newTopicBtn = event.target.closest(".new-topic-button");
+    if (newTopicBtn) {
+      newTopic(catID);
+      return;
+    }
+
+    const title = event.target.closest(".topic-title");
+    if (title) {
+      const topicID = parseInt(title.getAttribute("data_id"));
+      displayPosts(catID, topicID);
+      return;
+    }
+
+    const author = event.target.closest(".topic-author, .last-post-author");
+    if (author) {
+      const username = author.getAttribute("data_id");
+      displayProfile(username);
+      return;
+    }
+
+    const backHome = event.target.closest(".go-back");
+    if (backHome) {
+      displayHome();
+      return;
+    }
+
+    const msgBtn = event.target.closest(".button-link");
+    if (msgBtn) {
+      const topicID = msgBtn.getAttribute("data_topicid");
+      const postId = msgBtn.getAttribute("data_postid");
+
+      displayPosts(catID, topicID, postId);
+      return;
+    }
+  });
+}
+
+/**
+ * Fonction mère pour l'affichage des catégories. Crée le conteneur pour la liste des sujets
+ * @param {int} catID L'identificant de la catégorie
+ * @param {string} mode Si la catégorie n'est lancée que pour ouvrir un nouveau sujet
+ * @returns
+ */
 export function displayTopics(catID, mode) {
   clearPages("category");
 
-  if (!SessionData.isLogged) {
-    const popup = document.getElementById("auth-popup");
-    popup.classList.remove("is-hidden");
-    displayHome();
-    return;
-  }
+  if (!isUserLoggedIn()) return;
 
   let categPageContainer = document.getElementById("category-topics");
 
@@ -94,6 +107,11 @@ export function displayTopics(catID, mode) {
   writeTopics(catID, mode);
 }
 
+/**
+ * Construit un sujet à partir des données de la BDD
+ * @param {object} topic Les données du sujet à afficher (titre, id, dernier post, etc)
+ * @returns {HTMLElement} L'élément du sujet qui sera ajouté au conteneur
+ */
 function buildTopic(topic) {
   const topicBloc = document.createElement("div");
   topicBloc.className = "topic-bloc";

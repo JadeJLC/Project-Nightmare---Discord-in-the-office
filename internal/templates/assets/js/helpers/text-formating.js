@@ -1,3 +1,8 @@
+/**
+ * Fait apparaître les balises BBCode dans le textarea autour de la zone de texte sélectionnée
+ * Si aucun texte n'est sélectionné, les balises apparaissent à la fin et le curseur se place entre elles
+ * @param {string} tag L'indicateur de balise BBCode à utiliser (b, i, center, ...)
+ */
 export function applyBBCode(tag) {
   const textarea = document.getElementById("post-content");
   const start = textarea.selectionStart;
@@ -18,6 +23,14 @@ export function applyBBCode(tag) {
   textarea.focus();
 }
 
+/**
+ * Transforme le contenu du message en HTML lisible pour l'affichage du post
+ * Retire d'éventuelles balises HTML injectées par l'utilisateur
+ *
+ * @param {string} postContent Le contenu brut du message avec les balises et le MD
+ * @param {string} typeMode Les modes de saisie activés (BBCode et/ou Markdown)
+ * @returns {string} Le texte en HTML safe et avec la mise en page
+ */
 export function readBBCode(postContent, typeMode) {
   // Retire les tag HTML potentiellement dangereux dans les messages
   let secureHTML = postContent
@@ -31,6 +44,11 @@ export function readBBCode(postContent, typeMode) {
   return secureHTML;
 }
 
+/**
+ * Transforme les balises BBCode en HTML
+ * @param {string} text Le texte contenant les balises BBCode
+ * @returns {string} Le texte avec des balises HTML équivalentes
+ */
 function bbToHTML(text) {
   const tagMap = {
     b: "strong",
@@ -62,6 +80,11 @@ function bbToHTML(text) {
   return text;
 }
 
+/**
+ * Transforme les indicateurs markdown (**gras**, _italique_) en HTML
+ * @param {string} text Le texte contenant les indicateurs markdown
+ * @returns {string} Le texte avec des balises HTML équivalentes
+ */
 function mdToHTML(text) {
   const patterns = {
     boldItalic: /\*\*\*(.*?)\*\*\*/,

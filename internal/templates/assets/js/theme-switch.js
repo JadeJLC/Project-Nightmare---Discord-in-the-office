@@ -1,6 +1,11 @@
 const localThemeKey = "pn-theme";
 const rootElement = document.documentElement;
 
+/**
+ * Enregistre le thème choisi dans le navigateur
+ *
+ * @param {string} theme Le nom du thème, soit light soit dark, renvoyé par le bouton
+ */
 export function setTheme(theme) {
   const themeSwitchBtn = document.getElementById("theme-selector");
   rootElement.setAttribute("data-theme", theme);
@@ -12,6 +17,10 @@ export function setTheme(theme) {
   }
 }
 
+/**
+ * Détermine le thème à utiliser en récupérant la donnée dans le navigateur
+ * Si aucun thème n'a encore été choisi, affiche par défaut le thème sombre
+ */
 export function initTheme() {
   const themeSwitchBtn = document.getElementById("theme-selector");
   const savedTheme = localStorage.getItem(localThemeKey) || "dark";
@@ -33,8 +42,10 @@ if (document.readyState === "loading") {
 } else {
   initTheme();
 }
-
-// Fonction pour déplacer les boutons "Afficher sous forme de catégories / feed" au scroll"
+/**
+ * Déplace le bouton "Afficher sous forme de catégories/feed" au scroll
+ * Le bouton se déplace en haut à gauche pour rester toujours accessible
+ */
 function buttonMove() {
   window.addEventListener("scroll", () => {
     const button = document.getElementById("front-page-buttons");

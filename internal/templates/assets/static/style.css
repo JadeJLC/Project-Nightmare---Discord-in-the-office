@@ -209,6 +209,10 @@ header {
   margin-right: 100px;
 }
 
+#member-buttons {
+  display: contents;
+}
+
 .header-buttons button,
 .edit-content,
 .editor-button,
@@ -609,8 +613,13 @@ header {
   width: 100%;
 }
 
-.last-post-author {
+.last-post-author,
+.topic-author {
   display: inline;
+  cursor: pointer;
+}
+
+.on-topic {
   cursor: pointer;
 }
 
