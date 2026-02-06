@@ -27,7 +27,7 @@ function createUserCard(user) {
         </div>
         <div class="info">
             <span class="username">${user.username}</span>
-            <span class="status online">Online</span>
+            <span class="status online">En&nbsp;ligne</span>
         </div>
     `;
 
