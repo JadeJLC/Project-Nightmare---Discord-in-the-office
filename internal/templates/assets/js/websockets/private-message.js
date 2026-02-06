@@ -5,6 +5,7 @@ import { loadConversationsList } from "../page-creation/chat.js";
 
 let currentDMUserId = null;
 let lastSenderId = null;
+let lastGroup = null;
 
 export function handleIncomingDM(msg) {
   // 1. Si la conversation est ouverte → afficher le message
@@ -96,47 +97,52 @@ export async function openConversation(otherUserId) {
 export function displayDM(msg) {
   const container = document.getElementById("dm-messages");
 
-  const div = document.createElement("div");
-  div.classList.add("dm-message");
-
   const senderId = msg.sender_id;
   const username = msg.sender_username;
   const isMine = senderId === SessionData.userID;
 
-  div.classList.add(isMine ? "mine" : "theirs");
+  // Déterminer si on doit créer un nouveau groupe
+  const isNewGroup = lastSenderId !== senderId;
 
-  // Déterminer si on doit afficher le header (nom + avatar)
-  const showHeader = lastSenderId !== senderId;
+  // Si nouveau groupe → créer un wrapper
+  if (isNewGroup) {
+    lastGroup = document.createElement("div");
+    lastGroup.classList.add("dm-group");
+    lastGroup.classList.add(isMine ? "mine" : "theirs");
 
-  div.innerHTML = `
-    ${
-      showHeader
-        ? `
+    // Header (avatar + nom)
+    lastGroup.innerHTML = `
       <div class="dm-header">
         <div class="reduced-avatar">
-              <img src="assets/images-avatar/${msg.sender_image}.png">
-            </div>
+          <img src="assets/images-avatar/${msg.sender_image}.png">
+        </div>
         <div class="dm-author">${username}</div>
       </div>
-    `
-        : ""
+    `;
+
+    // Insérer le groupe avant la barre d’input
+    const inputBar = document.querySelector(".dm-input");
+    if (inputBar) {
+      container.insertBefore(lastGroup, inputBar);
+    } else {
+      container.appendChild(lastGroup);
     }
-    
+  }
+
+  // Créer le message individuel
+  const messageDiv = document.createElement("div");
+  messageDiv.classList.add("dm-message");
+  messageDiv.innerHTML = `
     <span class="dm-time">${new Date(msg.created_at).toLocaleTimeString()}</span>
     <div class="dm-content">${msg.content}</div>
-    
   `;
+
+  // Ajouter le message dans le groupe courant
+  lastGroup.appendChild(messageDiv);
 
   // Mettre à jour le dernier sender
   lastSenderId = senderId;
 
-  // Insérer avant la barre d’input
-  const inputBar = document.querySelector(".dm-input");
-  if (inputBar) {
-    container.insertBefore(div, inputBar);
-  } else {
-    container.appendChild(div);
-  }
-
+  // Scroll
   container.scrollTop = container.scrollHeight;
 }

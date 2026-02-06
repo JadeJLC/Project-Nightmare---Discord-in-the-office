@@ -2,6 +2,7 @@ import { SessionData } from "../variables.js";
 import { clearPages } from "../helpers/clear-pages.js";
 import { isUserLoggedIn } from "../helpers/check-log-status.js";
 import { displayPosts } from "./topic.js";
+import { ws } from "../websockets/connect.js";
 
 // #region ***** Affichage des informations utilisateur
 
@@ -48,7 +49,7 @@ async function writeUserProfile(profile, logged) {
     const user = await response.json();
 
     buildProfileHTML(user, logged);
-    setProfileButtons(user.email, profile);
+    setProfileButtons(user.email, profile, user.id);
 
     activateButton(user.email);
 
@@ -94,6 +95,9 @@ function buildProfileHTML(user) {
             </h3>
             <span class="profile-signup">Inscrit.e le ${user.inscription}</span>
           </div>
+        </div>
+        <div id="profile-buttons">
+          <button type="button" id="send-dm-btn">Envoyer un message</button>
         </div>
         <br />
         <hr />
@@ -363,12 +367,15 @@ function switchToTopics(profileName) {
  * @param {string} status Pour l'envoi à la fonction des boutons
  * @param {string} profileName Nom de l'utilisateur
  */
-function setProfileButtons(status, profileName) {
+function setProfileButtons(status, profileName, profilId) {
   let profilePageContainer = document.getElementById("profile-page");
 
   if (profilePageContainer.dataset.listenerAttached) return;
 
   profilePageContainer.addEventListener("click", (event) => {
+    const dmBtn = event.target.closest("#send-dm-btn");
+    if (dmBtn) initProfileDMButton(profilId, profileName);
+
     const topicBtn = event.target.closest("#profile-mytopics");
     if (topicBtn) switchToTopics(profileName);
 
@@ -491,6 +498,64 @@ function displayEditForm() {
   document.getElementById("profile-first-input").classList.toggle("is-hidden");
   document.getElementById("profile-last-input").classList.toggle("is-hidden");
   document.getElementById("confirm-edit").classList.toggle("is-hidden");
+}
+
+function openDMPopup(targetUsername) {
+  return new Promise((resolve, reject) => {
+    // Création du wrapper
+    const popup = document.createElement("div");
+    popup.classList.add("dm-popup-overlay");
+    popup.innerHTML = `
+      <div class="dm-popup">
+        <h3>Envoyer un message à ${targetUsername}</h3>
+        <textarea id="dm-popup-text" placeholder="Écrire un message..."></textarea>
+        <div class="dm-popup-actions">
+          <button id="dm-popup-cancel">Annuler</button>
+          <button id="dm-popup-send">Envoyer</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    const textarea = popup.querySelector("#dm-popup-text");
+    const btnCancel = popup.querySelector("#dm-popup-cancel");
+    const btnSend = popup.querySelector("#dm-popup-send");
+
+    btnCancel.addEventListener("click", () => {
+      popup.remove();
+      reject("cancelled");
+    });
+
+    btnSend.addEventListener("click", () => {
+      const text = textarea.value.trim();
+      if (!text) return;
+
+      popup.remove();
+      resolve(text);
+    });
+  });
+}
+
+export async function initProfileDMButton(targetId, targetUsername) {
+  try {
+    // 1. Ouvrir le pop-up et attendre le message
+    const message = await openDMPopup(targetUsername);
+
+    // 2. Envoyer via WebSocket
+    ws.send(
+      JSON.stringify({
+        type: "private_message",
+        to: targetId,
+        content: message,
+      }),
+    );
+
+    // 3. Redirection vers la messagerie
+    window.location.href = `/messagerie?user=${targetId}`;
+  } catch (e) {
+    // L'utilisateur a annulé → on ne fait rien
+  }
 }
 
 // #endregion
