@@ -10,6 +10,7 @@
     <title>PN : Discord in the Office</title>
     <script type="module" src="/assets/js/init.js"></script>
 
+    <!-- Sélecteur de thème -->
     <link rel="stylesheet" href="assets/static/style.css" />
   </head>
   <body>
@@ -48,6 +49,14 @@
       </label>
     </header>
 
+    <div id="online-members-list">
+      <button id="online-members-btn"><</button>
+      <div id="members-list" class="isHidden">
+        <div id="online-user-cards"></div>
+      </div>
+    </div>
+
     <!-- Le reste de la page se créera ici via javascript -->
+    <script type="module" src="/assets/js/init.js"></script>
   </body>
 </html>

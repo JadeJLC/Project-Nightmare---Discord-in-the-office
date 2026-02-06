@@ -28,6 +28,11 @@ export function clearPages(destination) {
     if (topicPosts) topicPosts.remove();
   }
 
+  if (destination != "dm") {
+    let dmPageContainer = document.getElementById("dm-page");
+    if (dmPageContainer) dmPageContainer.remove();
+  }
+
   updateHeader(destination);
 }
 
@@ -123,7 +128,7 @@ function updateHeader(destination) {
           <img src="assets/images/user.svg" />
           <span>Ouvrir mon profil</span>
         </button>
-        <button type="button" id="display-online-users">
+        <button type="button" id="display-mailbox">
           <img src="assets/images/message-circle.svg" />
           <span>Messagerie privée</span>
         </button>

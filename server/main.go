@@ -18,6 +18,7 @@ func main() {
     sessionRepository := repositories.NewSessionRepo(db)
     categRepository := repositories.NewCategRepo(db)
     topicRepository := repositories.NewTopicRepo(db)
+    chatRepository := repositories.NewChatRepo(db)
     messageRepository := repositories.NewMessageRepo(db)
     reactionRepository := repositories.NewReactionRepo(db)
 
@@ -26,11 +27,14 @@ func main() {
     sessionService := services.NewSessionService(sessionRepository)
     categService := services.NewCategoryService(categRepository)
     topicService := services.NewTopicService(topicRepository)
+    chatService := services.NewChatService(chatRepository)
+
+    // Router (handlers instanciés proprement)
     messageService := services.NewMessageService(messageRepository)
     reactionService := services.NewReactionService(reactionRepository)
 
     // Router (handlers instanciés proprement)
-    router := handlers.Router(userService, sessionService, categService, topicService,messageService, reactionService)
+    router := handlers.Router(userService, sessionService, chatService, categService, topicService,messageService, reactionService)
 
     // Lancement serveur
     addr := ":5006"

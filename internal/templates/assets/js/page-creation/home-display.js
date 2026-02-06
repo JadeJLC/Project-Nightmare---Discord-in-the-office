@@ -1,7 +1,14 @@
 import { buttonMove } from "../theme-switch.js";
+<<<<<<< HEAD
 import { displayCategories } from "./home-categories.js";
 import { displayFeed } from "./home-feed.js";
 import { clearPages } from "../helpers/clear-pages.js";
+=======
+import { SessionData } from "../variables/session-data.js";
+import { displayCategories } from "./home-categories.js";
+import { displayFeed } from "./home-feed.js";
+import { clearPages } from "./clear-pages.js";
+>>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
 
 let displayType = "categ";
 
@@ -13,6 +20,7 @@ export function displayHome() {
 
   const frontPageContainer = createHomeWelcome();
 
+<<<<<<< HEAD
   const buttonZone = document.getElementById("front-page-buttons");
 
   const button = createHomeButtons();
@@ -25,6 +33,19 @@ export function displayHome() {
     displayAsFeed();
   } else {
     displayAsCats();
+=======
+  if (!SessionData.isLogged) {
+    usernameHeader.innerHTML =
+      "Bienvenue&nbsp;! <br /> Pensez à vous connecter&nbsp;!";
+  } else {
+    usernameHeader.innerHTML = `Bienvenue ${SessionData.username}&nbsp;! <br /> Heureux de vous revoir&nbsp;!`;
+  }
+
+  if (!SessionData.isLogged) {
+    logButton.innerHTML = "Inscription/Connexion";
+  } else {
+    logButton.innerHTML = `Déconnexion`;
+>>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
   }
   buttonMove();
 }

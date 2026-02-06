@@ -9,7 +9,7 @@ import (
 /*
 * Gestion des réponses et des éléments de serveur à appeler en fonction des requêtes API de la page javascript
  */
-func Router(userService *services.UserService, sessionService *services.SessionService, categService *services.CategoryService, topicService *services.TopicService, messageService *services.MessageService, reactionService *services.ReactionService) http.Handler {
+func Router(userService *services.UserService, sessionService *services.SessionService, chatService *services.ChatService, categService *services.CategoryService, topicService *services.TopicService, messageService *services.MessageService, reactionService *services.ReactionService) http.Handler {
     mux := http.NewServeMux()
 
     // Handlers instanciés proprement
@@ -18,6 +18,11 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     homeHandler := NewHomeHandler(categService, topicService)
 	meHandler := NewMeHandler(userService)
     logoutHandler := NewLogoutHandler(userService, sessionService)
+    chatHandler := NewChatHandler(sessionService, chatService)
+    conversationHandler := NewConversationHandler(sessionService, chatService, userService)
+    wsHandler := NewWebSocketHandler(sessionService, chatService, userService)
+
+    
     profileHandler := NewProfileHandler(userService, messageService, reactionService, topicService)
     categoryHandler := NewCategoryHandler(userService, messageService, *categService, topicService)
     topicHandler := NewTopicHandler(messageService, topicService)
@@ -25,10 +30,14 @@ func Router(userService *services.UserService, sessionService *services.SessionS
 
     // Routes
     mux.Handle("/", homeHandler)
+    mux.Handle("/ws", wsHandler)
     mux.Handle("/api/login", loginHandler)
     mux.Handle("/api/logout", logoutHandler)
     mux.Handle("/api/register", registerHandler)
 	mux.Handle("/api/me", meHandler)
+    mux.Handle("/api/dm", chatHandler)
+    mux.Handle("/api/conversations", conversationHandler)
+
     mux.Handle("/api/profile", profileHandler)
     mux.Handle("/api/category", categoryHandler)
     mux.Handle("/api/topic", topicHandler)

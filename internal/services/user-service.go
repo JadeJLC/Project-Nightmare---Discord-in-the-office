@@ -41,7 +41,7 @@ func (s *UserService) Authenticate(authenticator, password string) (*domain.User
         user, err = s.repo.GetUserByUsername(authenticator)
     }
     if err != nil {
-        return nil, errors.New("invalid credentials")
+        return nil, errors.New("invalid credentials 2")
     }
 
     if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {

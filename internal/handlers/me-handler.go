@@ -42,11 +42,13 @@ func (h *MeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         json.NewEncoder(w).Encode(map[string]any{
             "logged": false,
         })
+       
         return
     }
 
     json.NewEncoder(w).Encode(map[string]any{
         "logged":   true,
         "username": user.Username,
+        "image": user.Image,
     })
 }

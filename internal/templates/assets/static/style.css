@@ -114,6 +114,15 @@ body {
   font-family: var(--header-font);
   transition: all 0.3s ease;
 }
+
+body.members-list-visible {
+  margin-right: 260px;
+  transition: margin-right 0.3s ease;
+}
+body.members-list-visible #online-members-list {
+  transform: translateX(0);
+}
+
 .is-hidden {
   display: none !important;
 }
@@ -245,7 +254,13 @@ header {
   white-space: nowrap;
 }
 
+<<<<<<< HEAD
 [data-theme="dark"] button img {
+=======
+[data-theme="dark"] .header-buttons button img,
+[data-theme="dark"] .edit-content img,
+[data-theme="dark"] .button-link img {
+>>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
   filter: invert(100%);
 }
 
@@ -305,6 +320,10 @@ header {
 /* #region ***** Page d'accueil */
 #front-page,
 #profile-page,
+<<<<<<< HEAD
+=======
+#dm-page,
+>>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
 #category-topics,
 #topic-posts {
   margin-top: 100px !important;
@@ -525,6 +544,39 @@ header {
   position: absolute;
 }
 
+<<<<<<< HEAD
+=======
+.reduced-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+}
+
+.reduced-avatar img {
+  width: 100%; /* respecte le ratio naturel */
+  height: auto; /* évite toute déformation */
+  image-rendering: pixelated;
+
+  /* Dézoom */
+  transform: scale(0.75);
+  transform-origin: top center;
+
+  /* Positionnement */
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+
+  /* Ajuste pour viser la tête */
+  top: 0px;
+}
+
+.reduced-avatar:hover {
+  cursor: pointer;
+}
+
+>>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
 .post-content {
   position: relative;
   display: flex;
@@ -613,16 +665,23 @@ header {
   width: 100%;
 }
 
+<<<<<<< HEAD
 .last-post-author,
 .topic-author {
+=======
+.last-post-author {
+>>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
   display: inline;
   cursor: pointer;
 }
 
+<<<<<<< HEAD
 .on-topic {
   cursor: pointer;
 }
 
+=======
+>>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
 .post-open {
   position: relative;
   text-align: right;
@@ -685,6 +744,7 @@ header {
   padding-top: 4px;
 }
 
+<<<<<<< HEAD
 .go-back {
   position: relative;
   top: -5px;
@@ -693,6 +753,10 @@ header {
 .edit-content img,
 #edit-avatar img,
 .go-back img {
+=======
+.edit-content img,
+#edit-avatar img {
+>>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
   width: 100%;
 }
 
@@ -923,9 +987,13 @@ hr {
 
 .form-group input:focus,
 .form-group select:focus,
+<<<<<<< HEAD
 .profile-right input:focus,
 .post-editor input:focus,
 .post-editor textarea:focus {
+=======
+.profile-right input:focus {
+>>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
   border: 2px solid var(--neon);
   box-shadow: 0 0 12px var(--neon-soft);
 }
@@ -1098,7 +1166,12 @@ u {
   #front-page,
   #profile-page,
   #topics-page,
+<<<<<<< HEAD
   #topic-posts {
+=======
+  #topic-posts,
+  #dm-page {
+>>>>>>> 817be74ba432ba264337ba67e9d00cfedbf1d396
     margin-top: 140px !important;
   }
 
@@ -1136,4 +1209,95 @@ u {
   }
 }
 
-/* #endregion */
+/* Conteneur du panneau */
+#online-members-list {
+  position: fixed;
+  top: 90px;
+  right: 0;
+  width: 260px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transform: translateX(95%);
+  transition: transform 0.3s ease;
+}
+
+/* Le panneau (la liste) */
+#members-list {
+  flex: 1;
+  background: var(--panel);
+  color: var(--text);
+  font-family: var(--header-font);
+  border-top: 2px solid var(--neon);
+  border-left: 2px solid var(--neon);
+  box-shadow: 0 0 12px var(--neon-soft);
+
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+/* Quand la liste est visible */
+#members-list:not(.isHidden) {
+  transform: translateX(0);
+}
+
+/* Le bouton : positionné PAR RAPPORT AU PANNEAU */
+#online-members-btn {
+  position: absolute;
+  top: 0;
+  left: -35px; /* largeur du bouton + petit décalage */
+  background: var(--button);
+  color: var(--text);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px 0 0 4px;
+  cursor: pointer;
+  z-index: 1001;
+  border: 2px solid var(--accent);
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  margin: 6px 0;
+  background-color: var(--bg-down);
+  border: 2px solid var(--neon);
+  box-shadow: 0 0 12px var(--neon-soft);
+  color: #eee;
+  font-family: var(--header-font);
+  transition: transform 0.2s ease;
+}
+
+.user-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 10px #0ff;
+}
+
+.user-card .avatar {
+  width: 32px;
+  height: 32px;
+  background-color: var(--bg);
+  border-radius: 50%;
+  box-shadow: 0 0 4px #0ff2;
+}
+
+.user-card .info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-card .username {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.user-card .status.online {
+  font-size: 12px;
+  color: #0f0;
+}
+
+#dm-empty {
+  height: auto;
+}
