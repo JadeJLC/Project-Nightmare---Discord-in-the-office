@@ -44,6 +44,8 @@ export function updateConversationPreview(msg) {
 }
 
 export async function openConversation(otherUserId) {
+  lastSenderId = null;
+  lastGroup = null;
   currentDMUserId = otherUserId;
 
   const res = await fetch(`/api/dm?user=${otherUserId}&limit=20`);
@@ -99,6 +101,8 @@ export function closeConversation() {
   const container = document.getElementById("dm-messages");
   container.innerHTML = "";
   pageData.ConversationWith = "none";
+  lastSenderId = null;
+  lastGroup = null;
 }
 
 export function displayDM(msg) {
@@ -116,6 +120,7 @@ export function displayDM(msg) {
     lastGroup = document.createElement("div");
     lastGroup.classList.add("dm-group");
     lastGroup.classList.add(isMine ? "mine" : "theirs");
+    console.log("sender_image =", msg.sender_image);
 
     // Header (avatar + nom)
     lastGroup.innerHTML = `

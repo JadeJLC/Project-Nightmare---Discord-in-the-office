@@ -148,6 +148,7 @@ func (h *WebSocketHandler) handlePrivateMessage(from, to int, content string) {
     "type":             "private_message",
     "sender_id":        from,
     "sender_username":  fromUser.Username,
+    "sender_image": fromUser.Image,
     "receiver_id":      to,
     "receiver_username": toUser.Username,
     "content":          content,
