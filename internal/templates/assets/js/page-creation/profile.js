@@ -3,6 +3,8 @@ import { clearPages } from "../helpers/clear-pages.js";
 import { isUserLoggedIn } from "../helpers/check-log-status.js";
 import { displayPosts } from "./topic.js";
 import { ws } from "../websockets/connect.js";
+import { displayMailbox } from "./chat.js";
+import { openConversation } from "../websockets/private-message.js";
 
 // #region ***** Affichage des informations utilisateur
 
@@ -96,9 +98,6 @@ function buildProfileHTML(user) {
             <span class="profile-signup">Inscrit.e le ${user.inscription}</span>
           </div>
         </div>
-        <div id="profile-buttons">
-          <button type="button" id="send-dm-btn">Envoyer un message</button>
-        </div>
         <br />
         <hr />
         <div id="profile-messages">
@@ -127,6 +126,9 @@ function buildOtherDetails(user) {
             <p><span>Âge&nbsp;:</span> ${user.age}&nbsp;ans</p>
             <p><span>Genre&nbsp;:</span> ${user.genre}</p>
           </div>
+        </div>
+        <div id="profile-buttons">
+          <button type="button" id="send-dm-btn">Envoyer un message</button>
         </div>
       </div>`;
 }
@@ -552,7 +554,11 @@ export async function initProfileDMButton(targetId, targetUsername) {
     );
 
     // 3. Redirection vers la messagerie
-    window.location.href = `/messagerie?user=${targetId}`;
+    displayMailbox()
+      .then(() => openConversation(targetId))
+      .then(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+      });
   } catch (e) {
     // L'utilisateur a annulé → on ne fait rien
   }

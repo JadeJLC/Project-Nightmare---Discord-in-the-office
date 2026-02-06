@@ -1,25 +1,31 @@
 // Fonctions pour la création de la page "messages privés" avec un utilisateur
 
-import { SessionData } from "../variables.js";
+import { pageData, SessionData } from "../variables.js";
 import { clearPages } from "../helpers/clear-pages.js";
-import { openConversation } from "../websockets/private-message.js";
+import {
+  openConversation,
+  closeConversation,
+} from "../websockets/private-message.js";
 import { isUserLoggedIn } from "../helpers/check-log-status.js";
 
 export function displayMailbox() {
-  if (!isUserLoggedIn) return;
-  clearPages("dm");
-  const usernameHeader = document.getElementById("header-username");
-  usernameHeader.innerHTML = `Messagerie de ${SessionData.username}`;
+  return new Promise((resolve) => {
+    if (!isUserLoggedIn()) return;
 
-  let dmPage = document.getElementById("dm-page");
+    clearPages("dm");
 
-  if (!dmPage) {
-    dmPage = document.createElement("div");
-    dmPage.id = "dm-page";
-    dmPage.classList.add("dm-container");
-  }
+    const usernameHeader = document.getElementById("header-username");
+    usernameHeader.innerHTML = `Messagerie de ${SessionData.username}`;
 
-  dmPage.innerHTML = `
+    let dmPage = document.getElementById("dm-page");
+
+    if (!dmPage) {
+      dmPage = document.createElement("div");
+      dmPage.id = "dm-page";
+      dmPage.classList.add("dm-container");
+    }
+
+    dmPage.innerHTML = `
       <div id="dm-sidebar" class="dm-sidebar">
           <h3>Messages privés</h3>
           <div id="dm-conversations"></div>
@@ -27,15 +33,14 @@ export function displayMailbox() {
 
       <div id="dm-content" class="dm-content">
           <div id="dm-header" class="dm-header"></div>
-
-          <div id="dm-messages" class="dm-messages">
-          </div>
+          <div id="dm-messages" class="dm-messages"></div>
       </div>
-  `;
+    `;
 
-  document.body.appendChild(dmPage);
+    document.body.appendChild(dmPage);
 
-  loadConversationsList();
+    loadConversationsList().then(resolve);
+  });
 }
 
 export async function loadConversationsList() {
@@ -65,8 +70,13 @@ export async function loadConversationsList() {
         `;
 
     div.addEventListener("click", () => {
-      openConversation(conv.otherUser.id);
+      if (pageData.ShowingConversation) {
+        closeConversation();
+      } else {
+        openConversation(conv.otherUser.id);
+      }
     });
+
     container.appendChild(div);
   });
 }

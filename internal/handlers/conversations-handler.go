@@ -47,12 +47,23 @@ func (h *ConversationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			otherID = c.User2ID
 		}
 
-		otherUser, _ := h.userService.GetUserByID(otherID)
+		otherUser, err := h.userService.GetUserByID(otherID)
+		if err != nil {
+			log.Println("Erreur GetUserByID:", err)
+			http.Error(w, "Error loading user", http.StatusInternalServerError)
+			return
+		}
+		if otherUser == nil {
+			log.Println("Utilisateur introuvable:", otherID)
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
 
 		resp = append(resp, ConvResponse{
 			OtherUser: *otherUser,
 			LastAt:    c.LastMessageAt,
 		})
+
 	}
 
 

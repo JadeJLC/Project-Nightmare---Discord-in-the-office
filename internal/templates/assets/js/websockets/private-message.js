@@ -1,5 +1,5 @@
 // Fonctions pour afficher la liste des utilisateurs en ligne et permettre de leur envoyer des messages
-import { SessionData } from "../variables.js";
+import { pageData, SessionData } from "../variables.js";
 import { ws } from "./connect.js";
 import { loadConversationsList } from "../page-creation/chat.js";
 
@@ -92,6 +92,13 @@ export async function openConversation(otherUserId) {
   });
 
   msgContainer.appendChild(div);
+  pageData.ShowingConversation = true;
+}
+
+export function closeConversation() {
+  const container = document.getElementById("dm-messages");
+  container.innerHTML = "";
+  pageData.ShowingConversation = false;
 }
 
 export function displayDM(msg) {
