@@ -44,22 +44,30 @@ function setHomeFeedLinks(feedContainer) {
   feedContainer.addEventListener("click", (event) => {
     const title = event.target.closest(".topic-title");
     if (title) {
-      const topicID = title.getAttribute("data_id");
-      displayTopics(topicID);
+      const catID = title.dataset.catid;
+      const topicID = title.dataset.topicid;
+      console.log(
+        "Ouverture du sujet :",
+        topicID,
+        " dans la catégorie :",
+        catID,
+      );
+      displayPosts(catID, topicID);
       return;
     }
 
     const lastPost = event.target.closest(".button-link");
     if (lastPost) {
-      const topicID = lastPost.getAttribute("data_topicid");
-      const postID = lastPost.getAttribute("data_postid");
-      displayPosts(topicID, postID);
+      const catID = lastPost.dataset.catid;
+      const topicID = lastPost.dataset.topicid;
+      const postID = lastPost.dataset.postid;
+      displayPosts(catID, topicID, postID);
       return;
     }
 
     const author = event.target.closest(".last-post-author");
     if (author) {
-      const profile = author.getAttribute("data_id");
+      const profile = author.dataset.author;
       displayProfile(profile);
     }
   });
@@ -71,6 +79,7 @@ function setHomeFeedLinks(feedContainer) {
  * @returns {HTMLElement} L'élément HTML du sujet
  */
 function buildFeedTopic(topic) {
+  console.log(topic);
   const topicBloc = document.createElement("div");
   topicBloc.className = "topic-bloc";
 
@@ -84,17 +93,17 @@ function buildFeedTopic(topic) {
     topicBloc.className = "feed-notopic";
     topicBloc.innerHTML = `<img src="/assets/icons/notopic.png"/> Aucun sujet correspondant à votre recherche n'a été trouvé`;
   } else {
-    topicBloc.innerHTML = `<button type="button" class="button-link" style="float:right;padding-top:10px" data_topicid="${topicID}" data_postid="${postID}">
+    topicBloc.innerHTML = `<button type="button" class="button-link" style="float:right;padding-top:10px" data-catid="${topic.cat_id}" data-topicid="${topicID}" data-postid="${postID}">
                   <img
                     src="assets/images/external-link.svg"
                     alt="Voir le message"
                     title="Voir le message"
                   />
                 </button>
-                <h3 class="topic-title" data_id="${topicID}">Sujet : ${topic.topic_title}</h3> 
+                <h3 class="topic-title" data-catid="${topic.cat_id}" data-topicid="${topicID}">Sujet : ${topic.topic_title}</h3> 
  <div class="topic-content">   
     <div class="topic-lastpost">${message} </div>
-    <div class="topic-lastinfo">posté le ${topic.created_on} par <span class="last-post-author" data_id="${topic.author}">${topic.author}</span></div>
+    <div class="topic-lastinfo">posté le ${topic.created_on} par <span class="last-post-author" data-author="${topic.author}">${topic.author}</span></div>
  </div>`;
   }
 

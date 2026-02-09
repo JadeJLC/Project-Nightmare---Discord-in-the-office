@@ -143,7 +143,7 @@ func (r *TopicRepo) GetTopicsByCategory(catID int) (*domain.TopicList, error) {
 * Récupère les 10 sujets les plus récents pour l'affichage du feed
 */
 func (r *TopicRepo) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error) {
-	rows, err := r.db.Query(`SELECT post_id, topic_id, content, created_on, username, title
+	rows, err := r.db.Query(`SELECT post_id, topic_id, content, created_on, username, title, category
 	FROM (
     	SELECT
 	        m.post_id,
@@ -152,6 +152,7 @@ func (r *TopicRepo) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error
         	m.created_on,
         	u.username,
         	t.title,
+			t.category,
         	ROW_NUMBER() OVER(PARTITION BY m.topic_id ORDER BY m.created_on DESC) as rn
     	FROM messages m
     	JOIN topics t ON m.topic_id = t.topic_id 
@@ -171,7 +172,7 @@ func (r *TopicRepo) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error
 
 	for rows.Next() {
 		lastPost := &domain.LastPost{}
-		err := rows.Scan(&lastPost.ID, &lastPost.TopicID, &lastPost.Content, &lastPost.Time, &lastPost.Author, &lastPost.TopicTitle); 
+		err := rows.Scan(&lastPost.ID, &lastPost.TopicID, &lastPost.Content, &lastPost.Time, &lastPost.Author, &lastPost.TopicTitle, &lastPost.CatID); 
 
 		if err != nil {
 			return nil, err

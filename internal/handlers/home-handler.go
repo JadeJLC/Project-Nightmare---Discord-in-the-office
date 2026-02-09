@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"real-time-forum/internal/services"
 )
@@ -36,6 +37,7 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
         if mode == "feed" {
             data, err = h.topicService.GetTopicsByMostRecent(0)
+            log.Print(err)
         } else {
             data, err = h.categoryService.GetAllCategories()
         }

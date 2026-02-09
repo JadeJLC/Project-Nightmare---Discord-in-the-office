@@ -18,6 +18,7 @@ type LastPost struct {
 	Content string `json:"content"`
 	Time string `json:"created_on"`
 	TopicTitle string `json:"topic_title"`
+	CatID int `json:"cat_id"`
 }
 
 type MessageRepo interface {
