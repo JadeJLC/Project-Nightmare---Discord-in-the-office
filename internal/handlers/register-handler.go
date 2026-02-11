@@ -4,8 +4,10 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"real-time-forum/internal/auth"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
+	"regexp"
 )
 
 type RegisterHandler struct {
@@ -33,9 +35,32 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    isValidUsername := regexp.MustCompile(`^[a-zA-Z0-9_]+$`).MatchString(newUser.Username)
+    if !isValidUsername || len(newUser.Username) < 3 || len(newUser.Username) > 20 {
+        http.Error(w, "Nom d'utilisateur invalide (Alphanumérique, 3-20 caractères)", http.StatusBadRequest)
+        return
+    }
+
+    ip := r.RemoteAddr
+
+    if auth.IsRateLimited(ip) {
+        http.Error(w, "Veuillez attendre entre deux requêtes.", http.StatusTooManyRequests)
+        return
+    }
+
     mode := r.URL.Query().Get("mode")
 
     if mode == "edit" {
+       if !h.checkUserLoggedIn(w, r, newUser.Username) {
+            http.Error(w, "Autorisation de modification de profil refusée", http.StatusUnauthorized)
+            return
+        }
+
+        if err := h.userService.EditProfile(newUser); err != nil {
+            http.Error(w, err.Error(), http.StatusBadRequest)
+            return
+        }
+
         if err := h.userService.EditProfile(newUser); err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
@@ -51,4 +76,25 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     
 
     json.NewEncoder(w).Encode(map[string]string{"status": "success"})
+}
+
+
+func (h *RegisterHandler) checkUserLoggedIn(w http.ResponseWriter, r *http.Request, targetUsername string) bool {
+    cookie, err := r.Cookie("auth_token")
+    if err != nil {
+        return false
+    }
+
+    targetUser, err := h.userService.GetUserByUsername(targetUsername)
+    sessionUserID, err2 := h.sessionService.GetUserID(cookie.Value)
+
+    if err != nil || err2 != nil {
+        return false 
+    }
+
+    if targetUser.ID != sessionUserID {
+        return false 
+    }
+
+    return true 
 }

@@ -30,7 +30,7 @@ func (h *ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     }
 
     // 2. Lire les paramètres GET
-    otherID, _ := strconv.Atoi(r.URL.Query().Get("user"))
+    otherID := r.URL.Query().Get("user")
     offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
     limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 

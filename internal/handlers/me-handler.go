@@ -37,7 +37,7 @@ func (h *MeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    user, err := h.userService.GetUserByID(int(userID))
+    user, err := h.userService.GetUserByID(userID)
     if err != nil {
         json.NewEncoder(w).Encode(map[string]any{
             "logged": false,

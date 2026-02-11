@@ -2,8 +2,10 @@ package repositories
 
 import (
 	"database/sql"
+	"html"
 	"log"
 	"real-time-forum/internal/domain"
+	"strings"
 	"time"
 )
 
@@ -18,7 +20,8 @@ func NewTopicRepo(db *sql.DB) *TopicRepo{
 /*
 * Ouvre un nouveau sujet et l'ajoute dans la base de données
 */
-func (r *TopicRepo) Create(category int, title string, authorId int) error {
+func (r *TopicRepo) Create(category int, title, authorId string) error {
+	title = html.EscapeString(strings.TrimSpace(title))
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("02/01/2006 à 15:04:05")
 	_, err := r.db.Exec(`
@@ -73,7 +76,7 @@ func (r *TopicRepo) GetTopicByTitle(title string) (*domain.Topic, error) {
 /*
 * Récupère tous les sujets ouverts par un utilisateur
 */
-func (r *TopicRepo) GetTopicsByAuthor(authorID int) ([]*domain.Topic, error) {
+func (r *TopicRepo) GetTopicsByAuthor(authorID string) ([]*domain.Topic, error) {
 	rows, err := r.db.Query(`SELECT 
     t.topic_id, 
     t.title, 

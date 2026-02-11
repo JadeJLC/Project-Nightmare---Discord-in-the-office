@@ -1,7 +1,7 @@
 package domain
 
 type User struct {
-	ID          int64  `json:"id"`
+	ID          string `json:"id"`
 	Username    string `json:"username"`
 	Email       string `json:"email"`
 	Password    string `json:"password"`
@@ -18,6 +18,6 @@ type UserRepository interface {
 	GetUserByEmail(email string) (*User, error)
 	GetUserByUsername(username string) (*User, error)
 	GetUserByToken(token string) (*User, error)
-	GetUserByID(id int) (*User, error)
-	UpdateUserProfile(userID int, user *User) error
+	GetUserByID(id string) (*User, error)
+	UpdateUserProfile(userID string, user *User) error
 }

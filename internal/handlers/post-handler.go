@@ -60,7 +60,7 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		topicID := sectionID
 	if mode == "newtopic" {
-		h.topicService.CreateTopic(sectionID, int(user.ID), newTopic.Title)
+		h.topicService.CreateTopic(sectionID, user.ID, newTopic.Title)
 		topicData, err := h.topicService.GetTopicByTitle(newTopic.Title)
 
 		if err !=nil {
@@ -70,7 +70,7 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} 
 	
 
-    h.messageService.CreateMessage(topicID, newTopic.Content, int(user.ID))
+    h.messageService.CreateMessage(topicID, newTopic.Content, user.ID)
 
 	}
 

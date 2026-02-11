@@ -81,7 +81,6 @@ export function getRegisterData(registerForm) {
 
       if (response.ok) {
         alert("Inscription réussie !");
-        popup.classList.add("is-hidden");
         window.location.reload();
       } else {
         alert("Erreur : " + (await response.text()));

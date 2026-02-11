@@ -13,7 +13,7 @@ func NewTopicService(r *repositories.TopicRepo) *TopicService {
     return &TopicService{repo: r}
 }
 
-func (s *TopicService) CreateTopic(catID, userID int, title string) error {
+func (s *TopicService) CreateTopic(catID int, userID, title string) error {
 	return s.repo.Create(catID, title, userID)
 }
 
@@ -29,7 +29,7 @@ func (s *TopicService) GetTopicByTitle(title string) (*domain.Topic, error) {
 	return s.repo.GetTopicByTitle(title)
 }
 
-func (s *TopicService) GetTopicsByAuthorID(authorID int) ([]*domain.Topic, error) {
+func (s *TopicService) GetTopicsByAuthorID(authorID string) ([]*domain.Topic, error) {
 	return s.repo.GetTopicsByAuthor(authorID)
 }
 

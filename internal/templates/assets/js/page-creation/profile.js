@@ -2,6 +2,7 @@ import { SessionData } from "../variables.js";
 import { clearPages } from "../helpers/clear-pages.js";
 import { isUserLoggedIn } from "../helpers/check-log-status.js";
 import { displayPosts } from "./topic.js";
+import { decodeHTML } from "../helpers/text-formating.js";
 
 // #region ***** Affichage des informations utilisateur
 
@@ -147,14 +148,14 @@ function buildSelfDetails(user) {
           <span>Informations</span>
           <div class="profile-public">
             <p><span>Âge&nbsp;:</span> ${user.age}&nbsp;ans</p>
-            <p><span>Genre&nbsp;:</span> <input class="is-hidden" type="text" name="genre" value="${user.genre}" id="profile-gender-input"><span id="profile-gender-span">${user.genre}</span></p>
+            <p><span>Genre&nbsp;:</span> <input class="is-hidden" type="text" name="genre" value="${decodeHTML(user.genre)}" id="profile-gender-input"><span id="profile-gender-span">${user.genre}</span></p>
           </div>
           <hr />
           <div class="profile-private">
-            <p><span>Email&nbsp;:</span><input class="is-hidden" type="text" name="email" value="${user.email}" id="profile-email-input"> <span id="profile-email-span">${user.email}</span></p>
+            <p><span>Email&nbsp;:</span><input class="is-hidden" type="text" name="email" value="${decodeHTML(user.email)}" id="profile-email-input"> <span id="profile-email-span">${user.email}</span></p>
             <p><span>Identité&nbsp:</span>
-            <input class="is-hidden" type="text" name="firstname" value="${user.firstname}" id="profile-first-input"><span id="profile-first-span"> ${user.firstname}</span>
-            <input class="is-hidden" type="text" name="lastname" value="${user.lastname}" id="profile-last-input"><span id="profile-last-span"> ${user.lastname}</span></p>
+            <input class="is-hidden" type="text" name="firstname" value="${decodeHTML(user.firstname)}" id="profile-first-input"><span id="profile-first-span"> ${user.firstname}</span>
+            <input class="is-hidden" type="text" name="lastname" value="${decodeHTML(user.lastname)}" id="profile-last-input"><span id="profile-last-span"> ${user.lastname}</span></p>
           </div>
         </div>
       </form>`;
@@ -456,6 +457,7 @@ async function editProfileDetails(mode) {
   const profileName = SessionData.username;
   const profForm = document.getElementById("profile-form");
   const data = Object.fromEntries(new FormData(profForm).entries());
+  if (data.username != profileName) return;
 
   try {
     const response = await fetch("/api/register?mode=edit", {

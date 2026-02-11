@@ -13,8 +13,8 @@ func NewMessageService(r *repositories.MessageRepo) *MessageService {
     return &MessageService{repo: r}
 }
 
-func (s *MessageService) CreateMessage(topicID int, content string, author int) error {
-	return s.repo.Create(topicID, content, author)
+func (s *MessageService) CreateMessage(topicID int, content string, userID string) error {
+	return s.repo.Create(topicID, content, userID)
 }
 
 func (s *MessageService) DeleteMessage(postID int) error {
@@ -29,7 +29,7 @@ func (s *MessageService) GetMessagesByTopic(topicID int) ([]*domain.Message, err
 	return s.repo.GetMessagesByTopic(topicID)
 }
 
-func (s *MessageService) GetMessagesByAuthor(authorID int) ([]*domain.Message, error) {
+func (s *MessageService) GetMessagesByAuthor(authorID string) ([]*domain.Message, error) {
 	return s.repo.GetMessagesByAuthor(authorID)
 }
 

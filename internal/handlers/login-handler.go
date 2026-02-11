@@ -54,6 +54,7 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         HttpOnly: true,
         MaxAge:   3600,
 		Secure: false,
+        SameSite: http.SameSiteStrictMode,
     })
 
     json.NewEncoder(w).Encode(map[string]any{

@@ -4,20 +4,21 @@ package services
 import (
 	"errors"
 	"real-time-forum/internal/domain"
+	"real-time-forum/internal/repositories"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
-    repo domain.UserRepository
+    repo *repositories.UserRepository
 }
 
-func NewUserService(repo domain.UserRepository) *UserService {
-    return &UserService{repo: repo}
+func NewUserService(r *repositories.UserRepository) *UserService {
+    return &UserService{repo: r}
 }
 
-func (s *UserService) GetUserByID(id int) (*domain.User, error) { 
+func (s *UserService) GetUserByID(id string) (*domain.User, error) { 
     return s.repo.GetUserByID(id) 
 }
 
@@ -71,5 +72,5 @@ func (s *UserService) EditProfile(newInfo domain.User) error {
     if err != nil {
        return err
     }
-    return s.repo.UpdateUserProfile(int(user.ID), &newInfo)
+    return s.repo.UpdateUserProfile(user.ID, &newInfo)
 }

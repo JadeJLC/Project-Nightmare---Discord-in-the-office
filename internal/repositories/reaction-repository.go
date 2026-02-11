@@ -61,7 +61,7 @@ func (r *ReactionRepo) GetPostReactions(postID int) ([]*domain.Reaction, error) 
 /*
 * Récupère la liste de tous les messages auxquels l'utilisateur a réagi
 */
-func (r *ReactionRepo) GetUserReactions(userID int) ([]*domain.ReactionDisplay, error) {
+func (r *ReactionRepo) GetUserReactions(userID string) ([]*domain.ReactionDisplay, error) {
 	rows, err := r.db.Query(`SELECT
 			r.post_id,
 			r.reaction_type,
