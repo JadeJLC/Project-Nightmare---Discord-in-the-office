@@ -50,8 +50,7 @@ function setHomeCategoriesLinks(categoriesContainer) {
     const lastPostTitle = event.target.closest(".last-post-title");
     if (lastPostTitle) {
       const topicID = lastPostTitle.getAttribute("data_id");
-      const catID = lastPostTitle.getAttribute("data_catid");
-      displayPosts(catID, topicID);
+      displayPosts(topicID);
       return;
     }
 
@@ -59,8 +58,7 @@ function setHomeCategoriesLinks(categoriesContainer) {
     if (lastPostBtn) {
       const topicID = lastPostBtn.getAttribute("data_topicid");
       const postId = lastPostBtn.getAttribute("data_postid");
-      const catID = lastPostBtn.getAttribute("data_catid");
-      displayPosts(catID, topicID, postId);
+      displayPosts(topicID, postId);
       return;
     }
 
@@ -91,7 +89,7 @@ function buildCategory(category) {
   if (lastpost.topic_title === "Aucun message pour le moment") {
     lastPostHTML = `<div class="cat-lastpost"><center>${lastpost.topic_title}</center></div>`;
   } else {
-    lastPostHTML = `<div class="cat-lastpost"><button data_topicid="${lastpost.topic_id}" data_catid="${catID}" data_postid="${postID}" type="button" class="button-link link-right">
+    lastPostHTML = `<div class="cat-lastpost"><button data_topicid="${lastpost.topic_id}" data_postid="${postID}" type="button" class="button-link link-right">
                   <img
                     src="assets/images/external-link.svg"
                     alt="Voir le message"
@@ -99,7 +97,7 @@ function buildCategory(category) {
                   />
                 </button>
                 <center>Dernier message</center>
-    <div class="last-post-title" data_catid="${catID}" data_id="${lastpost.topic_id}">
+    <div class="last-post-title" data_id="${lastpost.topic_id}">
  ${lastpost.topic_title} </div>
     <div class="last-post-date">• le ${lastpost.created_on} par <span class="last-post-author" data_id="${lastpost.author}">${lastpost.author}</span></div>
     </div>`;

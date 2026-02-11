@@ -290,6 +290,14 @@ header {
   opacity: 0;
 }
 
+.edit-message span {
+  left: 0px;
+}
+
+.edit-message:hover span {
+  left: -90px;
+}
+
 .header-buttons button:hover span,
 .edit-content:hover span,
 .preview-reaction:hover span,
@@ -585,7 +593,8 @@ header {
 
 .post-left {
   width: 97%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 .post-bloc.first-post {
@@ -1128,6 +1137,10 @@ u {
     margin-top: 50px;
   }
 
+  .post-date {
+    width: 90%;
+  }
+
   #forum-title-short {
     display: none;
   }
@@ -1179,6 +1192,40 @@ u {
   .post-right {
     width: 80px;
     text-align: right !important;
+  }
+
+  .cat-content {
+    display: block;
+    position: relative;
+  }
+
+  .cat-content .cat-image {
+    position: absolute;
+    top: -130px;
+    right: -30px;
+    transform: scaleX(-1);
+  }
+
+  .cat-description,
+  .cat-lastpost {
+    width: initial;
+  }
+
+  .cat-lastpost {
+    margin-top: 0px;
+    border-left: none;
+    border-top: 2px dashed var(--neon-soft);
+    padding-top: 20px;
+    margin-top: 10px;
+    text-align: left;
+  }
+
+  .last-post-date {
+    text-align: left;
+  }
+
+  .cat-lastpost center {
+    margin-bottom: 10px;
   }
 }
 
