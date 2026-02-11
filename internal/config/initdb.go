@@ -21,5 +21,8 @@ func InitDB() *sql.DB {
 	} else {
 		log.Printf("✅ connection to database succeded")
 	}
+	db.Exec("PRAGMA journal_mode=WAL;")
+	db.Exec("PRAGMA busy_timeout = 5000;")
+
 	return db
 }

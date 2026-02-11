@@ -1336,21 +1336,21 @@ u {
   margin: auto;
 }
 
-.dm-message {
+.dm-group {
   width: 90%;
   padding: 10px;
   margin: 20px 0;
   position: relative;
 }
 
-.dm-message.theirs {
+.dm-group.theirs {
   margin-left: 8%;
   border-radius: 15px;
   border-bottom-right-radius: 0px;
   background-color: var(--popup-transparent);
 }
 
-.dm-message.mine {
+.dm-group.mine {
   margin-left: -5%;
   border-radius: 15px;
   border-bottom-left-radius: 0px;
