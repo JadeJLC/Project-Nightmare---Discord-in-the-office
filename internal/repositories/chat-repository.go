@@ -22,7 +22,7 @@ func (r *ChatRepo) SaveDM(msg domain.DM) error {
     return err
 }
 
-func (r *ChatRepo) GetDMs(user1, user2, offset, limit int) ([]domain.DM, error) {
+func (r *ChatRepo) GetDMs(user1, user2 string, offset, limit int) ([]domain.DM, error) {
     rows, err := r.db.Query(`
         SELECT 
             d.id,
@@ -75,7 +75,7 @@ func (r *ChatRepo) GetDMs(user1, user2, offset, limit int) ([]domain.DM, error) 
 
 
 
-func (r *ChatRepo) UpdateConversation(user1, user2 int) error {
+func (r *ChatRepo) UpdateConversation(user1, user2 string) error {
     now := time.Now()
 
     // Vérifie si la conversation existe
@@ -103,7 +103,7 @@ func (r *ChatRepo) UpdateConversation(user1, user2 int) error {
     return err
 }
 
-func (r *ChatRepo) GetConversations(userID int) ([]domain.Conversation, error) {
+func (r *ChatRepo) GetConversations(userID string) ([]domain.Conversation, error) {
     rows, err := r.db.Query(`
         SELECT id, user1_id, user2_id, last_DM_at
         FROM conversations

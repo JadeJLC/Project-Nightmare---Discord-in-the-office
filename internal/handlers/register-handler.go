@@ -51,6 +51,16 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     mode := r.URL.Query().Get("mode")
 
     if mode == "edit" {
+       if !h.checkUserLoggedIn(w, r, newUser.Username) {
+            http.Error(w, "Autorisation de modification de profil refusée", http.StatusUnauthorized)
+            return
+        }
+
+        if err := h.userService.EditProfile(newUser); err != nil {
+            http.Error(w, err.Error(), http.StatusBadRequest)
+            return
+        }
+
         if err := h.userService.EditProfile(newUser); err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
@@ -66,4 +76,25 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     
 
     json.NewEncoder(w).Encode(map[string]string{"status": "success"})
+}
+
+
+func (h *RegisterHandler) checkUserLoggedIn(w http.ResponseWriter, r *http.Request, targetUsername string) bool {
+    cookie, err := r.Cookie("auth_token")
+    if err != nil {
+        return false
+    }
+
+    targetUser, err := h.userService.GetUserByUsername(targetUsername)
+    sessionUserID, err2 := h.sessionService.GetUserID(cookie.Value)
+
+    if err != nil || err2 != nil {
+        return false 
+    }
+
+    if targetUser.ID != sessionUserID {
+        return false 
+    }
+
+    return true 
 }

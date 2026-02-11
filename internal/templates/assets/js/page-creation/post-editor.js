@@ -26,8 +26,12 @@ export function displayPostEditor(mode, sectionID, container, post) {
   }
   const postEdit = buildPostEditorHTML(mode, post.content);
 
-  container.appendChild(postEdit);
-  setPostEditorButtons(container, sectionID, mode, post.post_id);
+  let newContainer = container.cloneNode(true);
+  container.insertAdjacentElement("afterend", newContainer);
+  container.remove();
+
+  newContainer.appendChild(postEdit);
+  setPostEditorButtons(newContainer, sectionID, mode, post.post_id);
 }
 
 /**
@@ -93,11 +97,13 @@ function buildPostEditorHTML(mode, message) {
 function setPostEditorButtons(container, sectionID, mode, postID) {
   container.addEventListener("click", (event) => {
     const goBack = event.target.closest(".go-back");
+
     if (goBack && mode === "newtopic") {
       goBack.innerHTML = "Retour à la catégorie";
       displayTopics(sectionID);
       return;
     } else if ((goBack && mode === "reply") || (goBack && mode === "edit")) {
+      console.log("Retour au sujet ", sectionID);
       displayPosts(sectionID);
       return;
     }

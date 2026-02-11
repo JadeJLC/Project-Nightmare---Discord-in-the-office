@@ -61,7 +61,8 @@ async function writePosts(topicID, postID) {
     setTopicLinks(topicsPageContainer, catID, topicID, postID);
 
     postID = String(postID).padStart(2, "0");
-    if (postID) document.getElementById(postID).scrollIntoView();
+    const postHref = document.getElementById(postID);
+    if (postHref) postHref.scrollIntoView();
   } catch (error) {
     console.log("Erreur dans la récupération des sujets : ", error);
   }

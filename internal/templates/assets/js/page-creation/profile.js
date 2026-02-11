@@ -457,6 +457,7 @@ async function editProfileDetails(mode) {
   const profileName = SessionData.username;
   const profForm = document.getElementById("profile-form");
   const data = Object.fromEntries(new FormData(profForm).entries());
+  if (data.username != profileName) return;
 
   try {
     const response = await fetch("/api/register?mode=edit", {

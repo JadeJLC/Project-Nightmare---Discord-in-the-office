@@ -40,7 +40,7 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     switch mode {
     case "message":
-        list, err := h.messageService.GetMessagesByAuthor(int(data.ID))
+        list, err := h.messageService.GetMessagesByAuthor(data.ID)
         if err != nil {
             list = []*domain.Message{{Content: "Nothing to Display"}}
         }
@@ -48,7 +48,7 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         return
 
     case "reactions":
-        list, err := h.reactionService.GetUserReactions(int(data.ID))
+        list, err := h.reactionService.GetUserReactions(data.ID)
         if err != nil || len(list) == 0 {
             list = []*domain.ReactionDisplay{{TopicTitle: "Nothing to Display"}}
         }
@@ -56,7 +56,7 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         return
 
     case "topics":
-        list, err := h.topicService.GetTopicsByAuthorID(int(data.ID))
+        list, err := h.topicService.GetTopicsByAuthorID(data.ID)
         if err != nil || len(list) == 0 {
             list = []*domain.Topic{{Title: "Nothing to Display"}}
         }

@@ -2,8 +2,10 @@ package repositories
 
 import (
 	"database/sql"
+	"html"
 	"log"
 	"real-time-forum/internal/domain"
+	"strings"
 	"time"
 )
 
@@ -18,13 +20,14 @@ func NewMessageRepo(db *sql.DB) *MessageRepo {
 /*
 * Ajoute un nouveau message dans la base de données
 */
-func (r *MessageRepo) Create(topicID int, content string, author int) error {
+func (r *MessageRepo) Create(topicID int, content string, userID string) error {
+	content = html.EscapeString(strings.TrimSpace(content))
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("02/01/2006 à 15:04:05")
 	_, err := r.db.Exec(`
 	INSERT INTO messages (topic_id, author, content, created_on)
 	VALUES (?, ?, ?, ?)
-	`, topicID, author, content, formattedTime)
+	`, topicID, userID, content, formattedTime)
 	return err
 }
 
@@ -42,6 +45,7 @@ func (r *MessageRepo) Delete(postID int) error {
 * Modifie le contenu du message dans la base de données
 */
 func (r *MessageRepo) Edit(postID int, newMessage string) error {
+	newMessage = html.EscapeString(strings.TrimSpace(newMessage))
 	_, err := r.db.Exec(`
 	UPDATE messages SET content = ?
 	WHERE post_id = ?
@@ -89,7 +93,7 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
 /*
 * Récupère la liste de tous les messages postés par un utilisateur particulier, sur quel sujet et dans quelle catégorie
 */
-func (r *MessageRepo) GetMessagesByAuthor(author int) ([]*domain.Message, error) {
+func (r *MessageRepo) GetMessagesByAuthor(author string) ([]*domain.Message, error) {
 	rows, err := r.db.Query(`SELECT
             m.post_id,
             m.topic_id,

@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var wsClients = make(map[int]*websocket.Conn) // userID → socket
+var wsClients = make(map[string]*websocket.Conn) // userID → socket
 var wsMutex sync.Mutex
 
 
@@ -64,7 +64,7 @@ func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     go h.listen(userID, conn)
 }
 
-func (h *WebSocketHandler) listen(userID int, conn *websocket.Conn) {
+func (h *WebSocketHandler) listen(userID string, conn *websocket.Conn) {
     defer func() {
         wsMutex.Lock()
         delete(wsClients, userID)
@@ -82,7 +82,7 @@ func (h *WebSocketHandler) listen(userID int, conn *websocket.Conn) {
         }
 
         if msg["type"] == "private_message" {
-            to := int(msg["to"].(float64))
+            to := msg["to"].(string)
             content := msg["content"].(string)
             h.handlePrivateMessage(userID, to, content)
         }
@@ -120,7 +120,7 @@ func (h *WebSocketHandler) broadcastPresence() {
 
 
 
-func (h *WebSocketHandler) handlePrivateMessage(from, to int, content string) {
+func (h *WebSocketHandler) handlePrivateMessage(from, to string, content string) {
     // 1. Construire le message
     dm := domain.DM{
         SenderID:   from,

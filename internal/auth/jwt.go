@@ -9,7 +9,7 @@ import (
 
 var jwtKey = []byte("super-secret-key") // UNE SEULE clé
 
-func GenerateToken(userID int64) (string, error) {
+func GenerateToken(userID string) (string, error) {
     claims := jwt.MapClaims{
         "user_id": userID,
         "exp":     time.Now().Add(24 * time.Hour).Unix(),
@@ -19,24 +19,24 @@ func GenerateToken(userID int64) (string, error) {
     return token.SignedString(jwtKey)
 }
 
-func ExtractUserID(tokenStr string) (int64, error) {
+func ExtractUserID(tokenStr string) (string, error) {
     token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
         return jwtKey, nil
     })
 
     if err != nil || !token.Valid {
-        return 0, errors.New("invalid token")
+        return "", errors.New("invalid token")
     }
 
     claims, ok := token.Claims.(jwt.MapClaims)
     if !ok {
-        return 0, errors.New("invalid claims")
+        return "", errors.New("invalid claims")
     }
 
-    idFloat, ok := claims["user_id"].(float64)
+    idString, ok := claims["user_id"].(string)
     if !ok {
-        return 0, errors.New("user_id missing")
+        return "", errors.New("user_id missing")
     }
 
-    return int64(idFloat), nil
+    return idString, nil
 }

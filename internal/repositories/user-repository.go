@@ -8,15 +8,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type userRepository struct {
+type UserRepository struct {
     db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) domain.UserRepository {
-    return &userRepository{db: db}
+func NewUserRepository(db *sql.DB) *UserRepository {
+    return &UserRepository{db: db}
 }
 
 func cleanUserInput (user *domain.User)  {
@@ -29,36 +30,35 @@ func cleanUserInput (user *domain.User)  {
 /*
 * Ajoute un utilisateur dans la base de données en sécurisant les éléments envoyés
 */
-func (r *userRepository) Create(user *domain.User) error {
+func (r *UserRepository) Create(user *domain.User) error {
     cleanUserInput(user)
 
     hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
     if err != nil {
         return err
     }
+    
+    user.ID = uuid.New().String()
 
     date := time.Now()
     formattedTime := date.Format("02/01/2006")
 
-    res, err := r.db.Exec(`
-        INSERT INTO users (username, email, password, age, gender, firstname, lastname, image, inscription)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", formattedTime,
+    _, err = r.db.Exec(`
+        INSERT INTO users (user_id, username, email, password, age, gender, firstname, lastname, image, inscription)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        user.ID, user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", formattedTime,
     )
     if err != nil {
         return err
     }
-    id, err := res.LastInsertId()
-    if err == nil {
-        user.ID = id
-    }
+    
     return nil
 }
 
 /*
 * Récupère les informations d'un utilisateur à partir de son email
 */
-func (r *userRepository) GetUserByEmail(email string) (*domain.User, error) {
+func (r *UserRepository) GetUserByEmail(email string) (*domain.User, error) {
     row := r.db.QueryRow(`
         SELECT user_id, username, email, password, age, gender, firstname, lastname
         FROM users WHERE email = ?`, email)
@@ -75,7 +75,7 @@ func (r *userRepository) GetUserByEmail(email string) (*domain.User, error) {
 /*
 * Récupère les informations d'un utilisateur à partir de son pseudo
 */
-func (r *userRepository) GetUserByUsername(username string) (*domain.User, error) {
+func (r *UserRepository) GetUserByUsername(username string) (*domain.User, error) {
     row := r.db.QueryRow(`
         SELECT user_id, username, email, password, age, gender, firstname, lastname, image, inscription
         FROM users WHERE username = ?`, username)
@@ -92,7 +92,7 @@ func (r *userRepository) GetUserByUsername(username string) (*domain.User, error
 /*
 * Récupère les informations d'un utilisateur à partir des tokens de connexion
 */
-func (r *userRepository) GetUserByToken(token string) (*domain.User, error) { 
+func (r *UserRepository) GetUserByToken(token string) (*domain.User, error) { 
 	user := &domain.User{}
 	err := r.db.QueryRow(`SELECT id, username, image FROM users WHERE token = ?`, token).Scan(&user.ID, &user.Username, &user.Image) 
 	if err != nil {
@@ -101,7 +101,7 @@ func (r *userRepository) GetUserByToken(token string) (*domain.User, error) {
 	return user, nil 
 }
 
-func (r *userRepository) GetUserByID(id int) (*domain.User, error) { 
+func (r *UserRepository) GetUserByID(id string) (*domain.User, error) { 
     user := &domain.User{}
     err := r.db.QueryRow(`
         SELECT user_id, username, image FROM users WHERE user_id = ?`, id).
@@ -113,7 +113,7 @@ func (r *userRepository) GetUserByID(id int) (*domain.User, error) {
     return user, nil 
 }
 
-func (r *userRepository) UpdateUserProfile(userID int, user *domain.User) error {
+func (r *UserRepository) UpdateUserProfile(userID string, user *domain.User) error {
     cleanUserInput(user)
     _, err := r.db.Exec(`
 	UPDATE users SET email = ?, gender = ?, firstname = ?, lastname = ?
