@@ -5,6 +5,7 @@ import { displayPosts } from "./topic.js";
 import { ws } from "../websockets/connect.js";
 import { displayMailbox } from "./chat.js";
 import { openConversation } from "../websockets/private-message.js";
+import { decodeHTML } from "../helpers/text-formating.js";
 
 // #region ***** Affichage des informations utilisateur
 

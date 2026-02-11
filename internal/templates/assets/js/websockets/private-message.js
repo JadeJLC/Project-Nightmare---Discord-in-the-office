@@ -110,7 +110,7 @@ export function displayDM(msg) {
 
   const senderId = msg.sender_id;
   const username = msg.sender_username;
-  const isMine = senderId === SessionData.userID;
+  const isMine = username === SessionData.username;
 
   // Déterminer si on doit créer un nouveau groupe
   const isNewGroup = lastSenderId !== senderId;
@@ -120,7 +120,6 @@ export function displayDM(msg) {
     lastGroup = document.createElement("div");
     lastGroup.classList.add("dm-group");
     lastGroup.classList.add(isMine ? "mine" : "theirs");
-    console.log("sender_image =", msg.sender_image);
 
     // Header (avatar + nom)
     lastGroup.innerHTML = `
