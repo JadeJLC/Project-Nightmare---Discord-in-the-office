@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"real-time-forum/internal/auth"
 	"real-time-forum/internal/domain"
@@ -16,12 +17,12 @@ type RegisterHandler struct {
 }
 
 func NewRegisterHandler(us *services.UserService, ss *services.SessionService) *RegisterHandler {
-    return &RegisterHandler{userService: us}
+    return &RegisterHandler{userService: us, sessionService: ss}
 }
 
 /*
 * Gestion de l'inscription d'un utilisateur ou de la modification d'un profil
-* Le mode "edit" permet de modifier un profil
+* Le mode "edit" permet de modifier un profil, le mode "avatar" de changer d'image
 */
 func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodPost {
@@ -50,20 +51,30 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     mode := r.URL.Query().Get("mode")
 
-    if mode == "edit" {
+    
+    
+
+    if mode == "edit" || mode == "avatar" {
        if !h.checkUserLoggedIn(w, r, newUser.Username) {
             http.Error(w, "Autorisation de modification de profil refusée", http.StatusUnauthorized)
             return
         }
 
+        if mode == "edit" {
         if err := h.userService.EditProfile(newUser); err != nil {
             http.Error(w, err.Error(), http.StatusBadRequest)
             return
-        }
+            }
+        } 
+        
+        if mode =="avatar" {
+            image := newUser.Image
 
-        if err := h.userService.EditProfile(newUser); err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
+            if err := h.userService.EditAvatar(newUser.Username, image); err != nil {
+            http.Error(w, err.Error(), http.StatusBadRequest)
+            return
+            }
+
         }
     } else  {
         if err := h.userService.Register(&newUser); err != nil {
@@ -80,15 +91,19 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 
 func (h *RegisterHandler) checkUserLoggedIn(w http.ResponseWriter, r *http.Request, targetUsername string) bool {
+    
     cookie, err := r.Cookie("auth_token")
     if err != nil {
         return false
     }
 
     targetUser, err := h.userService.GetUserByUsername(targetUsername)
-    sessionUserID, err2 := h.sessionService.GetUserID(cookie.Value)
+    sessionUserID, err2 := h.sessionService.GetUserID(cookie.Value) // The error happens here
+
 
     if err != nil || err2 != nil {
+        log.Print(err)
+        log.Print(err2)
         return false 
     }
 

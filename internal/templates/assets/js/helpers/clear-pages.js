@@ -8,6 +8,7 @@ import { SessionData } from "../variables.js";
  */
 export function clearPages(destination) {
   window.scrollTo(0, 0);
+  clearPopups();
 
   if (destination != "home") clearHomePage();
   if (destination === "newtopic") showNewTopicForm();
@@ -161,4 +162,10 @@ function updateHeader(destination) {
           <span>Afficher les notifications</span>
         </button>`;
   }
+}
+
+export function clearPopups() {
+  const popup = document.getElementById("opened-popup");
+
+  if (popup) popup.remove();
 }

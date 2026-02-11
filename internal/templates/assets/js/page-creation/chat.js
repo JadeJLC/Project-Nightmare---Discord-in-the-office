@@ -65,14 +65,20 @@ export async function loadConversationsList() {
             <img src="assets/images-avatar/${conv.otherUser.image}.png" alt="Image de profil - ${conv.otherUser.image}" />
         </div>
         <div class="info">
-            <span class="username">${conv.otherUser.username}</span> <span id="dm-arrow">↓</span>
+            <span class="username">${conv.otherUser.username}</span> <span class="dm-arrow">↓</span>
         </div>
         `;
 
     div.addEventListener("click", () => {
       if (pageData.ConversationWith === `${conv.otherUser.id}`) {
+        div.classList.remove("active");
+        const arrow = div.querySelector(".dm-arrow");
+        arrow.textContent = "↓";
         closeConversation();
       } else {
+        div.classList.add("active");
+        const arrow = div.querySelector(".dm-arrow");
+        arrow.textContent = "↑";
         openConversation(conv.otherUser.id);
       }
     });

@@ -2,10 +2,11 @@ import { SessionData } from "../variables.js";
 import { clearPages } from "../helpers/clear-pages.js";
 import { isUserLoggedIn } from "../helpers/check-log-status.js";
 import { displayPosts } from "./topic.js";
-import { ws } from "../websockets/connect.js";
-import { displayMailbox } from "./chat.js";
-import { openConversation } from "../websockets/private-message.js";
 import { decodeHTML } from "../helpers/text-formating.js";
+import {
+  editProfileDetails,
+  editProfileImage,
+} from "../helpers/profile-secondary.js";
 
 // #region ***** Affichage des informations utilisateur
 
@@ -52,7 +53,7 @@ async function writeUserProfile(profile, logged) {
     const user = await response.json();
 
     buildProfileHTML(user, logged);
-    setProfileButtons(user.email, profile, user.id);
+    setProfileButtons(user.email, user);
 
     activateButton(user.email);
 
@@ -84,7 +85,7 @@ function buildProfileHTML(user) {
       <div class="profile-left">
         <div class="profile-user-info">
           <div class="profile-icon">
-            <img id="profile-image" src="assets/images-avatar/${user.image}.png" alt="Image de profil - ${user.image}"/>
+            <img id="profile-image" src="assets/images-avatar/${user.image}.png" data-character="${user.image}" alt="Image de profil : ${user.image}"/>
             <button type="button" class="edit-content is-hidden" id="edit-avatar">
           <img src="assets/images/tool.svg" />
           <span>Changer d'image</span>
@@ -335,7 +336,7 @@ async function displayProfileTopics(profileName) {
   }
 }
 
-// #region
+// #endregion
 
 // #region ***** Mise en place des boutons
 /**
@@ -354,6 +355,7 @@ function switchToReactions(profileName) {
 function switchToMessages(profileName) {
   localStorage.setItem("profileDisplay", "messages");
   displayProfile(profileName);
+  editProfileImage(profileName);
 }
 
 /**
@@ -368,16 +370,19 @@ function switchToTopics(profileName) {
 /**
  * Active les effets de clic sur les boutons du profil
  * @param {string} status Pour l'envoi à la fonction des boutons
- * @param {string} profileName Nom de l'utilisateur
+ * @param {object} user Utilisateur concerné
  */
-function setProfileButtons(status, profileName, profilId) {
+function setProfileButtons(status, user) {
+  const profileName = user.username;
+  const profileID = user.id;
+
   let profilePageContainer = document.getElementById("profile-page");
 
   if (profilePageContainer.dataset.listenerAttached) return;
 
   profilePageContainer.addEventListener("click", (event) => {
     const dmBtn = event.target.closest("#send-dm-btn");
-    if (dmBtn) initProfileDMButton(profilId, profileName);
+    if (dmBtn) initProfileDMButton(profileID, profileName);
 
     const topicBtn = event.target.closest("#profile-mytopics");
     if (topicBtn) switchToTopics(profileName);
@@ -389,16 +394,26 @@ function setProfileButtons(status, profileName, profilId) {
     if (reactionBtn) switchToReactions(profileName);
 
     const editBtn = event.target.closest("#edit-infos");
-    if (editBtn) {
+    if (editBtn && status != "Not Available") {
       editProfileDetails();
     }
 
+    const editAvatarBtn = event.target.closest("#edit-avatar");
+
+    if (editAvatarBtn && status != "Not Available") {
+      const avaName =
+        document.getElementById("profile-image").dataset.character;
+
+      editProfileImage({ ...user, image: avaName });
+    }
+
     const profForm = document.getElementById("profile-form");
-    if (profForm)
+    if (profForm && status != "Not Available") {
       profForm.onsubmit = async (e) => {
         e.preventDefault();
         editProfileDetails("valider");
       };
+    }
 
     const seeTopic = event.target.closest(".on-topic");
     if (seeTopic) {
@@ -447,120 +462,6 @@ function activateButton(status) {
     topicBtn.classList.add("active");
     reactionBtn.classList.remove("active");
     messageBtn.classList.remove("active");
-  }
-}
-
-// #endregion
-
-// #region ***** Modification du profil
-/**
- * Permet à l'utilisateur de modifier les détails de son profil (mail, noms, age, genre)
- * @param {string} mode Si indiqué : le mode "valider" envoie dans la base de données
- */
-async function editProfileDetails(mode) {
-  if (!isUserLoggedIn()) return;
-  displayEditForm();
-
-  if (mode != "valider") return;
-
-  const profileName = SessionData.username;
-  const profForm = document.getElementById("profile-form");
-  const data = Object.fromEntries(new FormData(profForm).entries());
-  if (data.username != profileName) return;
-
-  try {
-    const response = await fetch("/api/register?mode=edit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      displayProfile(profileName);
-    } else {
-      alert("Erreur : " + (await response.text()));
-    }
-  } catch (err) {
-    console.error("Erreur réseau :", err);
-  }
-}
-
-/**
- * Affiche ou masque les champs d'édition du profil quand on clique sur le bouton
- */
-function displayEditForm() {
-  document.getElementById("profile-gender-span").classList.toggle("is-hidden");
-  document.getElementById("profile-email-span").classList.toggle("is-hidden");
-  document.getElementById("profile-first-span").classList.toggle("is-hidden");
-  document.getElementById("profile-last-span").classList.toggle("is-hidden");
-  document.getElementById("edit-infos").classList.toggle("is-hidden");
-
-  document.getElementById("profile-gender-input").classList.toggle("is-hidden");
-  document.getElementById("profile-email-input").classList.toggle("is-hidden");
-  document.getElementById("profile-first-input").classList.toggle("is-hidden");
-  document.getElementById("profile-last-input").classList.toggle("is-hidden");
-  document.getElementById("confirm-edit").classList.toggle("is-hidden");
-}
-
-function openDMPopup(targetUsername) {
-  return new Promise((resolve, reject) => {
-    // Création du wrapper
-    const popup = document.createElement("div");
-    popup.classList.add("dm-popup-overlay");
-    popup.innerHTML = `
-      <div class="dm-popup">
-        <h3>Envoyer un message à ${targetUsername}</h3>
-        <textarea id="dm-popup-text" placeholder="Écrire un message..."></textarea>
-        <div class="dm-popup-actions">
-          <button id="dm-popup-cancel">Annuler</button>
-          <button id="dm-popup-send">Envoyer</button>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(popup);
-
-    const textarea = popup.querySelector("#dm-popup-text");
-    const btnCancel = popup.querySelector("#dm-popup-cancel");
-    const btnSend = popup.querySelector("#dm-popup-send");
-
-    btnCancel.addEventListener("click", () => {
-      popup.remove();
-      reject("cancelled");
-    });
-
-    btnSend.addEventListener("click", () => {
-      const text = textarea.value.trim();
-      if (!text) return;
-
-      popup.remove();
-      resolve(text);
-    });
-  });
-}
-
-export async function initProfileDMButton(targetId, targetUsername) {
-  try {
-    // 1. Ouvrir le pop-up et attendre le message
-    const message = await openDMPopup(targetUsername);
-
-    // 2. Envoyer via WebSocket
-    ws.send(
-      JSON.stringify({
-        type: "private_message",
-        to: targetId,
-        content: message,
-      }),
-    );
-
-    // 3. Redirection vers la messagerie
-    displayMailbox()
-      .then(() => openConversation(targetId))
-      .then(() => {
-        window.scrollTo(0, document.body.scrollHeight);
-      });
-  } catch (e) {
-    // L'utilisateur a annulé → on ne fait rien
   }
 }
 

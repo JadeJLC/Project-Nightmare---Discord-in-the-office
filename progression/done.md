@@ -55,12 +55,16 @@ Données d'inscriptions demandées :
 - Image de profil
 - Cliquer sur le nom d'un utilisateur permet d'accéder à son profil
 - Possibilité d modifier ses informations personnelles
+- Possibilité de modifier son image de profil
 
 ### Sujets et messages
 
 - Titre du sujet, contenu du premier message
 - Nom et avatar de la personne ayant posté le message
 - Contenu des réponses en dessous
+- Créer un nouveau sujet et y attribuer une catégorie
+- Répondre à un sujet
+- Modifier ses propres messages
 
 ### Page d'accueil
 
@@ -71,12 +75,34 @@ Données d'inscriptions demandées :
 
 - Bouton connexion/déconnexion
 - Bouton "voir mon profil"
+- Bouton ouvrir/fermer la liste des utilisateurs en ligne (cliquer sur un utilisateur ouvre les messages privés)
 
 ### Back
 
 - Gestion des cookies et des sessions
 - Création et organisation de la base de données
+- Détecter si un utilisateur est en ligne
 
 ### Front
 
 - Formulaire d'inscription / connexion
+
+### Sécurité
+
+- Sécurisation des input pour éviter les injections HTML ou SLQ
+- Sécurisation des ID utilisateur pour réduire les risques de piratage de compte
+- Sécurisation des messages envoyés par l'utilisateur (rejette le HTML)
+
+### Messages privés
+
+- Savoir qui est en ligne ou hors ligne
+- Pouvoir envoyer des messages aux autres utilisateurs actuellement en ligne
+- Section "en ligne" accessible en permanence
+- Boîte MP pour les détails des conversation
+- N'affiche que les dix derniers messages de la conversation
+
+**Contenu**
+
+- Date d'envoi du message
+- Nom d'utilisateur de la personne ayant envoyé le message
+- Contenu du message

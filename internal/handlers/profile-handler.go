@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
 )
@@ -66,4 +67,22 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     default:
         json.NewEncoder(w).Encode(data)
     }
+}
+
+func (h *ProfileHandler) GetAvatarList(w http.ResponseWriter, r *http.Request) {
+    files, err := os.ReadDir("./internal/templates/assets/images-avatar") 
+    if err != nil {
+        http.Error(w, "Unable to read directory", http.StatusInternalServerError)
+        return
+    }
+
+    var fileNames []string
+    for _, file := range files {
+        if !file.IsDir() {
+            fileNames = append(fileNames, file.Name())
+        }
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(fileNames)
 }

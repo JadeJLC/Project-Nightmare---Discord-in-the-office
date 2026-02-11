@@ -331,6 +331,7 @@ header {
 #category-topics,
 #topic-posts {
   margin-top: 100px !important;
+  padding-bottom: 15px;
 }
 
 /* Intro de la page */
@@ -562,7 +563,7 @@ header {
   image-rendering: pixelated;
 
   /* Dézoom */
-  transform: scale(0.75);
+  transform: scale(0.9);
   transform-origin: top center;
 
   /* Positionnement */
@@ -625,6 +626,10 @@ header {
   max-width: 385px;
   min-width: fit-content;
   margin-bottom: 30px;
+}
+
+.post-message {
+  padding-right: 15px;
 }
 
 .first-post .post-date {
@@ -905,10 +910,54 @@ hr {
   overflow: auto;
 }
 
+.profile-picture-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+.profile-picture-bloc {
+  background: var(--fond-categ);
+  border-radius: 15px;
+  width: 130px;
+  text-align: center;
+  margin: 10px 5px;
+  padding: 5px;
+}
+
+.profile-picture-bloc img {
+  margin-top: 5px;
+}
+
+.profile-picture-bloc label {
+  display: block;
+  width: 96%;
+  height: 96%;
+  border-radius: 15px;
+  padding: 2%;
+}
+
+.profile-picture-bloc input {
+  display: none;
+}
+
+.profile-popup h3 {
+  height: 50px;
+  position: sticky;
+  top: -15px;
+  padding-top: 5px;
+  border-radius: 15px;
+  background: inherit;
+}
+
+.profile-picture-bloc input:checked + label {
+  background: var(--popup-transparent);
+}
 /* #endregion */
 
 /* #region ***** Popups */
-.popup-overlay {
+.popup-overlay,
+.profile-popup-overlay {
   background: var(--popup-transparent);
   width: 80vw;
   height: 80vh;
@@ -920,20 +969,25 @@ hr {
   left: 0;
 }
 
-.popup-content {
+.popup-content,
+.profile-popup {
   width: 80%;
   max-width: 700px;
-  max-height: 70vh;
   margin: auto;
   position: relative;
   background: var(--bg);
   padding: 15px;
   border-bottom: 2px solid var(--accent);
   border-radius: 15px;
+}
+
+.profile-popup div {
+  max-height: 70vh;
   overflow: auto;
 }
 
-.popup-content h2 {
+.popup-content h2,
+.profile-popup h3 {
   margin: auto;
   width: fit-content;
   font-family: var(--header-font);
@@ -1296,7 +1350,7 @@ u {
 
 .user-card:hover {
   transform: scale(1.02);
-  box-shadow: 0 0 10px #0ff;
+  box-shadow: 0 0 10px var(--neon);
 }
 
 .user-card .avatar {
@@ -1324,6 +1378,15 @@ u {
   display: block;
   line-height: 15px;
   padding-top: 2px;
+}
+
+.dm-conversation-item.user-card {
+  box-shadow: none;
+}
+
+.user-card:hover,
+.user-card.active {
+  box-shadow: 0 0 12px var(--neon-soft);
 }
 
 #dm-empty {
@@ -1363,6 +1426,7 @@ u {
 
 .dm-header {
   display: flex;
+  margin-bottom: 20px;
 }
 
 .dm-content {
@@ -1379,8 +1443,10 @@ u {
   font-size: 0.6em;
   font-style: italic;
   display: block;
+  float: right;
   text-align: right;
   margin-right: 10%;
+  margin-bottom: 5px;
 }
 
 .dm-sidebar h3 {

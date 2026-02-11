@@ -122,3 +122,12 @@ func (r *UserRepository) UpdateUserProfile(userID string, user *domain.User) err
 
     return err
 }
+
+func (r *UserRepository) UpdateUserImage(username, image string) error {
+    _, err := r.db.Exec(`
+	UPDATE users SET image = ?
+	WHERE username = ?
+	`, image, username)
+
+    return err
+}

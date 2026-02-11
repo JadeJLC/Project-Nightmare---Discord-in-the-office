@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"html"
 	"real-time-forum/internal/domain"
 	"time"
 )
@@ -15,6 +16,7 @@ func NewChatRepo(db *sql.DB) *ChatRepo {
 }
 
 func (r *ChatRepo) SaveDM(msg domain.DM) error {
+    msg.Content = html.EscapeString(msg.Content)
     _, err := r.db.Exec(`
         INSERT INTO dms (sender_id, receiver_id, content, created_at)
         VALUES (?, ?, ?, ?)

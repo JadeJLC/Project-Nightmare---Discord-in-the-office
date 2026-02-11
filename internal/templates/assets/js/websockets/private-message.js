@@ -1,30 +1,38 @@
-// Fonctions pour afficher la liste des utilisateurs en ligne et permettre de leur envoyer des messages
 import { pageData, SessionData } from "../variables.js";
 import { ws } from "./connect.js";
 import { loadConversationsList } from "../page-creation/chat.js";
+import { formatDMTime } from "../helpers/text-formating.js";
 
-let currentDMUserId = null;
-let lastSenderId = null;
-let lastGroup = null;
+const DMstate = {
+  loggedUserID: null,
+  lastSenderID: null,
+  lastGroup: null,
+  lastDMTime: null,
+};
 
+/**
+ * Ajoute un message en direct à la conversation ou envoie une notification
+ * @param {object} msg Les informations du message reçu
+ */
 export function handleIncomingDM(msg) {
-  // 1. Si la conversation est ouverte → afficher le message
   if (
-    currentDMUserId === msg.sender_id ||
-    currentDMUserId === msg.receiver_id
+    DMstate.loggedUserID === msg.sender_id ||
+    DMstate.loggedUserID === msg.receiver_id
   ) {
     displayDM(msg);
   }
 
-  // 2. Mettre à jour la liste des conversations
   updateConversationPreview(msg);
 
-  // 3. Ajouter une notification si la conversation n’est pas ouverte
-  if (currentDMUserId !== msg.sender_id) {
+  if (DMstate.loggedUserID !== msg.sender_id) {
     // addDMNotification(msg.sender_id);
   }
 }
 
+/**
+ * Ajoute un nouveau message à la conversation ouverte
+ * @param {object} msg Les données du message
+ */
 export function updateConversationPreview(msg) {
   const userId =
     msg.sender_id === SessionData.userID ? msg.receiver_id : msg.sender_id;
@@ -34,21 +42,24 @@ export function updateConversationPreview(msg) {
   );
 
   if (item) {
-    // Déplacer en haut de la liste
     const container = document.getElementById("dm-conversations");
     container.prepend(item);
   } else {
-    // Si la conversation n’existe pas encore → la créer
     loadConversationsList();
   }
 }
 
+/**
+ * Ouvre une conversation en cliquant sur un utilisateur dans la boîte à MP
+ * @param {string} otherUserId ID de l'utilisateur avec qui la conversation est en cours
+ */
 export async function openConversation(otherUserId) {
-  lastSenderId = null;
-  lastGroup = null;
-  currentDMUserId = otherUserId;
+  DMstate.lastSenderID = null;
+  DMstate.lastGroup = null;
+  DMstate.lastDMTime = null;
+  DMstate.loggedUserID = otherUserId;
 
-  const res = await fetch(`/api/dm?user=${otherUserId}&limit=20`);
+  const res = await fetch(`/api/dm?user=${otherUserId}&limit=10`); // Increased limit slightly
   const messages = await res.json();
 
   const msgContainer = document.getElementById("dm-messages");
@@ -56,10 +67,11 @@ export async function openConversation(otherUserId) {
 
   if (messages.length === 0) {
     document.getElementById("dm-empty").style.display = "block";
-    return;
   }
 
-  messages.reverse().forEach(displayDM);
+  if (messages && messages.length > 0) {
+    messages.reverse().forEach(displayDM);
+  }
 
   const div = document.createElement("div");
   div.classList.add("dm-input");
@@ -72,88 +84,100 @@ export async function openConversation(otherUserId) {
   const input = div.querySelector("#dm-input-text");
   const sendBtn = div.querySelector("#dm-send-btn");
 
-  sendBtn.addEventListener("click", () => {
+  const sendMessage = () => {
     const text = input.value.trim();
     if (!text) return;
 
-    // Envoi WebSocket
     ws.send(
       JSON.stringify({
         type: "private_message",
-        to: currentDMUserId,
+        to: DMstate.loggedUserID,
         content: text,
       }),
     );
 
     input.value = "";
-  });
+  };
 
-  // Envoi avec Entrée
+  sendBtn.addEventListener("click", sendMessage);
+
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendBtn.click();
+    if (e.key === "Enter") sendMessage();
   });
 
   msgContainer.appendChild(div);
   pageData.ConversationWith = `${otherUserId}`;
+
+  msgContainer.scrollTop = msgContainer.scrollHeight;
 }
 
+/**
+ * Ferme la conversation en cliquant sur l'icône correspondant
+ */
 export function closeConversation() {
   const container = document.getElementById("dm-messages");
   container.innerHTML = "";
   pageData.ConversationWith = "none";
-  lastSenderId = null;
-  lastGroup = null;
+
+  DMstate.lastSenderID = null;
+  DMstate.lastGroup = null;
+  DMstate.lastDMTime = null;
 }
 
+/**
+ * Affiche un message. Si les messages ont été envoyés à moins de 5 minutes d'intervalle, ils sont regroupés dans le même bloc.
+ * Sinon, on crée un bloc séparé pour bien les différencier
+ * @param {object} msg Le message à afficher
+ */
 export function displayDM(msg) {
   const container = document.getElementById("dm-messages");
+  const inputBar = document.querySelector(".dm-input");
 
   const senderId = msg.sender_id;
   const username = msg.sender_username;
   const isMine = username === SessionData.username;
 
-  // Déterminer si on doit créer un nouveau groupe
-  const isNewGroup = lastSenderId !== senderId;
+  const msgDateObj = new Date(msg.created_at);
+  const timeDiffInGroup = 10 * 60 * 1000;
 
-  // Si nouveau groupe → créer un wrapper
-  if (isNewGroup) {
-    lastGroup = document.createElement("div");
-    lastGroup.classList.add("dm-group");
-    lastGroup.classList.add(isMine ? "mine" : "theirs");
+  const isSameSender = DMstate.lastSenderID === senderId;
+  const isWithinTime =
+    DMstate.lastDMTime && msgDateObj - DMstate.lastDMTime < timeDiffInGroup;
+  const shouldGroup = isSameSender && isWithinTime;
 
-    // Header (avatar + nom)
-    lastGroup.innerHTML = `
+  if (shouldGroup && DMstate.lastGroup) {
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("dm-content");
+    messageDiv.textContent = msg.content;
+
+    DMstate.lastGroup.appendChild(messageDiv);
+  } else {
+    DMstate.lastGroup = document.createElement("div");
+    DMstate.lastGroup.classList.add("dm-group");
+    DMstate.lastGroup.classList.add(isMine ? "mine" : "theirs");
+
+    const timeStr = formatDMTime(msg.created_at);
+
+    DMstate.lastGroup.innerHTML = `
+      <span class="dm-time">${timeStr}</span>
       <div class="dm-header">
         <div class="reduced-avatar">
           <img src="assets/images-avatar/${msg.sender_image}.png">
         </div>
         <div class="dm-author">${username}</div>
       </div>
+      <div class="dm-content">${msg.content}</div>
     `;
 
-    // Insérer le groupe avant la barre d’input
-    const inputBar = document.querySelector(".dm-input");
     if (inputBar) {
-      container.insertBefore(lastGroup, inputBar);
+      container.insertBefore(DMstate.lastGroup, inputBar);
     } else {
-      container.appendChild(lastGroup);
+      container.appendChild(DMstate.lastGroup);
     }
   }
 
-  // Créer le message individuel
-  const messageDiv = document.createElement("div");
-  messageDiv.classList.add("dm-message");
-  messageDiv.innerHTML = `
-    <span class="dm-time">${new Date(msg.created_at).toLocaleTimeString()}</span>
-    <div class="dm-content">${msg.content}</div>
-  `;
+  DMstate.lastSenderID = senderId;
+  DMstate.lastDMTime = msgDateObj;
 
-  // Ajouter le message dans le groupe courant
-  lastGroup.appendChild(messageDiv);
-
-  // Mettre à jour le dernier sender
-  lastSenderId = senderId;
-
-  // Scroll
   container.scrollTop = container.scrollHeight;
 }

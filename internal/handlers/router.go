@@ -42,6 +42,7 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     mux.Handle("/api/category", categoryHandler)
     mux.Handle("/api/topic", topicHandler)
     mux.Handle("/api/post", postingHandler)
+    mux.HandleFunc("/api/avatars", profileHandler.GetAvatarList)
 
 
     // Assets

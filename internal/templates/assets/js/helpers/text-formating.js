@@ -175,8 +175,52 @@ export function htmlToMD(html) {
   return text;
 }
 
+/**
+ * Transforme les données safe stockées dans la BDD en données lisibles par les balises HTML
+ * @param {map} map Les données HTML à convertir
+ * @returns Le résultat du décodage
+ */
 export function decodeHTML(map) {
   const txt = document.createElement("textarea");
   txt.innerHTML = map;
   return txt.value;
+}
+
+/**
+ * Formatte la date des messages pour aujourd'hui, hier ou date précise + heure
+ * @param {string} dateString Date récupérée dans la base de données
+ * @returns {string} Date formattée
+ */
+export function formatDMTime(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+
+  const yesterday = new Date();
+  yesterday.setDate(now.getDate() - 1);
+
+  const timePart = date.toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const dayMonth = date.toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+  });
+
+  const year = date.getFullYear();
+
+  if (date.toDateString() === now.toDateString()) {
+    return `Aujourd'hui - ${timePart}`;
+  }
+
+  if (date.toDateString() === yesterday.toDateString()) {
+    return `Hier - ${timePart}`;
+  }
+
+  if (year === now.getFullYear()) {
+    return `${dayMonth} - ${timePart}`;
+  } else {
+    return `${dayMonth}/${year} - ${timePart}`;
+  }
 }

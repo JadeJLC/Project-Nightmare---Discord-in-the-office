@@ -85,7 +85,6 @@ async function sendMessage(form, mode, typeMode, sectionID, postID) {
     );
 
     if (response.ok) {
-      alert("Message envoyé !");
       if (mode === "newtopic") displayTopics(sectionID);
       if (mode === "reply") displayPosts(sectionID);
       if (mode === "edit") displayPosts(sectionID, postID);

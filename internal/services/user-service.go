@@ -74,3 +74,7 @@ func (s *UserService) EditProfile(newInfo domain.User) error {
     }
     return s.repo.UpdateUserProfile(user.ID, &newInfo)
 }
+
+func (s *UserService) EditAvatar(userID, image string) error {
+    return s.repo.UpdateUserImage(userID, image)
+}
