@@ -4,8 +4,10 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"real-time-forum/internal/auth"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
+	"regexp"
 )
 
 type RegisterHandler struct {
@@ -30,6 +32,19 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     var newUser domain.User
     if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
         http.Error(w, "Données invalides", http.StatusBadRequest)
+        return
+    }
+
+    isValidUsername := regexp.MustCompile(`^[a-zA-Z0-9_]+$`).MatchString(newUser.Username)
+    if !isValidUsername || len(newUser.Username) < 3 || len(newUser.Username) > 20 {
+        http.Error(w, "Nom d'utilisateur invalide (Alphanumérique, 3-20 caractères)", http.StatusBadRequest)
+        return
+    }
+
+    ip := r.RemoteAddr
+
+    if auth.IsRateLimited(ip) {
+        http.Error(w, "Veuillez attendre entre deux requêtes.", http.StatusTooManyRequests)
         return
     }
 

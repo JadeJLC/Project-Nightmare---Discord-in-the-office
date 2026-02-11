@@ -2,6 +2,7 @@ import { previewMessage, sendMessage } from "./new-message.js";
 import { typeMode } from "../variables.js";
 import { displayTopics } from "./category-topics.js";
 import { displayPosts } from "./topic.js";
+import { applyBBCode } from "../helpers/text-formating.js";
 
 /**
  * Création de l'éditeur de message

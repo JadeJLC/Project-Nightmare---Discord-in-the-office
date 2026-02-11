@@ -174,3 +174,9 @@ export function htmlToMD(html) {
 
   return text;
 }
+
+export function decodeHTML(map) {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = map;
+  return txt.value;
+}

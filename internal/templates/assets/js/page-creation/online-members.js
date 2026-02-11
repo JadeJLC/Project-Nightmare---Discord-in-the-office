@@ -22,19 +22,26 @@ function createUserCard(user) {
   card.className = "user-card";
 
   card.innerHTML = `
-        <div class="reduced-avatar">
+        <div class="reduced-avatar" data-name="${user.username}>
             <img src="assets/images-avatar/${user.image}.png" alt="Image de profil - ${user.image}" />
         </div>
         <div class="info">
-            <span class="username">${user.username}</span>
+            <span class="username" data-name="${user.username}>${user.username}</span>
             <span class="status online">En&nbsp;ligne</span>
         </div>
     `;
 
   card.addEventListener("click", (event) => {
-    const user = event.target.closest(".reduced-avatar");
-    if (user) {
-      const username = user.getAttribute("data_id");
+    const userImg = event.target.closest(".reduced-avatar");
+    if (userImg) {
+      const username = userImg.dataset.name;
+      displayProfile(username);
+      return;
+    }
+
+    const userName = event.target.closest(".username");
+    if (userName) {
+      const username = userName.dataset.name;
       displayProfile(username);
       return;
     }

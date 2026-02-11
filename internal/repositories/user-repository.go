@@ -3,7 +3,9 @@ package repositories
 
 import (
 	"database/sql"
+	"html"
 	"real-time-forum/internal/domain"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -17,10 +19,19 @@ func NewUserRepository(db *sql.DB) domain.UserRepository {
     return &userRepository{db: db}
 }
 
+func cleanUserInput (user *domain.User)  {
+   user.Firstname = html.EscapeString(strings.TrimSpace(user.Firstname))
+   user.Lastname  = html.EscapeString(strings.TrimSpace(user.Lastname))
+   user.Email     = html.EscapeString(strings.TrimSpace(user.Email))
+   user.Gender    = html.EscapeString(strings.TrimSpace(user.Gender))
+}
+
 /*
-* Ajoute un utilisateur dans la base de données
+* Ajoute un utilisateur dans la base de données en sécurisant les éléments envoyés
 */
 func (r *userRepository) Create(user *domain.User) error {
+    cleanUserInput(user)
+
     hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
     if err != nil {
         return err
@@ -103,6 +114,7 @@ func (r *userRepository) GetUserByID(id int) (*domain.User, error) {
 }
 
 func (r *userRepository) UpdateUserProfile(userID int, user *domain.User) error {
+    cleanUserInput(user)
     _, err := r.db.Exec(`
 	UPDATE users SET email = ?, gender = ?, firstname = ?, lastname = ?
 	WHERE user_id = ?
