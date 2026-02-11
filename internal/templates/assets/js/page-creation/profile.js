@@ -194,12 +194,12 @@ async function displayProfileMessages(profileName) {
       .map(
         (message) =>
           `<div class="profile-preview preview-message">
-            <h3 class="on-topic" data-catid=${message.cat_id} data-topicid="${message.topic_id}">Sur le sujet : ${message.topic_title}</h3>
+            <h3 class="on-topic" data-topicid="${message.topic_id}">Sur le sujet : ${message.topic_title}</h3>
             <div class="topic-content">
               <div class="topic-lastpost"> ${message.content} </div>
               <div class="topic-lastinfo">
                 posté le ${message.created_on}
-                <button type="button" class="button-link last-post" data-catid=${message.cat_id} data-topicid="${message.topic_id}" data-postid="${message.post_id}">
+                <button type="button" class="button-link last-post" data-topicid="${message.topic_id}" data-postid="${message.post_id}">
                   <img
                     src="assets/images/external-link.svg"
                     alt="Voir le message"
@@ -392,17 +392,15 @@ function setProfileButtons(status, profileName) {
 
     const seeTopic = event.target.closest(".on-topic");
     if (seeTopic) {
-      const catID = seeTopic.dataset.catid;
       const topicID = seeTopic.dataset.topicid;
-      displayPosts(catID, topicID);
+      displayPosts(topicID);
     }
 
     const seeLastPost = event.target.closest(".last-post");
     if (seeLastPost) {
-      const catID = seeLastPost.dataset.catid;
       const topicID = seeLastPost.dataset.topicid;
       const postID = seeLastPost.dataset.postid;
-      displayPosts(catID, topicID, postID);
+      displayPosts(topicID, postID);
     }
 
     const author = event.target.closest(".last-post-author");

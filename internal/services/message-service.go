@@ -21,8 +21,8 @@ func (s *MessageService) DeleteMessage(postID int) error {
 	return  s.repo.Delete(postID)
 }
 
-func (s *MessageService) EditMessage(topicID int, content string) error {
-	return s.repo.Edit(topicID, content)
+func (s *MessageService) EditMessage(postID int, content string) error {
+	return s.repo.Edit(postID, content)
 }
 
 func (s *MessageService) GetMessagesByTopic(topicID int) ([]*domain.Message, error) {

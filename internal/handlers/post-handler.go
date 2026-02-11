@@ -47,10 +47,18 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Données invalides", http.StatusBadRequest)
         return
     }
-
-	topicID := sectionID
 	
 
+	if mode == "edit" {
+	postID, err := strconv.Atoi(r.URL.Query().Get("postID"))
+	if err != nil {
+		log.Print("Erreur dans la récupération des information du message :", err)
+		return
+	}
+		h.messageService.EditMessage(postID, newTopic.Content)
+
+	} else {
+		topicID := sectionID
 	if mode == "newtopic" {
 		h.topicService.CreateTopic(sectionID, int(user.ID), newTopic.Title)
 		topicData, err := h.topicService.GetTopicByTitle(newTopic.Title)
@@ -64,6 +72,9 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     h.messageService.CreateMessage(topicID, newTopic.Content, int(user.ID))
 
+	}
+
 	json.NewEncoder(w).Encode(map[string]string{"status": "success"})
 
 }
+ 

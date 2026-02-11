@@ -58,7 +58,7 @@ function setCategoryLinks(categPageContainer, catID) {
     const title = event.target.closest(".topic-title");
     if (title) {
       const topicID = parseInt(title.getAttribute("data_id"));
-      displayPosts(catID, topicID);
+      displayPosts(topicID);
       return;
     }
 
@@ -80,7 +80,7 @@ function setCategoryLinks(categPageContainer, catID) {
       const topicID = msgBtn.getAttribute("data_topicid");
       const postId = msgBtn.getAttribute("data_postid");
 
-      displayPosts(catID, topicID, postId);
+      displayPosts(topicID, postId);
       return;
     }
   });

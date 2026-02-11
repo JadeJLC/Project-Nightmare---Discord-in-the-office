@@ -12,6 +12,7 @@ export function clearPages(destination) {
   if (destination != "home") clearHomePage();
   if (destination === "newtopic") showNewTopicForm();
   if (destination === "reply") showReplyForm();
+  if (destination === "edit") showEditForm();
 
   if (destination != "profile") {
     const profilePageContainer = document.getElementById("profile-page");
@@ -23,7 +24,7 @@ export function clearPages(destination) {
     if (categoryTopics) categoryTopics.remove();
   }
 
-  if (destination != "reply") {
+  if (destination != "reply" && destination != "edit") {
     const topicPosts = document.getElementById("topic-posts");
     if (topicPosts) topicPosts.remove();
   }
@@ -86,6 +87,29 @@ function showReplyForm() {
 
   if (!topicTitle.innerHTML.includes("Répondre au sujet"))
     topicTitle.innerHTML = "Répondre au sujet : <br>" + topicTitle.innerHTML;
+
+  const postList = document.querySelectorAll(".post-bloc");
+  postList.forEach((post) => {
+    post.remove();
+  });
+
+  const newTopicBtn = document.getElementById("new-topic-button");
+  if (newTopicBtn) newTopicBtn.remove();
+}
+
+/**
+ * Affiche le formulaire pour modifier un message
+ * Conserve le titre du sujet, son ID et celui de la catégorie pour pouvoir revenir en arrière
+ */
+function showEditForm() {
+  const newMessageBtn = document.getElementById("new-message-button");
+  if (newMessageBtn) newMessageBtn.remove();
+
+  const topicTitle = document.getElementById("topic-title");
+
+  if (!topicTitle.innerHTML.includes("Modifier mon message sur"))
+    topicTitle.innerHTML =
+      "Modifier mon message sur : <br>" + topicTitle.innerHTML;
 
   const postList = document.querySelectorAll(".post-bloc");
   postList.forEach((post) => {

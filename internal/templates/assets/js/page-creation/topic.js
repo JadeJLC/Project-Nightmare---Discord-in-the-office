@@ -2,8 +2,9 @@
 
 import { isUserLoggedIn } from "../helpers/check-log-status.js";
 import { clearPages } from "../helpers/clear-pages.js";
+import { SessionData } from "../variables.js";
 import { displayTopics } from "./category-topics.js";
-import { newMessage, newTopic } from "./new-message.js";
+import { editMessage, newMessage, newTopic } from "./new-message.js";
 import { displayProfile } from "./profile.js";
 
 /**
@@ -13,7 +14,7 @@ import { displayProfile } from "./profile.js";
  * @param {int} postID Identifiant du post précis à focus
  * @returns
  */
-export function displayPosts(catID, topicID, postID) {
+export function displayPosts(topicID, postID) {
   clearPages("topic");
 
   if (!isUserLoggedIn()) return;
@@ -21,11 +22,11 @@ export function displayPosts(catID, topicID, postID) {
   let topicsPageContainer = document.getElementById("topic-posts");
 
   if (!topicsPageContainer) {
-    let addedContainer = `<div id="topic-posts" data-catid="${catID}"></div>`;
+    let addedContainer = `<div id="topic-posts"></div>`;
     document.body.insertAdjacentHTML("beforeend", addedContainer);
   }
 
-  writePosts(catID, topicID, postID);
+  writePosts(topicID, postID);
 }
 
 /**
@@ -34,12 +35,14 @@ export function displayPosts(catID, topicID, postID) {
  * @param {int} topicID Identifiant du sujet
  * @param {int} postID Identifiant du post à focus
  */
-async function writePosts(catID, topicID, postID) {
+async function writePosts(topicID, postID) {
   try {
     const response = await fetch(`/api/topic?topicID=${topicID}`);
     const topic = await response.json();
 
     const topicsPageContainer = document.getElementById("topic-posts");
+
+    const catID = topic.cat_id;
 
     const topicTitle = `<h2 id="topic-title"><button class="go-back" data_catid="${catID}" id="go-back">
     <img src="/assets/images/arrow-left.svg"/><span>Retour à la catégorie</span></button>
@@ -57,6 +60,7 @@ async function writePosts(catID, topicID, postID) {
     topicsPageContainer.innerHTML = `${topicTitle} ${topicActions} ${postList}`;
     setTopicLinks(topicsPageContainer, catID, topicID, postID);
 
+    postID = String(postID).padStart(2, "0");
     if (postID) document.getElementById(postID).scrollIntoView();
   } catch (error) {
     console.log("Erreur dans la récupération des sujets : ", error);
@@ -95,6 +99,15 @@ function setTopicLinks(topicsPageContainer, catID, topicID) {
       displayTopics(catID, "newtopic");
       return;
     }
+
+    const editBtn = event.target.closest(".edit-message");
+    if (editBtn) {
+      const postID = editBtn.dataset.postid;
+      const postContainer = editBtn.closest(".post-left");
+      const postContent =
+        postContainer.querySelector(".post-message").innerHTML;
+      editMessage(topicID, postID, postContent);
+    }
   });
 }
 
@@ -107,13 +120,21 @@ function setTopicLinks(topicsPageContainer, catID, topicID) {
 function buildPostHTML(post, index) {
   const postID = String(post.post_id).padStart(2, "0");
   const isFirst = index === 0;
+  let editBtn;
+
+  if (post.author.username === SessionData.username) {
+    editBtn = `<button type="button" class="edit-content edit-message" id="confirm-edit" data-postid="${post.post_id}">
+          <img src="assets/images/tool.svg" />
+          <span>Modifier mon<br> message</span>
+        </button>`;
+  }
 
   return `
     <div class="post-bloc ${isFirst ? "first-post" : ""}" id="${postID}">
       <div class="post-indic">${isFirst ? "Premier post" : ""}</div>
       <div class="post-content">   
         
-        <div class="post-left">
+        <div class="post-left">${editBtn ? `${editBtn}` : ""}
           <div class="post-date">Message du ${post.created_on}</div>
           <div class="post-message">${post.content}</div>
         </div>

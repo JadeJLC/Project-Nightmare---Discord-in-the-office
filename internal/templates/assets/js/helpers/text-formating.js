@@ -112,3 +112,65 @@ function mdToHTML(text) {
     return match;
   });
 }
+
+/**
+ * Transforme les balises HTML en BBCode
+ * @param {string} html Le texte HTML provenant de .innerHTML
+ * @returns {string} Le texte formaté en BBCode
+ */
+export function htmlToBB(html) {
+  let text = html;
+
+  const alignMap = {
+    "text-align:left": "left",
+    "text-align:right": "right",
+    "text-align:center": "center",
+    "text-align:justify": "justify",
+  };
+
+  Object.entries(alignMap).forEach(([style, bbTag]) => {
+    const regex = new RegExp(`<div style=["']${style}["']>(.*?)<\\/div>`, "gi");
+    text = text.replace(regex, `[${bbTag}]$1[/${bbTag}]`);
+  });
+
+  const tagMap = {
+    strong: "b",
+    b: "b",
+    em: "i",
+    i: "i",
+    u: "u",
+    s: "s",
+  };
+
+  Object.entries(tagMap).forEach(([htmlTag, bbTag]) => {
+    const regex = new RegExp(`<${htmlTag}>(.*?)<\\/${htmlTag}>`, "gi");
+    text = text.replace(regex, `[${bbTag}]$1[/${bbTag}]`);
+  });
+
+  text = text.replace(/<br\s*\/?>/gi, "\n");
+
+  return text;
+}
+
+/**
+ * Transforme les balises HTML en indicateurs Markdown
+ * @param {string} html Le texte HTML provenant de .innerHTML
+ * @returns {string} Le texte formaté en Markdown
+ */
+export function htmlToMD(html) {
+  let text = html;
+
+  text = text.replace(/<strong><em>(.*?)<\/em><\/strong>/gi, "***$1***");
+
+  text = text.replace(/<strong>(.*?)<\/strong>/gi, "**$1**");
+
+  text = text.replace(/<u>(.*?)<\/u>/gi, "__$1__");
+
+  text = text.replace(/<em>(.*?)<\/em>/gi, "_$1_");
+
+  text = text.replace(/<s>(.*?)<\/s>/gi, "~~$1~~");
+
+  text = text.replace(/<br\s*\/?>/gi, "\n");
+
+  return text;
+}

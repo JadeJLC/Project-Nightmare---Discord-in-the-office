@@ -290,6 +290,14 @@ header {
   opacity: 0;
 }
 
+.edit-message span {
+  left: 0px;
+}
+
+.edit-message:hover span {
+  left: -90px;
+}
+
 .header-buttons button:hover span,
 .edit-content:hover span,
 .preview-reaction:hover span,
@@ -585,7 +593,8 @@ header {
 
 .post-left {
   width: 97%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 .post-bloc.first-post {
@@ -1126,6 +1135,10 @@ u {
 @media (max-width: 780px), (orientation: portrait) {
   .popup-content {
     margin-top: 50px;
+  }
+
+  .post-date {
+    width: 90%;
   }
 
   #forum-title-short {
