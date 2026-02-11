@@ -22,11 +22,11 @@ function createUserCard(user) {
   card.className = "user-card";
 
   card.innerHTML = `
-        <div class="reduced-avatar" data-name="${user.username}>
+        <div class="reduced-avatar" data-name="${user.username}">
             <img src="assets/images-avatar/${user.image}.png" alt="Image de profil - ${user.image}" />
         </div>
         <div class="info">
-            <span class="username" data-name="${user.username}>${user.username}</span>
+            <span class="username" data-name="${user.username}">${user.username}</span>
             <span class="status online">En&nbsp;ligne</span>
         </div>
     `;
