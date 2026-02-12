@@ -12,9 +12,6 @@ export function clearPages(destination) {
 
   localStorage.setItem("currentPage", pageData.currentPage);
 
-  let test = localStorage.getItem("currentPage");
-  console.log("Ouverture : ", test);
-
   if (destination != "home") clearHomePage();
   if (destination === "newtopic") showNewTopicForm();
   if (destination === "reply") showReplyForm();

@@ -98,7 +98,6 @@ export function displayTopics(catID, mode) {
   pageData.currentPage = `category-${catID}`;
 
   clearPages("category");
-  pageData.currentPage += "-" + catID;
 
   if (!isUserLoggedIn()) return;
 
