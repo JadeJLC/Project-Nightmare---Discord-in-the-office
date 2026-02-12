@@ -7,7 +7,13 @@ import { pageData } from "../variables.js";
 
 export function selectPage(type) {
   let destination = pageData.currentPage;
-  if (type === "back") destination = pageData.previousPage;
+  if (type === "back") {
+    if (pageData.previousPage === pageData.currentPage) {
+      destination = "home";
+    } else {
+      destination = pageData.previousPage;
+    }
+  }
 
   if (destination === "home") displayHome();
   if (destination === "dm") displayMailbox();

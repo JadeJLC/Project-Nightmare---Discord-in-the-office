@@ -101,7 +101,8 @@ func (r *MessageRepo) GetMessagesByAuthor(author string) ([]*domain.Message, err
         FROM messages m
         JOIN topics t ON m.topic_id = t.topic_id
 		JOIN categories c ON t.category = c.cat_id
-		WHERE m.author = ? `, author)
+		WHERE m.author = ?
+		ORDER BY m.created_on DESC `, author)
 	if err != nil {
 		return nil, err
 	}	

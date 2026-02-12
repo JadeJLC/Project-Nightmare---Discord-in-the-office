@@ -1045,7 +1045,7 @@ hr {
 }
 
 .popup-content button,
-.profile-popup button {
+.profile-popup-actions button {
   display: block;
   width: 200px;
   padding: 12px;
@@ -1059,7 +1059,7 @@ hr {
 }
 
 .popup-content button:hover,
-.profile-popup button:hover {
+.profile-popup-actions button:hover {
   border-color: var(--neon-soft);
   box-shadow: 0 0 12px var(--neon-soft);
 }
