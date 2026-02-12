@@ -1,4 +1,5 @@
 import { displayTopics } from "../page-creation/category-topics.js";
+import { displayMailbox } from "../page-creation/chat.js";
 import { displayHome } from "../page-creation/home-display.js";
 import { displayProfile } from "../page-creation/profile.js";
 import { displayPosts } from "../page-creation/topic.js";
@@ -6,13 +7,11 @@ import { pageData } from "../variables.js";
 
 export function selectPage(type) {
   let destination = pageData.currentPage;
-  console.log("Sélection de la destination : ", destination);
   if (type === "back") destination = pageData.previousPage;
 
-  if (destination === "home") {
-    displayHome();
-    return;
-  }
+  if (destination === "home") displayHome();
+  if (destination === "dm") displayMailbox();
+
   if (destination.includes("category")) getPageInfo(destination, "category");
   if (destination.includes("topic")) getPageInfo(destination, "topic");
   if (destination.includes("profile")) getPageInfo(destination, "profile");

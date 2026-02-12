@@ -8,6 +8,7 @@ import {
   editProfileImage,
 } from "../helpers/profile-secondary.js";
 import { initProfileDMButton } from "../helpers/profile-secondary.js";
+import { selectPage } from "../helpers/call-page.js";
 
 // #region ***** Affichage des informations utilisateur
 
@@ -85,6 +86,8 @@ function buildProfileHTML(user) {
       : buildSelfDetails(user);
 
   profilePageContainer.innerHTML = `
+  <button class="go-back" id="go-back" style="margin:0px 20px">
+  <img src="/assets/images/arrow-left.svg"/><span>Revenir en arrière</span></button>
       <div class="profile-left">
         <div class="profile-user-info">
           <div class="profile-icon">
@@ -399,6 +402,11 @@ function setProfileButtons(status, user) {
     const editBtn = event.target.closest("#edit-infos");
     if (editBtn && status != "Not Available") {
       editProfileDetails();
+    }
+
+    const goBack = event.target.closest("#go-back");
+    if (goBack) {
+      selectPage("back");
     }
 
     const editAvatarBtn = event.target.closest("#edit-avatar");

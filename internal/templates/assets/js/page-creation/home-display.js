@@ -11,7 +11,8 @@ let displayType = "categ";
  */
 export function displayHome() {
   pageData.previousPage = pageData.currentPage;
-  pageData.currentPage == "home";
+  pageData.currentPage = "home";
+
   clearPages("home");
 
   const frontPageContainer = createHomeWelcome();

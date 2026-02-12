@@ -7,12 +7,13 @@ import {
   closeConversation,
 } from "../websockets/private-message.js";
 import { isUserLoggedIn } from "../helpers/check-log-status.js";
+import { selectPage } from "../helpers/call-page.js";
 
 export function displayMailbox() {
   return new Promise((resolve) => {
     if (!isUserLoggedIn()) return;
     pageData.previousPage = pageData.currentPage;
-    pageData.currentPage == "dm";
+    pageData.currentPage = "dm";
     clearPages("dm");
 
     const usernameHeader = document.getElementById("header-username");
@@ -27,6 +28,8 @@ export function displayMailbox() {
     }
 
     dmPage.innerHTML = `
+  <button class="go-back" id="go-back" style="margin:0px 20px">
+  <img src="/assets/images/arrow-left.svg"/><span>Revenir en arrière</span></button>
       <div id="dm-sidebar" class="dm-sidebar">
           <h3>Messages privés</h3>
           <div id="dm-conversations"></div>
@@ -41,6 +44,32 @@ export function displayMailbox() {
     document.body.appendChild(dmPage);
 
     loadConversationsList().then(resolve);
+    setDMLinks(dmPage);
+  });
+}
+
+function setDMLinks(dmPage) {
+  dmPage.addEventListener("click", (event) => {
+    const goBack = event.target.closest("#go-back");
+    if (goBack) {
+      selectPage("back");
+    }
+
+    const convBtn = event.target.closest(".dm-conversation-item");
+    if (convBtn) {
+      const mpID = convBtn.dataset.userId;
+      if (pageData.ConversationWith === `${mpID}`) {
+        convBtn.classList.remove("active");
+        const arrow = convBtn.querySelector(".dm-arrow");
+        arrow.textContent = "↓";
+        closeConversation();
+      } else {
+        convBtn.classList.add("active");
+        const arrow = convBtn.querySelector(".dm-arrow");
+        arrow.textContent = "↑";
+        openConversation(mpID);
+      }
+    }
   });
 }
 
@@ -69,20 +98,6 @@ export async function loadConversationsList() {
             <span class="username">${conv.otherUser.username}</span> <span class="dm-arrow">↓</span>
         </div>
         `;
-
-    div.addEventListener("click", () => {
-      if (pageData.ConversationWith === `${conv.otherUser.id}`) {
-        div.classList.remove("active");
-        const arrow = div.querySelector(".dm-arrow");
-        arrow.textContent = "↓";
-        closeConversation();
-      } else {
-        div.classList.add("active");
-        const arrow = div.querySelector(".dm-arrow");
-        arrow.textContent = "↑";
-        openConversation(conv.otherUser.id);
-      }
-    });
 
     container.appendChild(div);
   });
