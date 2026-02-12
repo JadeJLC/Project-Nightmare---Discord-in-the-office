@@ -2,9 +2,9 @@
 
 import { isUserLoggedIn } from "../helpers/check-log-status.js";
 import { clearPages } from "../helpers/clear-pages.js";
-import { SessionData } from "../variables.js";
+import { SessionData, pageData } from "../variables.js";
 import { displayTopics } from "./category-topics.js";
-import { editMessage, newMessage, newTopic } from "./new-message.js";
+import { editMessage, newMessage } from "./new-message.js";
 import { displayProfile } from "./profile.js";
 
 /**
@@ -15,7 +15,10 @@ import { displayProfile } from "./profile.js";
  * @returns
  */
 export function displayPosts(topicID, postID) {
+  pageData.previousPage = pageData.currentPage;
+  pageData.currentPage = `topic-${topicID}${postID ? `-${postID}` : ""}`;
   clearPages("topic");
+  console.log("Display posts : ", pageData.currentPage);
 
   if (!isUserLoggedIn()) return;
 

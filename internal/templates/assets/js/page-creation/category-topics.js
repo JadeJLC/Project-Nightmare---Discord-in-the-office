@@ -4,6 +4,7 @@ import { displayProfile } from "./profile.js";
 import { displayPosts } from "./topic.js";
 import { newTopic } from "./new-message.js";
 import { isUserLoggedIn } from "../helpers/check-log-status.js";
+import { pageData } from "../variables.js";
 
 /**
  * Affiche le titre et la liste des sujets d'une catégorie
@@ -93,7 +94,11 @@ function setCategoryLinks(categPageContainer, catID) {
  * @returns
  */
 export function displayTopics(catID, mode) {
+  pageData.previousPage = pageData.currentPage;
+  pageData.currentPage = `category-${catID}`;
+
   clearPages("category");
+  pageData.currentPage += "-" + catID;
 
   if (!isUserLoggedIn()) return;
 

@@ -6,17 +6,20 @@ import { displayProfile } from "./page-creation/profile.js";
 import { connectWebSocket } from "./websockets/connect.js";
 import { displayMailbox } from "./page-creation/chat.js";
 import { SessionData, pageData } from "./variables.js";
+import { selectPage } from "./helpers/call-page.js";
 
 /**
  * Mise en place des fonctionnalités de la page
  */
 async function main() {
+  console.log("Début du chargement de la page");
   await checkLoginStatus();
   initTheme();
-  displayHome();
   initAuth();
   setHeaderListeners();
   connectWebSocket();
+  pageData.currentPage = localStorage.getItem("currentPage") || "home";
+  selectPage();
 }
 
 if (document.readyState === "loading") {

@@ -15,9 +15,6 @@ Créer un forum officiel pour la licence Project Nightmare. Le forum doit :
 
 Comme dans le premier forum, il faut pouvoir :
 
-- Créer un nouveau sujet et y attribuer une catégorie
-- Répondre à un sujet
-- Voir la liste des sujets récents sur la page d'accueil (ou une autre page dédiée)
 - _Like/dislike_
 
 ### Interface utilisateur
@@ -26,36 +23,14 @@ Comme dans le premier forum, il faut pouvoir :
 
 ### Messages privés
 
-Un système de messages privés doit être disponible sur le forum, sous la forme d'un chat simili-discord. Les utilisateurs doivent :
-
-- Savoir qui est en ligne ou hors ligne
-- Pouvoir envoyer des messages aux autres utilisateurs actuellement en ligne
-
-La section MP doit :
-
-- Être accessible en permanence (j'aurais tendance à dire ouvrable et refermable, parce que la liste permanente c'est un peu chiant)
 - Avoir les utilisateurs rangés dans l'ordre du dernier message (comme dans les MPs discord), et alphabétique pour ceux auquel aucun message n'a été envoyé
 - Afficher les 10 derniers messages de la conversation lorsque l'on clique sur un utilisateur, et afficher les précédents uniquement en scrollant (throttle, debounce, etc)
 - Envoyer des notifications en temps réel lorsque l'ont reçoit un nouveau message
-
-Format des messages :
-
-- Date d'envoi du message
-- Nom d'utilisateur de la personne ayant envoyé le message
-- Contenu du message
 - (optionnel) "... est en train d'écrire"
 
 ### Bonus de l'audit
 
-- Avoir un profil d'utilisateur
 - Possibilité d'envoyer des images par MP
-- Fonctions asynchrones
-
-## Aspect des pages
-
-### Profil utilisateur
-
-- Possibilité de modifier son image de profil
 
 ### Sujets et messages
 
@@ -65,7 +40,6 @@ Format des messages :
 ### Barre de navigation
 
 - Bouton notifications
-- Bouton ouvrir/fermer la liste des utilisateurs en ligne (cliquer sur un utilisateur ouvre les messages privés)
 
 ### _Panneau d'administration et modération_
 
@@ -88,7 +62,6 @@ Format des messages :
 
 - Gestion des notifications
 - Affichage des nouveaux messages privés en temps réel
-- Détecter si un utilisateur est en ligne
 
 ### Front
 

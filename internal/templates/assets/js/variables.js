@@ -19,4 +19,6 @@ export const state = { UserList: [] };
 export const pageData = {
   ShowingOnlineMembers: false,
   ConversationWith: "none",
+  currentPage: "",
+  previousPage: "",
 };

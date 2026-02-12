@@ -1,5 +1,5 @@
 import { displayHome } from "../page-creation/home-display.js";
-import { SessionData } from "../variables.js";
+import { pageData, SessionData } from "../variables.js";
 
 /**
  * Vide la page HTML pour la remplir avec les données de la nouvelle page
@@ -9,6 +9,11 @@ import { SessionData } from "../variables.js";
 export function clearPages(destination) {
   window.scrollTo(0, 0);
   clearPopups();
+
+  localStorage.setItem("currentPage", pageData.currentPage);
+
+  let test = localStorage.getItem("currentPage");
+  console.log("Ouverture : ", test);
 
   if (destination != "home") clearHomePage();
   if (destination === "newtopic") showNewTopicForm();

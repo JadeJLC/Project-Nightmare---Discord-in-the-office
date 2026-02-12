@@ -2,6 +2,7 @@ import { buttonMove } from "../theme-switch.js";
 import { displayCategories } from "./home-categories.js";
 import { displayFeed } from "./home-feed.js";
 import { clearPages } from "../helpers/clear-pages.js";
+import { pageData } from "../variables.js";
 
 let displayType = "categ";
 
@@ -9,6 +10,8 @@ let displayType = "categ";
  * Création de la page d'accueil. Appelle les fonctions de construction
  */
 export function displayHome() {
+  pageData.previousPage = pageData.currentPage;
+  pageData.currentPage == "home";
   clearPages("home");
 
   const frontPageContainer = createHomeWelcome();

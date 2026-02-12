@@ -1,4 +1,4 @@
-import { SessionData } from "../variables.js";
+import { SessionData, pageData } from "../variables.js";
 import { clearPages } from "../helpers/clear-pages.js";
 import { isUserLoggedIn } from "../helpers/check-log-status.js";
 import { displayPosts } from "./topic.js";
@@ -7,6 +7,7 @@ import {
   editProfileDetails,
   editProfileImage,
 } from "../helpers/profile-secondary.js";
+import { initProfileDMButton } from "../helpers/profile-secondary.js";
 
 // #region ***** Affichage des informations utilisateur
 
@@ -15,6 +16,8 @@ import {
  * @param {string} profileName Nom de l'utilisateur dont on affiche le profil
  */
 export function displayProfile(profileName) {
+  pageData.previousPage = pageData.currentPage;
+  pageData.currentPage = `profile-${profileName}`;
   clearPages("profile");
 
   const usernameHeader = document.getElementById("header-username");

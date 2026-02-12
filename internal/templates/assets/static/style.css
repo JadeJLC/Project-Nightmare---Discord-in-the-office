@@ -953,6 +953,12 @@ hr {
 .profile-picture-bloc input:checked + label {
   background: var(--popup-transparent);
 }
+
+.profile-popup textarea {
+  display: block;
+  width: 80%;
+  margin: auto;
+}
 /* #endregion */
 
 /* #region ***** Popups */
@@ -1038,7 +1044,8 @@ hr {
   box-shadow: 0 0 12px var(--neon-soft);
 }
 
-.popup-content button {
+.popup-content button,
+.profile-popup button {
   display: block;
   width: 200px;
   padding: 12px;
@@ -1051,7 +1058,8 @@ hr {
   color: var(--text);
 }
 
-.popup-content button:hover {
+.popup-content button:hover,
+.profile-popup button:hover {
   border-color: var(--neon-soft);
   box-shadow: 0 0 12px var(--neon-soft);
 }

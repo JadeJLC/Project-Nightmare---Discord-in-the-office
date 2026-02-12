@@ -11,7 +11,8 @@ import { isUserLoggedIn } from "../helpers/check-log-status.js";
 export function displayMailbox() {
   return new Promise((resolve) => {
     if (!isUserLoggedIn()) return;
-
+    pageData.previousPage = pageData.currentPage;
+    pageData.currentPage == "dm";
     clearPages("dm");
 
     const usernameHeader = document.getElementById("header-username");

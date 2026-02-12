@@ -1,4 +1,5 @@
 import { SessionData } from "../variables.js";
+import { displayHome } from "../page-creation/home-display.js";
 /**
  * Vérifie si l'utilisateur est bien connecté pour l'affichage des pages
  * @returns {boolean} Utilisateur connecté = true
