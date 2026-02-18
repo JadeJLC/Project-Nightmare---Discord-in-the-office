@@ -17,6 +17,11 @@ export function clearPages(destination) {
   if (destination === "reply") showReplyForm();
   if (destination === "edit") showEditForm();
 
+  if (destination != "notif") {
+    const notifPageContainer = document.getElementById("notif-page");
+    if (notifPageContainer) notifPageContainer.remove();
+  }
+
   if (destination != "profile") {
     const profilePageContainer = document.getElementById("profile-page");
     if (profilePageContainer) profilePageContainer.remove();
@@ -140,6 +145,7 @@ function updateHeader(destination) {
 
   const logBtn = document.getElementById("log-in-text");
   const memberBtns = document.getElementById("member-buttons");
+  const memberList = document.getElementById("online-members-list");
 
   if (!SessionData.isLogged) {
     usernameHeader.innerHTML =
@@ -147,6 +153,8 @@ function updateHeader(destination) {
 
     logBtn.innerHTML = `Inscription /<br />Connexion`;
     memberBtns.innerHTML = "";
+
+    memberList.classList.add("is-hidden");
   } else {
     usernameHeader.innerHTML = `Bienvenue ${SessionData.username}&nbsp;! <br /> Heureux de vous revoir&nbsp;!`;
     logBtn.innerHTML = `Déconnexion`;
@@ -163,6 +171,8 @@ function updateHeader(destination) {
           <img src="assets/images/bell.svg" />
           <span>Afficher les notifications</span>
         </button>`;
+
+    memberList.classList.remove("is-hidden");
   }
 }
 

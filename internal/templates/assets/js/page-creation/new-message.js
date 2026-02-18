@@ -5,6 +5,7 @@ import { displayPosts } from "./topic.js";
 import { typeMode } from "../variables.js";
 import { htmlToBB, htmlToMD, readBBCode } from "../helpers/text-formating.js";
 import { displayPostEditor } from "./post-editor.js";
+import { createReplyNotification } from "./notifications.js";
 
 /**
  * Appelle les fonction pour l'ouverture d'un nouveau sujet
@@ -86,7 +87,10 @@ async function sendMessage(form, mode, typeMode, sectionID, postID) {
 
     if (response.ok) {
       if (mode === "newtopic") displayTopics(sectionID);
-      if (mode === "reply") displayPosts(sectionID);
+      if (mode === "reply") {
+        displayPosts(sectionID);
+        createReplyNotification(sectionID, user);
+      }
       if (mode === "edit") displayPosts(sectionID, postID);
     } else {
       alert("Erreur : " + (await response.text()));

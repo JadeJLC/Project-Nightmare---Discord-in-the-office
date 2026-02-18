@@ -15,7 +15,7 @@ export function displayPostEditor(mode, sectionID, container, post) {
   const goBack = document.getElementById("go-back");
   if (goBack && mode === "newtopic") {
     goBack.innerHTML = `<img src="/assets/images/arrow-left.svg"/><span>Retour à la catégorie</span>`;
-  } else if (goBack && mode === "reply") {
+  } else if ((goBack && mode === "reply") || (goBack && mode === "edit")) {
     goBack.innerHTML = `<img src="/assets/images/arrow-left.svg"/><span>Retour au sujet</span>`;
   }
 
@@ -103,7 +103,6 @@ function setPostEditorButtons(container, sectionID, mode, postID) {
       displayTopics(sectionID);
       return;
     } else if ((goBack && mode === "reply") || (goBack && mode === "edit")) {
-      console.log("Retour au sujet ", sectionID);
       displayPosts(sectionID);
       return;
     }

@@ -82,7 +82,7 @@ function setTopicLinks(topicsPageContainer, catID, topicID) {
     const author = event.target.closest(".post-author");
     if (author) {
       const username = author.dataset.username;
-      displayProfile(username);
+      if (username != "Inconnu") displayProfile(username);
       return;
     }
 
@@ -152,7 +152,8 @@ function buildPostHTML(post, index) {
               </div> 
             </div>
             <div class="post-profile">
-              Membre depuis le ${post.author.inscription}
+            ${post.author.inscription != "Membre supprimé" ? "Membre depuis le" : ""}
+            ${post.author.inscription}
             </div>
           </div>
         </div>

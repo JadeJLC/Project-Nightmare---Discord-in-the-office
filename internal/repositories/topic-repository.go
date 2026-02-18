@@ -20,14 +20,14 @@ func NewTopicRepo(db *sql.DB) *TopicRepo{
 /*
 * Ouvre un nouveau sujet et l'ajoute dans la base de données
 */
-func (r *TopicRepo) Create(category int, title, authorId string) error {
+func (r *TopicRepo) Create(catID int, title, authorId string) error {
 	title = html.EscapeString(strings.TrimSpace(title))
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("02/01/2006 à 15:04:05")
 	_, err := r.db.Exec(`
-        INSERT INTO topics (category, title, created_on, author)
+        INSERT INTO topics (cat_id, title, created_on, author)
         VALUES (?, ?, ?, ?)
-    `, category, title, formattedTime, authorId)
+    `, catID, title, formattedTime, authorId)
     return err
 }
 
@@ -46,7 +46,7 @@ func (r *TopicRepo) Delete(topicID int) error {
 */
 func (r *TopicRepo) GetTopicById(topicID int) (*domain.Topic, error) {
 	row := r.db.QueryRow(`
-        SELECT category, title, created_on, author
+        SELECT cat_id, title, created_on, author
         FROM topics WHERE topic_id = ?`, topicID)
 
     topic := &domain.Topic{}
@@ -62,7 +62,7 @@ func (r *TopicRepo) GetTopicById(topicID int) (*domain.Topic, error) {
 */
 func (r *TopicRepo) GetTopicByTitle(title string) (*domain.Topic, error) {
 	row := r.db.QueryRow(`
-        SELECT topic_id, category, created_on, author
+        SELECT topic_id, cat_id, created_on, author
         FROM topics WHERE title = ?`, title)
 
     topic := &domain.Topic{}
@@ -119,7 +119,7 @@ func (r *TopicRepo) GetTopicsByCategory(catID int) (*domain.TopicList, error) {
 	u.username
     FROM topics t
 	JOIN users u ON t.author = u.user_id
-    WHERE category = ?`, catID)
+    WHERE t.cat_id = ?`, catID)
 	if err != nil {
 		log.Print("Erreur dans la récupération des sujets de la catégorie : ", err)
 		return nil, err
@@ -155,7 +155,7 @@ func (r *TopicRepo) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error
         	m.created_on,
         	u.username,
         	t.title,
-			t.category,
+			t.cat_id,
         	ROW_NUMBER() OVER(PARTITION BY m.topic_id ORDER BY m.created_on DESC) as rn
     	FROM messages m
     	JOIN topics t ON m.topic_id = t.topic_id 
@@ -190,4 +190,20 @@ func (r *TopicRepo) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error
 	
    
     return lastPosts, nil
+}
+
+/*
+* Permet de mute un sujet pour ne plus recevoir de notifications quand quelqu'un pose
+*/
+func (r *TopicRepo) MuteTopic(userID string, topicID int) error {
+    _, err := r.db.Exec(`
+        INSERT INTO topic_mutes (user_id, topic_id) 
+        VALUES (?, ?) 
+        ON CONFLICT DO NOTHING`, userID, topicID)
+    return err
+}
+
+func (r *TopicRepo) UnmuteTopic(userID string, topicID int) error {
+    _, err := r.db.Exec(`DELETE FROM topic_mutes WHERE user_id = ? AND topic_id = ?`, userID, topicID)
+    return err
 }

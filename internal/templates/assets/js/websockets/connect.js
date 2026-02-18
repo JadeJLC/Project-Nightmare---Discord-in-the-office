@@ -1,5 +1,6 @@
 import { updateOnlineUsers } from "../page-creation/online-members.js";
 import { handleIncomingDM } from "./private-message.js";
+import { handleIncomingNotification } from "../websockets/notif-websocket.js";
 
 export let ws = null;
 
@@ -31,7 +32,9 @@ export function connectWebSocket() {
             updateOnlineUsers(msg.users);
             break;
 
-          // futures fonctionnalités comme les notifications
+          case "notification":
+            handleIncomingNotification(msg);
+            break;
         }
       };
 

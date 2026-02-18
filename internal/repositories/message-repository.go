@@ -64,7 +64,7 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
 	m.created_on, 
 	m.reactions
     FROM messages m
-	JOIN users u ON m.author = u.user_id
+	LEFT JOIN users u ON m.author = u.user_id
 	JOIN topics t ON m.topic_id = t.topic_id
     WHERE m.topic_id = ?`, topicID)
 	if err != nil {
@@ -77,9 +77,30 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
     var messages = []*domain.Message{}
 	for rows.Next() {
 	message := &domain.Message{}
-		if err := rows.Scan(&message.ID, &message.Author.Username, &message.Author.Image, &message.Author.Inscription, &message.Content, &message.Time, &message.Reactions); err != nil {
-			return nil, err
-		}
+	var username, image, inscription *string
+
+		err := rows.Scan(
+            &message.ID, 
+            &username, 
+            &image, 
+            &inscription, 
+            &message.Content, 
+            &message.Time, 
+            &message.Reactions,
+        )
+        if err != nil {
+            return nil, err
+        }
+
+		if username == nil {
+            message.Author.Username = "Inconnu"
+            message.Author.Image = "Geoakim"
+            message.Author.Inscription = "Membre supprimé"
+        } else {
+            message.Author.Username = *username
+            message.Author.Image = *image
+            message.Author.Inscription = *inscription
+        }
 		messages = append(messages, message)
 	}
    
@@ -100,7 +121,7 @@ func (r *MessageRepo) GetMessagesByAuthor(author string) ([]*domain.Message, err
 			c.cat_id
         FROM messages m
         JOIN topics t ON m.topic_id = t.topic_id
-		JOIN categories c ON t.category = c.cat_id
+		JOIN categories c ON t.cat_id = c.cat_id
 		WHERE m.author = ?
 		ORDER BY m.created_on DESC `, author)
 	if err != nil {
@@ -130,7 +151,7 @@ func (r *MessageRepo) GetMessageByID(postID int) (*domain.Message, error) {
     WHERE post_id = ?`, postID)
 
     message := &domain.Message{}
-    err := row.Scan(&message.TopicID, &message.Author, &message.Content, &message.Time, &message.Reactions)
+    err := row.Scan(&message.TopicID, &message.Author.ID, &message.Content, &message.Time, &message.Reactions)
     if err != nil {
         return nil, err
     }

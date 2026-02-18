@@ -21,13 +21,15 @@ type WebSocketHandler struct {
     chatService    *services.ChatService
 	userService *services.UserService
     upgrader       websocket.Upgrader
+    notifService *services.NotificationService
 }
 
-func NewWebSocketHandler(ss *services.SessionService, cs *services.ChatService, us *services.UserService) *WebSocketHandler {
+func NewWebSocketHandler(ss *services.SessionService, cs *services.ChatService, us *services.UserService, ns *services.NotificationService) *WebSocketHandler {
     return &WebSocketHandler{
         sessionService: ss,
         chatService:    cs,
 		userService: us,
+        notifService: ns,
         upgrader: websocket.Upgrader{
             ReadBufferSize:  1024,
             WriteBufferSize: 1024,
@@ -122,11 +124,12 @@ func (h *WebSocketHandler) broadcastPresence() {
 
 func (h *WebSocketHandler) handlePrivateMessage(from, to string, content string) {
     // 1. Construire le message
+    now := time.Now()
     dm := domain.DM{
         SenderID:   from,
         ReceiverID: to,
         Content:    content,
-        CreatedAt:  time.Now(),
+        CreatedAt:  now,
     }
 
     // 2. Sauvegarde en DB
@@ -152,8 +155,8 @@ func (h *WebSocketHandler) handlePrivateMessage(from, to string, content string)
     "receiver_id":      to,
     "receiver_username": toUser.Username,
     "content":          content,
-    "created_at":       dm.CreatedAt,
-}
+    "created_at":       now.Format(time.RFC3339),
+    }
 
 
     // 5. Envoi temps réel au destinataire
@@ -167,5 +170,54 @@ func (h *WebSocketHandler) handlePrivateMessage(from, to string, content string)
         conn.WriteJSON(outgoing)
     }
     wsMutex.Unlock()
+
+    msgNotif := fmt.Sprintf("Nouveau message de %s", fromUser.Username)
+    h.handleNotifications(to, msgNotif, "")
 }
 
+
+func (h *WebSocketHandler) handleNotifications(receiverID, message, data string) {
+    currentTime := time.Now().Format("02/01/2006 à 15:04:05")
+
+    // 1. Sauvegarde en BDD
+    if err := h.notifService.AddNotification(receiverID, message, data); err != nil {
+        fmt.Println("Erreur dans la sauvegarde de la notification :", err)
+        return
+    }
+
+    // 2. Construction du message WebSocket
+    outgoing := map[string]interface{}{
+        "type":          "notification",
+        "receiver_id":   receiverID,
+        "notif_message": message,
+        "notif_status":  "new",
+        "time":          currentTime,
+        "data":          data,
+    }
+
+    // 3. Envoi temps réel si l’utilisateur est connecté
+    wsMutex.Lock()
+    if conn, ok := wsClients[receiverID]; ok {
+        conn.WriteJSON(outgoing)
+    }
+    wsMutex.Unlock()
+}
+
+func (h *WebSocketHandler) SendTopicNotification(receiverID, message, data string) {
+    now := time.Now().Format(time.RFC3339)
+
+    outgoing := map[string]interface{}{
+        "type":          "notification",
+        "receiver_id":   receiverID,
+        "notif_message": message,
+        "notif_status":  "new",
+        "notif_time":    now,
+        "notif_data":    data,
+    }
+
+    wsMutex.Lock()
+    if conn, ok := wsClients[receiverID]; ok {
+        conn.WriteJSON(outgoing)
+    }
+    wsMutex.Unlock()
+}

@@ -40,3 +40,11 @@ func (s *TopicService) GetTopicsByCategory(catID int) (*domain.TopicList, error)
 func (s *TopicService) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error) {
 	return s.repo.GetTopicsByMostRecent(offset)
 }
+
+func (s *TopicService) UnfollowTopic(userID string, topicID int) error {
+	return s.repo.MuteTopic(userID, topicID)
+}
+
+func (s *TopicService) FollowTopic(userID string, topicID int) error {
+	return s.repo.UnmuteTopic(userID, topicID)
+}

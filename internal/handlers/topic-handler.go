@@ -26,6 +26,7 @@ func (h *TopicHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     topicID, err := strconv.Atoi(r.URL.Query().Get("topicID"))
 	postID, err2 := strconv.Atoi(r.URL.Query().Get("postID"))
 	if err != nil {
+		log.Print("Identifiant de sujet invalide : ", err)
 		http.Error(w, "Identifiant de sujet invalide", http.StatusNotFound)
 	}
 	if err2 != nil {
@@ -47,6 +48,7 @@ func (h *TopicHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	topicInfo.CurrentPost = postID
 	
     if err != nil || len(topicInfo.PostList) == 0 {
+		log.Print("Erreur dans le format du sujet : ", err)
 		http.Error(w, "Erreur dans le format du sujet", http.StatusInternalServerError)
 	}
 	
