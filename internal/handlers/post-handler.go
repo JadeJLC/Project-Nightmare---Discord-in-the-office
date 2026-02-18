@@ -12,11 +12,12 @@ type PostHandler struct{
    	messageService *services.MessageService
 	topicService *services.TopicService
 	userService *services.UserService
+	sessionService *services.SessionService
 }
 
 
-func NewPostHandler(ms *services.MessageService, ts *services.TopicService, us *services.UserService) *PostHandler {
-    return &PostHandler{messageService: ms, topicService: ts, userService: us}
+func NewPostHandler(ms *services.MessageService, ts *services.TopicService, us *services.UserService, ss *services.SessionService) *PostHandler {
+    return &PostHandler{messageService: ms, topicService: ts, userService: us, sessionService: ss}
 }
 
 /*
@@ -55,7 +56,24 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Print("Erreur dans la récupération des information du message :", err)
 		return
 	}
+	editedPost, err := h.messageService.GetMessageByID(postID)
+	if err != nil {
+		log.Print("Tentative de modification d'un message inexistant")
+		http.Error(w, "Post inexistant", http.StatusNotFound)
+		return
+	}
+
+	cookie, err := r.Cookie("auth_token")
+	sessionUserID, _ := h.sessionService.GetUserID(cookie.Value)
+
+
+	if editedPost.Author.ID == sessionUserID {
 		h.messageService.EditMessage(postID, newTopic.Content)
+	} else {
+		log.Print("Tentative de modification du message d'un autre utilisateur")
+		http.Error(w, "Non autorisé", http.StatusUnauthorized)
+		return
+	}
 
 	} else {
 		topicID := sectionID

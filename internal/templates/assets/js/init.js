@@ -7,6 +7,10 @@ import { connectWebSocket } from "./websockets/connect.js";
 import { displayMailbox } from "./page-creation/chat.js";
 import { SessionData, pageData } from "./variables.js";
 import { selectPage } from "./helpers/call-page.js";
+import {
+  getUserNotifications,
+  notifPopup,
+} from "./page-creation/notifications.js";
 
 /**
  * Mise en place des fonctionnalités de la page
@@ -20,6 +24,7 @@ async function main() {
   connectWebSocket();
   pageData.currentPage = localStorage.getItem("currentPage") || "home";
   selectPage();
+  getUserNotifications();
 }
 
 if (document.readyState === "loading") {
@@ -40,6 +45,9 @@ function setHeaderListeners() {
 
     const profileBtn = event.target.closest("#display-profile");
     if (profileBtn) displayProfile(SessionData.username);
+
+    const notifBtn = event.target.closest("#display-notifications");
+    if (notifBtn) notifPopup();
 
     const mailBox = event.target.closest("#display-mailbox");
     if (mailBox) {

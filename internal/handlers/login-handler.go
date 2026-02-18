@@ -9,55 +9,67 @@ import (
 )
 
 type LoginHandler struct {
-    userService *services.UserService
-    sessionService *services.SessionService
+	userService    *services.UserService
+	sessionService *services.SessionService
 }
 
 func NewLoginHandler(us *services.UserService, ss *services.SessionService) *LoginHandler {
-    return &LoginHandler{userService: us, sessionService: ss,}
+	return &LoginHandler{userService: us, sessionService: ss}
 }
 
 type LoginRequest struct {
-    Authenticator string `json:"username"`
-    Password      string `json:"password"`
+	Authenticator string `json:"username"`
+	Password      string `json:"password"`
 }
 
-/*
-* Gestion de la connexion
-* Réccupère le formulaire de connexion et créee un cookie dans la BDD des sessions
-*/
+// Gestion de la connexion
+// Récupère le formulaire de connexion et crée un cookie dans la BDD des sessions
 func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    var req LoginRequest
-    json.NewDecoder(r.Body).Decode(&req)
+	w.Header().Set("Content-Type", "application/json")
 
-    user, err := h.userService.Authenticate(req.Authenticator, req.Password)
-    if err != nil {
-        json.NewEncoder(w).Encode(map[string]any{
-            "success": false,
-            "message": "Identifiants incorrects",
-        })
-        return
-    }
+	var req LoginRequest
+	json.NewDecoder(r.Body).Decode(&req)
 
-    token, _ := auth.GenerateToken(user.ID)
+	user, err := h.userService.Authenticate(req.Authenticator, req.Password)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]any{
+			"success": false,
+			"message": "Identifiants incorrects",
+		})
+		return
+	}
 
-    if err := h.sessionService.CreateSession(user.ID, token); err != nil {
-        http.Error(w, "Erreur session", http.StatusInternalServerError)
-        return
-    }
+	token, err := auth.GenerateToken(user.ID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]any{
+			"success": false,
+			"message": "Erreur lors de la génération du token",
+		})
+		return
+	}
 
+	if err := h.sessionService.CreateSession(user.ID, token); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]any{
+			"success": false,
+			"message": "Erreur lors de la création de la session",
+		})
+		return
+	}
 
-    http.SetCookie(w, &http.Cookie{
-        Name:     "auth_token",
-        Value:    token,
-        Path:     "/",
-        HttpOnly: true,
-        MaxAge:   3600,
-		Secure: false,
-        SameSite: http.SameSiteStrictMode,
-    })
+	http.SetCookie(w, &http.Cookie{
+		Name:     "auth_token",
+		Value:    token,
+		Path:     "/",
+		HttpOnly: true,
+		MaxAge:   3600,
+		Secure:   false,
+		SameSite: http.SameSiteStrictMode,
+	})
 
-    json.NewEncoder(w).Encode(map[string]any{
-        "success": true,
-    })
+	json.NewEncoder(w).Encode(map[string]any{
+		"success": true,
+	})
 }

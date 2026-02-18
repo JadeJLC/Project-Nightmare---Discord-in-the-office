@@ -2,7 +2,7 @@ import { buttonMove } from "../theme-switch.js";
 import { displayCategories } from "./home-categories.js";
 import { displayFeed } from "./home-feed.js";
 import { clearPages } from "../helpers/clear-pages.js";
-import { pageData } from "../variables.js";
+import { pageData, SessionData } from "../variables.js";
 
 let displayType = "categ";
 
@@ -19,13 +19,15 @@ export function displayHome() {
 
   const buttonZone = document.getElementById("front-page-buttons");
 
-  const button = createHomeButtons();
-  buttonZone.appendChild(button);
+  if (SessionData.isLogged) {
+    const button = createHomeButtons();
+    buttonZone.appendChild(button);
 
-  frontPageContainer.appendChild(buttonZone);
+    frontPageContainer.appendChild(buttonZone);
+  }
 
   const savedMode = localStorage.getItem("displaymode") || "categ";
-  if (savedMode === "feed") {
+  if (savedMode === "feed" && SessionData.isLogged) {
     displayAsFeed();
   } else {
     displayAsCats();

@@ -10,31 +10,39 @@ import (
 )
 
 func main() {
-    db := config.InitDB()
+    db, err := config.InitDB()
+
+    if err != nil {
+    log.Print("Erreur dans l'initialisation de la BDD : ", err)
+    }
     defer db.Close()
 
     // Repository
     userRepository := repositories.NewUserRepository(db)
     sessionRepository := repositories.NewSessionRepo(db)
+
     categRepository := repositories.NewCategRepo(db)
     topicRepository := repositories.NewTopicRepo(db)
-    chatRepository := repositories.NewChatRepo(db)
     messageRepository := repositories.NewMessageRepo(db)
+
+    chatRepository := repositories.NewChatRepo(db)
     reactionRepository := repositories.NewReactionRepo(db)
+    notifRepository := repositories.NewNotificationRepo(db)
 
     // Service
     userService := services.NewUserService(userRepository)
     sessionService := services.NewSessionService(sessionRepository)
+    
     categService := services.NewCategoryService(categRepository)
     topicService := services.NewTopicService(topicRepository)
-    chatService := services.NewChatService(chatRepository)
-
-    // Router (handlers instanciés proprement)
     messageService := services.NewMessageService(messageRepository)
+
+    chatService := services.NewChatService(chatRepository)
+    notifService := services.NewNotificationService(notifRepository)
     reactionService := services.NewReactionService(reactionRepository)
 
     // Router (handlers instanciés proprement)
-    router := handlers.Router(userService, sessionService, chatService, categService, topicService,messageService, reactionService)
+    router := handlers.Router(userService, sessionService, chatService, categService, topicService,messageService, reactionService, notifService)
 
     // Lancement serveur
     addr := ":5006"

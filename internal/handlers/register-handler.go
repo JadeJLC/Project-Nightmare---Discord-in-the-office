@@ -49,10 +49,7 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    mode := r.URL.Query().Get("mode")
-
-    
-    
+    mode := r.URL.Query().Get("mode")    
 
     if mode == "edit" || mode == "avatar" {
        if !h.checkUserLoggedIn(w, r, newUser.Username) {
@@ -98,7 +95,7 @@ func (h *RegisterHandler) checkUserLoggedIn(w http.ResponseWriter, r *http.Reque
     }
 
     targetUser, err := h.userService.GetUserByUsername(targetUsername)
-    sessionUserID, err2 := h.sessionService.GetUserID(cookie.Value) // The error happens here
+    sessionUserID, err2 := h.sessionService.GetUserID(cookie.Value)
 
 
     if err != nil || err2 != nil {

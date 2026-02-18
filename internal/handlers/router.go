@@ -9,7 +9,7 @@ import (
 /*
 * Gestion des réponses et des éléments de serveur à appeler en fonction des requêtes API de la page javascript
  */
-func Router(userService *services.UserService, sessionService *services.SessionService, chatService *services.ChatService, categService *services.CategoryService, topicService *services.TopicService, messageService *services.MessageService, reactionService *services.ReactionService) http.Handler {
+func Router(userService *services.UserService, sessionService *services.SessionService, chatService *services.ChatService, categService *services.CategoryService, topicService *services.TopicService, messageService *services.MessageService, reactionService *services.ReactionService, notifService *services.NotificationService) http.Handler {
     mux := http.NewServeMux()
 
     // Handlers instanciés proprement
@@ -18,15 +18,17 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     homeHandler := NewHomeHandler(categService, topicService)
 	meHandler := NewMeHandler(userService)
     logoutHandler := NewLogoutHandler(userService, sessionService)
+
     chatHandler := NewChatHandler(sessionService, chatService)
     conversationHandler := NewConversationHandler(sessionService, chatService, userService)
-    wsHandler := NewWebSocketHandler(sessionService, chatService, userService)
+    wsHandler := NewWebSocketHandler(sessionService, chatService, userService, notifService)
+    notificationHandler := NewNotificationHandler(sessionService, notifService, userService, messageService, topicService, wsHandler)
 
     
     profileHandler := NewProfileHandler(userService, messageService, reactionService, topicService)
     categoryHandler := NewCategoryHandler(userService, messageService, *categService, topicService)
     topicHandler := NewTopicHandler(messageService, topicService)
-    postingHandler := NewPostHandler(messageService, topicService, userService)
+    postingHandler := NewPostHandler(messageService, topicService, userService, sessionService)
 
     // Routes
     mux.Handle("/", homeHandler)
@@ -35,8 +37,11 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     mux.Handle("/api/logout", logoutHandler)
     mux.Handle("/api/register", registerHandler)
 	mux.Handle("/api/me", meHandler)
+
     mux.Handle("/api/dm", chatHandler)
     mux.Handle("/api/conversations", conversationHandler)
+    mux.Handle("/api/notifications", notificationHandler)
+    mux.HandleFunc("/api/notif", notificationHandler.NotificationDatabase)
 
     mux.Handle("/api/profile", profileHandler)
     mux.Handle("/api/category", categoryHandler)

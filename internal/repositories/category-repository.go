@@ -77,7 +77,7 @@ func (r *CategoryRepo) GetCatLastPost(catID int) (domain.LastPost, error) {
         FROM messages m
         JOIN topics t ON m.topic_id = t.topic_id 
 		JOIN users u ON m.author = u.user_id
-		WHERE t.category = ?
+		WHERE t.cat_id = ?
         ORDER BY m.created_on DESC
 		LIMIT 1;
     `, catID)
