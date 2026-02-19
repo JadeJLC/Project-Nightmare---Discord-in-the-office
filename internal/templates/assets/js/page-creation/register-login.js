@@ -1,5 +1,6 @@
 import { SessionData } from "../variables.js";
 import { injectpopupHTML, switchToLogin } from "./login-popup.js";
+import { displayError } from "./errors.js";
 
 /**
  * Gestion de la déconnexion des utilisateurs
@@ -12,9 +13,7 @@ export async function logOut() {
     });
 
     if (!response.ok) {
-      const text = await response.text();
-      console.error("Erreur logout :", text);
-      alert("Erreur logout : " + text);
+      displayError(response.status);
       return;
     }
 
@@ -48,6 +47,11 @@ export function getLoginData(loginForm) {
         body: JSON.stringify(data),
         credentials: "include",
       });
+
+      if (!response.ok) {
+        displayError(response.status);
+        return;
+      }
 
       const result = await response.json();
 
@@ -83,7 +87,7 @@ export function getRegisterData(registerForm) {
         alert("Inscription réussie !");
         window.location.reload();
       } else {
-        alert("Erreur : " + (await response.text()));
+        displayError(response.status);
       }
     } catch (err) {
       console.error("Erreur réseau :", err);

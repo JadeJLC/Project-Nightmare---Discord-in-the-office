@@ -43,6 +43,12 @@ func (h *TopicHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	topicInfo, err := h.topicService.GetTopicById(topicID)
 	if err != nil {
 		log.Print("Erreur dans la récupération du sujet :", err)
+
+		if err == sql.ErrNoRows {
+		http.Error(w, "Ce sujet n'existe pas", http.StatusNotFound)
+		} else {
+			http.Error(w, "Erreur dans la récupération du sujet", http.StatusInternalServerError)
+		}
 		return
 	}
 

@@ -5,6 +5,7 @@ import { displayPosts } from "./topic.js";
 import { newTopic } from "./new-message.js";
 import { isUserLoggedIn } from "../helpers/check-log-status.js";
 import { pageData } from "../variables.js";
+import { displayError } from "./errors.js";
 
 /**
  * Affiche le titre et la liste des sujets d'une catégorie
@@ -15,6 +16,11 @@ import { pageData } from "../variables.js";
 async function writeTopics(catID, mode) {
   try {
     const response = await fetch(`/api/category?catID=${catID}`);
+    if (!response.ok) {
+      displayError(response.status);
+      return;
+    }
+
     const category = await response.json();
 
     const categPageContainer = document.getElementById("category-topics");

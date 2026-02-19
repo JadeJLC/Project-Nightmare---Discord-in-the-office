@@ -1,4 +1,4 @@
-import { SessionData } from "../variables.js";
+import { displayError } from "../page-creation/errors.js";
 
 export function toggleReactionWindow(postID, container) {
   let reactionPopup = container.querySelector("#reaction-popup");
@@ -19,8 +19,18 @@ async function createReactionList(reactionPopup, postID) {
   const responseList = await fetch("/api/reactions?mode=files");
   const files = await responseList.json();
 
+  if (!responseList.ok) {
+    displayError(response.status);
+    return;
+  }
+
   const responseMe = await fetch(`/api/myreactions?postID=${postID}`);
   const myReactions = await responseMe.json();
+
+  if (!responseMe.ok) {
+    displayError(response.status);
+    return;
+  }
 
   files.forEach((fileName) => {
     const imageWrapper = document.createElement("div");
@@ -60,7 +70,8 @@ export async function addReaction(postID, reactionType) {
     );
 
     if (!response.ok) {
-      alert("Erreur : " + (await response.text()));
+      displayError(response.status);
+      return;
     }
   } catch (err) {
     console.error("Erreur réseau :", err);
@@ -74,7 +85,8 @@ export async function removeReaction(postID, reactionType) {
     );
 
     if (!response.ok) {
-      alert("Erreur : " + (await response.text()));
+      displayError(response.status);
+      return;
     }
   } catch (err) {
     console.error("Erreur réseau :", err);

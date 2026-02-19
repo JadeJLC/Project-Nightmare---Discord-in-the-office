@@ -5,6 +5,7 @@ import { isUserLoggedIn } from "./check-log-status.js";
 import { clearPopups } from "./clear-pages.js";
 import { SessionData } from "../variables.js";
 import { displayProfile } from "../page-creation/profile.js";
+import { displayError } from "../page-creation/errors.js";
 
 // #region ***** Modification des détails du profil
 /**
@@ -32,7 +33,8 @@ async function editProfileDetails(mode) {
     if (response.ok) {
       displayProfile(profileName);
     } else {
-      alert("Erreur : " + (await response.text()));
+      displayError(response.status);
+      return;
     }
   } catch (err) {
     console.error("Erreur réseau :", err);
@@ -65,6 +67,12 @@ function displayEditForm() {
 async function editProfileImage(user) {
   clearPopups();
   const response = await fetch("/api/avatars");
+
+  if (!response.ok) {
+    displayError(response.status);
+    return;
+  }
+
   const files = await response.json();
 
   const loggedName = SessionData.username;
@@ -140,7 +148,8 @@ async function updateProfilePicture(avaForm) {
     if (response.ok) {
       displayProfile(profileName);
     } else {
-      alert("Erreur : " + (await response.text()));
+      displayError(response.status);
+      return;
     }
   } catch (err) {
     console.error("Erreur réseau :", err);

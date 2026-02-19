@@ -6,6 +6,7 @@ import { typeMode } from "../variables.js";
 import { htmlToBB, htmlToMD, readBBCode } from "../helpers/text-formating.js";
 import { displayPostEditor } from "./post-editor.js";
 import { createReplyNotification } from "./notifications.js";
+import { displayError } from "./errors.js";
 
 /**
  * Appelle les fonction pour l'ouverture d'un nouveau sujet
@@ -93,7 +94,8 @@ async function sendMessage(form, mode, typeMode, sectionID, postID) {
       }
       if (mode === "edit") displayPosts(sectionID, postID);
     } else {
-      alert("Erreur : " + (await response.text()));
+      displayError(response.status);
+      return;
     }
   } catch (err) {
     console.error("Erreur réseau :", err);

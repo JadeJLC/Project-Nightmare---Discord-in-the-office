@@ -6,10 +6,16 @@ import {
   setNotificationLinks,
 } from "../helpers/notif-secondary.js";
 import { updateNotificationCounter } from "../websockets/notif-websocket.js";
+import { displayError } from "./errors.js";
 
 export async function getUserNotifications() {
   try {
     const response = await fetch(`/api/notifications`);
+    if (!response.ok) {
+      displayError(response.status);
+      return;
+    }
+
     const notifList = await response.json();
     SessionData.notifications = notifList;
   } catch (error) {
@@ -87,6 +93,11 @@ function notifPage() {
 export async function createReplyNotification(topicID, sender) {
   try {
     const response = await fetch(`/api/topic?topicID=${topicID}`);
+    if (!response.ok) {
+      displayError(response.status);
+      return;
+    }
+
     const topic = await response.json();
     const message = `<span class="notif-sender">${sender}</span> a posté une réponse sur <span class="notif-topic">${topic.topic_title}</span>`;
 
@@ -113,7 +124,8 @@ async function sendNotification(data) {
     });
 
     if (!response.ok) {
-      console.log("Erreur dans l'envoi de la notification : ", response);
+      displayError(response.status);
+      return;
     }
   } catch (error) {
     console.log("Erreur dans l'envoi de la notification : ", error);
@@ -127,7 +139,8 @@ export async function markAsRead(notifID) {
     );
 
     if (!response.ok) {
-      console.log("Erreur pour marquer la notification comme lue : ", response);
+      displayError(response.status);
+      return;
     }
 
     getUserNotifications();
@@ -141,7 +154,8 @@ export async function deleteNotification(notifID) {
     const response = await fetch(`/api/notif?mode=delete&notifID=${notifID}`);
 
     if (!response.ok) {
-      console.log("Erreur pour supprimer la notification : ", response);
+      displayError(response.status);
+      return;
     }
 
     getUserNotifications();
@@ -155,7 +169,8 @@ export async function unFollow(topicID) {
     const response = await fetch(`/api/notif?mode=unfollow&topicID=${topicID}`);
 
     if (!response.ok) {
-      console.log("Erreur pour mute le topic : ", response);
+      displayError(response.status);
+      return;
     }
   } catch (error) {
     console.log("Erreur pour mute le topic : ", error);
@@ -167,7 +182,8 @@ async function followBack(topicID) {
     const response = await fetch(`/api/notif?mode=follow&topicID=${topicID}`);
 
     if (!response.ok) {
-      console.log("Erreur pour demute le topic : ", response);
+      displayError(response.status);
+      return;
     }
   } catch (error) {
     console.log("Erreur pour demute le topic : ", error);

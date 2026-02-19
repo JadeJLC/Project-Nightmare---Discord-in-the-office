@@ -1,5 +1,5 @@
 import { displayPosts } from "./topic.js";
-import { displayTopics } from "./category-topics.js";
+import { displayError } from "./errors.js";
 import { displayProfile } from "./profile.js";
 
 /**
@@ -9,6 +9,11 @@ import { displayProfile } from "./profile.js";
 async function displayFeed() {
   try {
     const response = await fetch("/?mode=feed");
+    if (!response.ok) {
+      displayError(response.status);
+      return;
+    }
+
     const topicList = await response.json();
 
     let feedContainer = document.getElementById("feed");
