@@ -9,7 +9,7 @@ import {
 } from "../helpers/profile-secondary.js";
 import { initProfileDMButton } from "../helpers/profile-secondary.js";
 import { selectPage } from "../helpers/call-page.js";
-import { buildPostReactions } from "../helpers/reactions.js";
+import { displayError } from "./errors.js";
 
 // #region ***** Affichage des informations utilisateur
 
@@ -54,7 +54,8 @@ async function writeUserProfile(profile, logged) {
       `/api/profile?profile=${profile}&user=${logged}`,
     );
     if (!response.ok) {
-      throw new Error(`Server returned status ${response.status}`);
+      displayError(response.status);
+      return;
     }
 
     const user = await response.json();
@@ -191,7 +192,8 @@ async function displayProfileMessages(profileName) {
       `/api/profile?profile=${profileName}&mode=message`,
     );
     if (!response.ok) {
-      throw new Error(`Server returned status ${response.status}`);
+      displayError(response.status);
+      return;
     }
 
     const allMessages = await response.json();
@@ -244,7 +246,8 @@ async function displayProfileReactions(profileName) {
       `/api/profile?profile=${profileName}&mode=reactions`,
     );
     if (!response.ok) {
-      throw new Error(`Server returned status ${response.status}`);
+      displayError(response.status);
+      return;
     }
 
     const allReactions = await response.json();
@@ -303,7 +306,8 @@ async function displayProfileTopics(profileName) {
       `/api/profile?profile=${profileName}&mode=topics`,
     );
     if (!response.ok) {
-      throw new Error(`Server returned status ${response.status}`);
+      displayError(response.status);
+      return;
     }
 
     const allTopics = await response.json();

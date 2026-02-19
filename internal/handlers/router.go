@@ -29,9 +29,11 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     categoryHandler := NewCategoryHandler(userService, messageService, *categService, topicService)
     topicHandler := NewTopicHandler(messageService, topicService, reactionService, sessionService)
     postingHandler := NewPostHandler(messageService, topicService, userService, sessionService)
+    errorHandler := NewErrorHandler(sessionService)
 
     // Routes
     mux.Handle("/", homeHandler)
+    mux.Handle("/error", errorHandler)
     mux.Handle("/ws", wsHandler)
     mux.Handle("/api/login", loginHandler)
     mux.Handle("/api/logout", logoutHandler)

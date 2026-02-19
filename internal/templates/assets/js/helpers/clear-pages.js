@@ -18,6 +18,11 @@ export function clearPages(destination) {
   if (destination === "reply") showReplyForm();
   if (destination === "edit") showEditForm();
 
+  if (destination != "error") {
+    const errorPageContainer = document.getElementById("error-page");
+    if (errorPageContainer) errorPageContainer.remove();
+  }
+
   if (destination != "notif") {
     const notifPageContainer = document.getElementById("notif-page");
     if (notifPageContainer) notifPageContainer.remove();

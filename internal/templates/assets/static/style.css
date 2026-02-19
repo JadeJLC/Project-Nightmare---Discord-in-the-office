@@ -331,7 +331,8 @@ header {
 #profile-page,
 #dm-page,
 #category-topics,
-#topic-posts {
+#topic-posts,
+#error-page {
   margin-top: 100px !important;
   padding-bottom: 15px;
 }
@@ -476,7 +477,8 @@ header {
 }
 
 /* Affichage feed */
-.feed-notopic {
+.feed-notopic,
+.error-message {
   width: 85%;
   max-width: 1200px;
   padding: 16px;
@@ -489,7 +491,8 @@ header {
   position: relative;
 }
 
-.feed-notopic img {
+.feed-notopic img,
+.error-message img {
   position: absolute;
   right: -30px;
   top: -30px;
@@ -844,7 +847,8 @@ header {
 }
 
 #category-topics h2,
-#topic-posts h2 {
+#topic-posts h2,
+#error-page h2 {
   text-align: center;
   font-size: 42px;
   color: var(--neon);
@@ -1731,3 +1735,17 @@ u {
 }
 
 /* #endregion */
+
+.error-message {
+  width: 50%;
+}
+
+.error-message img {
+  transform: scaleX(-1);
+}
+
+.error-if {
+  margin-top: 40px;
+  text-align: center;
+  font-style: italic;
+}

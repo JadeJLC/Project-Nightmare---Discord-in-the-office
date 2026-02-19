@@ -1,5 +1,6 @@
 import { SessionData } from "../variables.js";
 import { displayHome } from "../page-creation/home-display.js";
+import { displayError } from "../page-creation/errors.js";
 /**
  * Vérifie si l'utilisateur est bien connecté pour l'affichage des pages
  * @returns {boolean} Utilisateur connecté = true
@@ -22,6 +23,8 @@ export async function checkLoginStatus() {
     const response = await fetch("/api/me", {
       credentials: "include",
     });
+
+    if (!response.ok) displayError(response.status);
 
     const data = await response.json();
 

@@ -12,6 +12,7 @@ import {
   addReaction,
   toggleReactionWindow,
 } from "../helpers/reactions.js";
+import { displayError } from "./errors.js";
 
 /**
  * Fonction-mère pour la génération du sujet et de ses messages
@@ -45,6 +46,10 @@ export function displayPosts(topicID, postID) {
 async function writePosts(topicID, postID) {
   try {
     const response = await fetch(`/api/topic?topicID=${topicID}`);
+    if (!response.ok) {
+      displayError(response.status);
+      return;
+    }
     const topic = await response.json();
 
     const topicsPageContainer = document.getElementById("topic-posts");

@@ -1,6 +1,7 @@
 import { displayTopics } from "./category-topics.js";
 import { displayProfile } from "./profile.js";
 import { displayPosts } from "./topic.js";
+import { displayError } from "./errors.js";
 
 /**
  * Affiche la liste des catégories sur la page d'accueil
@@ -8,6 +9,11 @@ import { displayPosts } from "./topic.js";
 async function displayCategories() {
   try {
     const response = await fetch("/?mode=categ");
+    if (!response.ok) {
+      displayError(response.status);
+      return;
+    }
+
     const catList = await response.json();
 
     const frontPageContainer = document.getElementById("front-page");
