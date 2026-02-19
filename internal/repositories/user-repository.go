@@ -3,7 +3,7 @@ package repositories
 
 import (
 	"database/sql"
-	"html"
+	"html/template"
 	"real-time-forum/internal/domain"
 	"strings"
 	"time"
@@ -21,10 +21,10 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 }
 
 func cleanUserInput (user *domain.User)  {
-   user.Firstname = html.EscapeString(strings.TrimSpace(user.Firstname))
-   user.Lastname  = html.EscapeString(strings.TrimSpace(user.Lastname))
-   user.Email     = html.EscapeString(strings.TrimSpace(user.Email))
-   user.Gender    = html.EscapeString(strings.TrimSpace(user.Gender))
+   user.Firstname = template.HTMLEscapeString(strings.TrimSpace(user.Firstname))
+   user.Lastname  = template.HTMLEscapeString(strings.TrimSpace(user.Lastname))
+   user.Email     = template.HTMLEscapeString(strings.TrimSpace(user.Email))
+   user.Gender    = template.HTMLEscapeString(strings.TrimSpace(user.Gender))
 }
 
 /*

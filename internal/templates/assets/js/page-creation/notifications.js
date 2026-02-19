@@ -5,6 +5,7 @@ import {
   getNotifData,
   setNotificationLinks,
 } from "../helpers/notif-secondary.js";
+import { updateNotificationCounter } from "../websockets/notif-websocket.js";
 
 export async function getUserNotifications() {
   try {
@@ -14,6 +15,8 @@ export async function getUserNotifications() {
   } catch (error) {
     console.log("Erreur dans la récupération des notifications : ", error);
   }
+  updateNotificationCounter();
+  updateNotifList();
 }
 
 function initNotifPopup() {
@@ -35,6 +38,12 @@ export function notifPopup() {
 
   popup.classList.toggle("is-hidden");
 
+  updateNotifList(popup);
+}
+
+export function updateNotifList() {
+  let popup = document.getElementById("notif-popup");
+  if (!popup) return;
   const notifArray = SessionData.notifications ?? [];
 
   popup.innerHTML = `<h4>Notifications</h4> <hr/>
@@ -111,7 +120,7 @@ async function sendNotification(data) {
   }
 }
 
-async function markAsRead(notifID) {
+export async function markAsRead(notifID) {
   try {
     const response = await fetch(
       `/api/notif?mode=markasread&notifID=${notifID}`,
@@ -120,24 +129,28 @@ async function markAsRead(notifID) {
     if (!response.ok) {
       console.log("Erreur pour marquer la notification comme lue : ", response);
     }
+
+    getUserNotifications();
   } catch (error) {
     console.log("Erreur pour marquer la notification comme lue : ", error);
   }
 }
 
-async function deleteNotification(notifID) {
+export async function deleteNotification(notifID) {
   try {
     const response = await fetch(`/api/notif?mode=delete&notifID=${notifID}`);
 
     if (!response.ok) {
       console.log("Erreur pour supprimer la notification : ", response);
     }
+
+    getUserNotifications();
   } catch (error) {
     console.log("Erreur pour supprimer la notification : ", error);
   }
 }
 
-async function unFollow(topicID) {
+export async function unFollow(topicID) {
   try {
     const response = await fetch(`/api/notif?mode=unfollow&topicID=${topicID}`);
 

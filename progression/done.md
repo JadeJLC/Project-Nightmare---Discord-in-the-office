@@ -76,12 +76,24 @@ Données d'inscriptions demandées :
 - Bouton connexion/déconnexion
 - Bouton "voir mon profil"
 - Bouton ouvrir/fermer la liste des utilisateurs en ligne (cliquer sur un utilisateur ouvre les messages privés)
+- Bouton notifications
+
+### Interface utilisateur
+
+- Bouton retour arrière pour pouvoir revenir sur la page précédente
+
+### Messages privés
+
+- Avoir les utilisateurs rangés dans l'ordre du dernier message (comme dans les MPs discord), et alphabétique pour ceux auquel aucun message n'a été envoyé
+- Envoyer des notifications en temps réel lorsque l'ont reçoit un nouveau message
 
 ### Back
 
 - Gestion des cookies et des sessions
 - Création et organisation de la base de données
 - Détecter si un utilisateur est en ligne
+- Gestion des notifications
+- Affichage des nouveaux messages privés en temps réel
 
 ### Front
 

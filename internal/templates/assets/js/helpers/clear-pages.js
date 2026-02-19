@@ -1,5 +1,6 @@
 import { displayHome } from "../page-creation/home-display.js";
 import { pageData, SessionData } from "../variables.js";
+import { updateNotificationCounter } from "../websockets/notif-websocket.js";
 
 /**
  * Vide la page HTML pour la remplir avec les données de la nouvelle page
@@ -168,11 +169,13 @@ function updateHeader(destination) {
           <span>Messagerie privée</span>
         </button>
         <button type="button" id="display-notifications">
+        <div id="notif-counter" class="is-hidden"></div>
           <img src="assets/images/bell.svg" />
           <span>Afficher les notifications</span>
         </button>`;
 
     memberList.classList.remove("is-hidden");
+    updateNotificationCounter();
   }
 }
 

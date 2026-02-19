@@ -9,6 +9,7 @@ import {
 } from "../helpers/profile-secondary.js";
 import { initProfileDMButton } from "../helpers/profile-secondary.js";
 import { selectPage } from "../helpers/call-page.js";
+import { buildPostReactions } from "../helpers/reactions.js";
 
 // #region ***** Affichage des informations utilisateur
 
@@ -16,10 +17,12 @@ import { selectPage } from "../helpers/call-page.js";
  * Fonction-mère pour la création du HTML de la page profil (conteneur, header, appel de fonction)
  * @param {string} profileName Nom de l'utilisateur dont on affiche le profil
  */
-export function displayProfile(profileName) {
+export function displayProfile(profileName, mode) {
   pageData.previousPage = pageData.currentPage;
   pageData.currentPage = `profile-${profileName}`;
-  clearPages("profile");
+
+  if (!mode) mode = "profile";
+  clearPages(mode);
 
   const usernameHeader = document.getElementById("header-username");
 
@@ -257,32 +260,34 @@ async function displayProfileReactions(profileName) {
       return;
     }
 
-    container.innerHTML = allReactions
-      .map(
-        (message) =>
-          `<div class="profile-preview preview-message">
-            <h3 class="on-topic" data-topicid="${message.topic_id}">Sur le sujet : ${message.topic_name}</h3>
-            <div class="preview-reaction">
-              <img src="assets/avatars/${message.reaction_image}" alt="Réaction"/>
-              <span>${message.reaction_name}</span>
-            </div>
-            <div class="topic-content">
-              <div class="topic-lastpost"> ${message.post_content} </div>
-              <div class="topic-lastinfo">
-                message de <span class="last-post-author" data-author="${message.post_author}">${message.post_author}</span> le ${message.post_date}
-                <button type="button" class="button-link last-post" data-catid=${message.cat_id} data-topicid="${message.topic_id}" data-postid="${message.post_id}">
-                  <img
-                    src="assets/images/external-link.svg"
-                    alt="Voir le message"
-                    title="Voir le message"
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-          </div>`,
-      )
-      .join("");
+    const posts = await Promise.all(
+      allReactions.map(async (message) => {
+        const reactionBlocs = message.reaction_list
+          .map(
+            (type) =>
+              `<div class="reaction-bloc"><img src="assets/images-reactions/${type}.png" alt="${type}"/></div>`,
+          )
+          .join("");
+
+        return `<div class="profile-preview preview-message">
+      <h3 class="on-topic" data-topicid="${message.topic_id}">Sur le sujet : ${message.topic_title}</h3>
+      
+      <div class="topic-content">
+        <div class="topic-lastpost preview-reactions"> ${message.content} 
+         <div class="post-reactions">${reactionBlocs}</div>
+        </div>
+        <div class="topic-lastinfo">
+          message de <span class="last-post-author" data-author="${message.author}">${message.author}</span> le ${message.created_on}
+          <button type="button" class="button-link last-post" data-catid=${message.cat_id} data-topicid="${message.topic_id}" data-postid="${message.post_id}">
+            <img src="assets/images/external-link.svg" alt="Voir le message" title="Voir le message"/>
+          </button>
+        </div>
+      </div>
+    </div>`;
+      }),
+    );
+
+    container.innerHTML = posts.join("");
   } catch (error) {
     console.log("Erreur dans la récupération des messages : ", error);
   }

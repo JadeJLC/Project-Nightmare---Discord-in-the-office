@@ -114,7 +114,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
         return
     }
 
-	if notifData.Type == "newreply" {
+	if notifData.Type == "newreply"  {
 		if r.Method != http.MethodPost {
         http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
         return
@@ -127,6 +127,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 			return
 		}
 
+		if notifData.Type == "newreply" {
 		topicPosts, err := h.messageService.GetMessagesByTopic(notifData.TopicID)
 		if err !=nil {
 			log.Print("Erreur dans la récupération du lien du post : ", err)
@@ -148,6 +149,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 				data,
 			)
 		}
+	}
 
 	}
 }

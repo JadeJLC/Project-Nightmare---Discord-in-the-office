@@ -2,6 +2,12 @@ import { displayPosts } from "../page-creation/topic.js";
 import { displayMailbox } from "../page-creation/chat.js";
 import { openConversation } from "../websockets/private-message.js";
 import { displayProfile } from "../page-creation/profile.js";
+import {
+  markAsRead,
+  unFollow,
+  deleteNotification,
+  notifPopup,
+} from "../page-creation/notifications.js";
 
 /**
  * Tri les données de la notification pour les ajouter sous forme de dataset à la balise HTML
@@ -10,6 +16,7 @@ import { displayProfile } from "../page-creation/profile.js";
  * @returns {string} Le dataset à ajouter au HTML
  */
 export function getNotifData(dataStr) {
+  console.log("Récupération des données de notification : ", dataStr);
   let type;
 
   if (dataStr.includes("[TOPIC") && dataStr.includes("[POST")) type = "seepost";
@@ -28,7 +35,7 @@ export function getNotifData(dataStr) {
   }
 
   if (type === "seedm") {
-    const dmMatch = dataStr.match(/DM:(\d+)/);
+    const dmMatch = dataStr.match(/DM:([^\]]+)/);
     const dmID = dmMatch ? dmMatch[1] : null;
 
     return `data-type="seedm" data-dmid="${dmID}"`;
@@ -46,16 +53,19 @@ export function setNotificationLinks(notifWindow) {
       const parentItem = seeMessage.closest(".notif-item");
       if (parentItem) {
         const notiftype = parentItem.dataset.type;
+        console.log(notiftype);
         switch (notiftype) {
           case "seepost":
             const topicID = parentItem.dataset.topicid;
             const postID = parentItem.dataset.postid;
             displayPosts(topicID, postID);
+            notifPopup();
             break;
           case "seedm":
             const dmID = parentItem.dataset.dmid;
             displayMailbox();
             openConversation(dmID);
+            notifPopup();
             break;
         }
       }

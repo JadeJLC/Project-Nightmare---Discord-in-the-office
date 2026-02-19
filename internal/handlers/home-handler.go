@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"real-time-forum/internal/services"
 )
@@ -41,6 +42,7 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         }
 
         if err != nil {
+            log.Print(err)
             http.Error(w, "Internal Server Error", http.StatusInternalServerError)
             return
         }

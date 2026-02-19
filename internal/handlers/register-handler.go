@@ -53,6 +53,7 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     if mode == "edit" || mode == "avatar" {
        if !h.checkUserLoggedIn(w, r, newUser.Username) {
+        log.Print("Autorisation de modification de profil refusée")
             http.Error(w, "Autorisation de modification de profil refusée", http.StatusUnauthorized)
             return
         }

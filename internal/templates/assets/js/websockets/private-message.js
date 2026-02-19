@@ -1,7 +1,7 @@
 import { pageData, SessionData } from "../variables.js";
 import { ws } from "./connect.js";
 import { loadConversationsList } from "../page-creation/chat.js";
-import { formatDMTime } from "../helpers/text-formating.js";
+import { formatDMTime, decodeHTML } from "../helpers/text-formating.js";
 
 const DMstate = {
   loggedUserID: null,
@@ -166,7 +166,7 @@ export function displayDM(msg) {
         </div>
         <div class="dm-author">${username}</div>
       </div>
-      <div class="dm-content">${msg.content}</div>
+      <div class="dm-content">${decodeHTML(msg.content)}</div>
     `;
 
     if (inputBar) {
