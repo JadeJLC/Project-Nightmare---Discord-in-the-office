@@ -58,7 +58,7 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	editedPost, err := h.messageService.GetMessageByID(postID)
 	if err != nil {
-		log.Print("Tentative de modification d'un message inexistant")
+		log.Print("Tentative de modification d'un message inexistant : ", postID)
 		http.Error(w, "Post inexistant", http.StatusNotFound)
 		return
 	}

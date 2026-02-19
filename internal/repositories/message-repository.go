@@ -57,6 +57,7 @@ func (r *MessageRepo) Edit(postID int, newMessage string) error {
 func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error) {
 	rows, err := r.db.Query(`SELECT 
 	m.post_id, 
+	u.user_id,
 	u.username,
 	u.image,
 	u.inscription,
@@ -80,6 +81,7 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
 
 		err := rows.Scan(
             &message.ID, 
+			&message.Author.ID,
             &username, 
             &image, 
             &inscription, 
@@ -158,6 +160,8 @@ func (r *MessageRepo) GetMessageReactions(postID int, authorID string) ([]*domai
 	}
 
 	for _, reaction := range reactionMap {
+	log.Print(authorID)
+	log.Print(reaction.UserID)
     reactions = append(reactions, reaction)
 	}
 
@@ -218,12 +222,12 @@ func (r *MessageRepo) GetMessagesByAuthor(author string) ([]*domain.Message, err
 * Récupère un message particulier à partir de son ID
 */
 func (r *MessageRepo) GetMessageByID(postID int) (*domain.Message, error) {
-	row := r.db.QueryRow(`SELECT topic_id, author, content, created_on, reactions 
+	row := r.db.QueryRow(`SELECT topic_id, author, content, created_on
     FROM messages
     WHERE post_id = ?`, postID)
 
     message := &domain.Message{}
-    err := row.Scan(&message.TopicID, &message.Author.ID, &message.Content, &message.Time, &message.Reactions)
+    err := row.Scan(&message.TopicID, &message.Author.ID, &message.Content, &message.Time)
     if err != nil {
         return nil, err
     }
