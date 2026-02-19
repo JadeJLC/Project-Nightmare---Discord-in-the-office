@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"database/sql"
-	"html"
+	"html/template"
 	"log"
 	"real-time-forum/internal/domain"
 	"strings"
@@ -21,7 +21,7 @@ func NewTopicRepo(db *sql.DB) *TopicRepo{
 * Ouvre un nouveau sujet et l'ajoute dans la base de données
 */
 func (r *TopicRepo) Create(catID int, title, authorId string) error {
-	title = html.EscapeString(strings.TrimSpace(title))
+	title = template.HTMLEscapeString(strings.TrimSpace(title))
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("02/01/2006 à 15:04:05")
 	_, err := r.db.Exec(`
@@ -146,7 +146,7 @@ func (r *TopicRepo) GetTopicsByCategory(catID int) (*domain.TopicList, error) {
 * Récupère les 10 sujets les plus récents pour l'affichage du feed
 */
 func (r *TopicRepo) GetTopicsByMostRecent(offset int) ([]*domain.LastPost, error) {
-	rows, err := r.db.Query(`SELECT post_id, topic_id, content, created_on, username, title, category
+	rows, err := r.db.Query(`SELECT post_id, topic_id, content, created_on, username, title, cat_id
 	FROM (
     	SELECT
 	        m.post_id,

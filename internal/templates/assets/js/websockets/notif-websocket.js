@@ -35,4 +35,5 @@ export function updateNotificationCounter() {
   ).length;
 
   counter.textContent = unread > 0 ? unread : "";
+  counter.className = unread > 0 ? "" : "is-hidden";
 }

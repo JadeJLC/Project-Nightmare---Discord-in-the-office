@@ -6,6 +6,12 @@ import { SessionData, pageData } from "../variables.js";
 import { displayTopics } from "./category-topics.js";
 import { editMessage, newMessage } from "./new-message.js";
 import { displayProfile } from "./profile.js";
+import {
+  buildPostReactions,
+  removeReaction,
+  addReaction,
+  toggleReactionWindow,
+} from "../helpers/reactions.js";
 
 /**
  * Fonction-mère pour la génération du sujet et de ses messages
@@ -18,8 +24,6 @@ export function displayPosts(topicID, postID) {
   pageData.previousPage = pageData.currentPage;
   pageData.currentPage = `topic-${topicID}${postID ? `-${postID}` : ""}`;
   clearPages("topic");
-  console.log("Display posts : ", pageData.currentPage);
-
   if (!isUserLoggedIn()) return;
 
   let topicsPageContainer = document.getElementById("topic-posts");
@@ -56,9 +60,11 @@ async function writePosts(topicID, postID) {
     <button class="new-message-button" id="new-message-button">Répondre au sujet</button>
     </div>`;
 
-    const postList = topic.post_list
-      .map((post, index) => buildPostHTML(post, index))
-      .join("");
+    const postList = (
+      await Promise.all(
+        topic.post_list.map((post, index) => buildPostHTML(post, index)),
+      )
+    ).join("");
 
     topicsPageContainer.innerHTML = `${topicTitle} ${topicActions} ${postList}`;
     setTopicLinks(topicsPageContainer, catID, topicID, postID);
@@ -112,6 +118,25 @@ function setTopicLinks(topicsPageContainer, catID, topicID) {
         postContainer.querySelector(".post-message").innerHTML;
       editMessage(topicID, postID, postContent);
     }
+
+    const reactImg = event.target.closest(".reaction-bloc");
+    if (reactImg) {
+      const reactionType = reactImg.dataset.rtype;
+      const postID = reactImg.dataset.postid;
+      if (reactImg.classList.contains("active")) {
+        removeReaction(postID, reactionType);
+      } else {
+        addReaction(postID, reactionType);
+      }
+      reactImg.classList.toggle("active");
+    }
+
+    const reactBtn = event.target.closest(".add-reaction");
+    if (reactBtn) {
+      const postID = reactBtn.dataset.postid;
+      const postContainer = reactBtn.closest(".post-left");
+      toggleReactionWindow(postID, postContainer);
+    }
   });
 }
 
@@ -121,10 +146,11 @@ function setTopicLinks(topicsPageContainer, catID, topicID) {
  * @param {int} index La position du message sur la page
  * @returns {HTMLElement} L'élément HTML contenant le message
  */
-function buildPostHTML(post, index) {
+async function buildPostHTML(post, index) {
   const postID = String(post.post_id).padStart(2, "0");
   const isFirst = index === 0;
   let editBtn;
+  let reactBtn;
 
   if (post.author.username === SessionData.username) {
     editBtn = `<button type="button" class="edit-content edit-message" id="confirm-edit" data-postid="${post.post_id}">
@@ -133,14 +159,25 @@ function buildPostHTML(post, index) {
         </button>`;
   }
 
+  if (post.author.username !== SessionData.username) {
+    reactBtn = `<button type="button" class="edit-content add-reaction" id="add-reaction" data-postid="${post.post_id}">
+          <img src="assets/images/react.svg" />
+          <span>Réagir à ce message</span>
+        </button>`;
+  }
+  const postReactions = await buildPostReactions(post.reactions);
+
   return `
     <div class="post-bloc ${isFirst ? "first-post" : ""}" id="${postID}">
       <div class="post-indic">${isFirst ? "Premier post" : ""}</div>
       <div class="post-content">   
         
-        <div class="post-left">${editBtn ? `${editBtn}` : ""}
+        <div class="post-left">
+        <div class="post-buttons">${editBtn ? `${editBtn}` : ""}
+        ${reactBtn ? `${reactBtn}` : ""} </div>
           <div class="post-date">Message du ${post.created_on}</div>
           <div class="post-message">${post.content}</div>
+          ${postReactions ? `${postReactions}` : ""}
         </div>
 
         <div class="post-right">

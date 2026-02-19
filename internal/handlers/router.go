@@ -27,7 +27,7 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     
     profileHandler := NewProfileHandler(userService, messageService, reactionService, topicService)
     categoryHandler := NewCategoryHandler(userService, messageService, *categService, topicService)
-    topicHandler := NewTopicHandler(messageService, topicService)
+    topicHandler := NewTopicHandler(messageService, topicService, reactionService, sessionService)
     postingHandler := NewPostHandler(messageService, topicService, userService, sessionService)
 
     // Routes
@@ -47,7 +47,10 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     mux.Handle("/api/category", categoryHandler)
     mux.Handle("/api/topic", topicHandler)
     mux.Handle("/api/post", postingHandler)
+
     mux.HandleFunc("/api/avatars", profileHandler.GetAvatarList)
+    mux.HandleFunc("/api/reactions", topicHandler.ReactOnAPost)
+    mux.HandleFunc("/api/myreactions", topicHandler.GetUserReactionsOnPost)
 
 
     // Assets

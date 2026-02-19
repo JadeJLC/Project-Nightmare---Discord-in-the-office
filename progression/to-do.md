@@ -15,17 +15,11 @@ Créer un forum officiel pour la licence Project Nightmare. Le forum doit :
 
 Comme dans le premier forum, il faut pouvoir :
 
-- _Like/dislike_
-
-### Interface utilisateur
-
-- Bouton retour arrière (ou arborescence) pour pouvoir revenir sur la page précédente
+- _Réagir à un message_
 
 ### Messages privés
 
-- Avoir les utilisateurs rangés dans l'ordre du dernier message (comme dans les MPs discord), et alphabétique pour ceux auquel aucun message n'a été envoyé
 - Afficher les 10 derniers messages de la conversation lorsque l'on clique sur un utilisateur, et afficher les précédents uniquement en scrollant (throttle, debounce, etc)
-- Envoyer des notifications en temps réel lorsque l'ont reçoit un nouveau message
 - (optionnel) "... est en train d'écrire"
 
 ### Bonus de l'audit
@@ -36,10 +30,6 @@ Comme dans le premier forum, il faut pouvoir :
 
 - _Possibilité d'envoyer des vidéos sur les messages (pour partager sa partie)_
 - _Section "streaming" pour partager son jeu en direct_
-
-### Barre de navigation
-
-- Bouton notifications
 
 ### _Panneau d'administration et modération_
 
@@ -57,11 +47,6 @@ Comme dans le premier forum, il faut pouvoir :
 - gofrs/uuid or google/uuid
 
 ## Tâches
-
-### Back
-
-- Gestion des notifications
-- Affichage des nouveaux messages privés en temps réel
 
 ### Front
 

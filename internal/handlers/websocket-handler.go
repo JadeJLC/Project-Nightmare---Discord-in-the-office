@@ -171,8 +171,8 @@ func (h *WebSocketHandler) handlePrivateMessage(from, to string, content string)
     }
     wsMutex.Unlock()
 
-    msgNotif := fmt.Sprintf("Nouveau message de %s", fromUser.Username)
-    h.handleNotifications(to, msgNotif, "")
+    msgNotif := fmt.Sprintf("<span class='notif-topic'>Nouveau message de %s</span>", fromUser.Username)
+    h.handleNotifications(to, msgNotif, fmt.Sprintf("[DM:%v]", from))
 }
 
 

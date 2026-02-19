@@ -16,7 +16,7 @@ func NewReactionRepo(db *sql.DB) *ReactionRepo {
 /*
 * Ajoute une réaction à la base de données
 */
-func (r *ReactionRepo) Add(postID, userID int, reaction string) error {
+func (r *ReactionRepo) Add(postID int, userID, reaction string) error {
 	_, err := r.db.Exec(`
 	INSERT INTO reactions (post_id, user_id, reaction_type)
 	VALUES (?, ?, ?)
@@ -27,35 +27,12 @@ func (r *ReactionRepo) Add(postID, userID int, reaction string) error {
 /*
 * Supprime une réaction de la base de données
 */
-func (r *ReactionRepo) Delete(postID, userID int) error {
+func (r *ReactionRepo) Delete(postID int, userID, reaction string) error {
     _, err := r.db.Exec(`
-        DELETE FROM reaction WHERE post_id = ? AND user_id ) ?
-    `, postID, userID)
+        DELETE FROM reactions 
+        WHERE post_id = ? AND user_id = ? AND reaction_type = ?
+    `, postID, userID, reaction)
     return err
-}
-
-/*
-* Récupère la liste de toutes les réactions sur un message particulier
-*/
-func (r *ReactionRepo) GetPostReactions(postID int) ([]*domain.Reaction, error) {
-	rows, err := r.db.Query(`SELECT user_id, reaction_type 
-    FROM reactions
-    WHERE post_id = ?`, postID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-    var reactions = []*domain.Reaction{}
-	reaction := &domain.Reaction{}
-	for rows.Next() {
-		if err := rows.Scan(&reaction.UserID, &reaction.Type); err != nil {
-			return nil, err
-		}
-		reactions = append(reactions, reaction)
-	}
-   
-    return reactions, nil
 }
 
 /*
@@ -63,31 +40,80 @@ func (r *ReactionRepo) GetPostReactions(postID int) ([]*domain.Reaction, error) 
 */
 func (r *ReactionRepo) GetUserReactions(userID string) ([]*domain.ReactionDisplay, error) {
 	rows, err := r.db.Query(`SELECT
-			r.post_id,
-			r.reaction_type,
-            m.topic_id,
-            m.content,
-            m.created_on,
-			u.username,
-            t.title
-        FROM reactions r
-		JOIN messages m ON r.post_id = m.post_id
-        JOIN users u ON m.author = u.user_id
-		JOIN topics t ON m.topic_id = t.topic_id
-		WHERE r.user_id = ?`, userID)
+		r.post_id,
+		r.reaction_type,
+		m.topic_id,
+		m.content,
+		m.created_on,
+		u.username,
+		t.title,
+		t.cat_id
+	FROM reactions r
+	JOIN messages m ON r.post_id = m.post_id
+	JOIN users u ON m.author = u.user_id
+	JOIN topics t ON m.topic_id = t.topic_id
+	WHERE r.user_id = ?`, userID)
 	if err != nil {
 		return nil, err
 	}
-
-	
 	defer rows.Close()
 
-    var reactions = []*domain.ReactionDisplay{}
-	reaction := &domain.ReactionDisplay{}
+	messageMap := make(map[int]*domain.ReactionDisplay)
 	for rows.Next() {
-		if err := rows.Scan(&reaction.PostID, &reaction.Type, &reaction.TopicID, &reaction.Content, &reaction.Time, &reaction.Author, &reaction.TopicTitle); err != nil {
+		var postID int
+		var reactionType string
+		var topicID, catID int
+		var content, createdOn, username, title string
+
+		if err := rows.Scan(&postID, &reactionType, &topicID, &content, &createdOn, &username, &title, &catID); err != nil {
 			return nil, err
 		}
+
+		if messageMap[postID] == nil {
+			messageMap[postID] = &domain.ReactionDisplay{
+				PostID:     postID,
+				UserID:     userID,
+				Author:     username,
+				Content:    content,
+				Time:       createdOn,
+				TopicTitle: title,
+				TopicID:    topicID,
+				CatID:      catID,
+				Reactions:  []string{},
+			}
+		}
+
+		messageMap[postID].Reactions = append(messageMap[postID].Reactions, reactionType)
+	}
+
+	var reactions []*domain.ReactionDisplay
+	for _, message := range messageMap {
+		reactions = append(reactions, message)
+	}
+
+	return reactions, nil
+}
+
+/*
+* Récupère la liste de toutes les réactions d'un utilisateur sur un message particulier
+*/
+func (r *ReactionRepo) GetUserReactionsOnPost(postID int, userID string) ([]*domain.Reaction, error) {
+	rows, err := r.db.Query(`SELECT reaction_type 
+    FROM reactions
+    WHERE post_id = ? AND user_id = ?`, postID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+    var reactions = []*domain.Reaction{}
+	for rows.Next() {
+	reaction := &domain.Reaction{}
+		if err := rows.Scan(&reaction.Type); err != nil {
+			return nil, err
+		}
+		reaction.PostID = postID
+		reaction.UserID = userID
 		reactions = append(reactions, reaction)
 	}
    

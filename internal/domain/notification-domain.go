@@ -14,6 +14,7 @@ type Notification struct {
 type NewNotif struct {
 	Type string `json:"notif_type"`
 	TopicID int `json:"topic_id"`
+	PostID int `json:"post_id"`
 	SenderName string `json:"sender_name"`
 	NotifMessage string `json:"message"`
 

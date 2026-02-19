@@ -44,7 +44,7 @@ function setHeaderListeners() {
     if (homeBtn) displayHome();
 
     const profileBtn = event.target.closest("#display-profile");
-    if (profileBtn) displayProfile(SessionData.username);
+    if (profileBtn) displayProfile(SessionData.username, "myprofile");
 
     const notifBtn = event.target.closest("#display-notifications");
     if (notifBtn) notifPopup();

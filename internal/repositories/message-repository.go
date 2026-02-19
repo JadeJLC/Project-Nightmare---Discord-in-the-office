@@ -61,8 +61,7 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
 	u.image,
 	u.inscription,
 	m.content, 
-	m.created_on, 
-	m.reactions
+	m.created_on
     FROM messages m
 	LEFT JOIN users u ON m.author = u.user_id
 	JOIN topics t ON m.topic_id = t.topic_id
@@ -85,8 +84,7 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
             &image, 
             &inscription, 
             &message.Content, 
-            &message.Time, 
-            &message.Reactions,
+            &message.Time,
         )
         if err != nil {
             return nil, err
@@ -101,10 +99,85 @@ func (r *MessageRepo) GetMessagesByTopic(topicID int) ([]*domain.Message, error)
             message.Author.Image = *image
             message.Author.Inscription = *inscription
         }
+
+		message.Reactions, err = r.GetMessageReactions(message.ID, message.Author.ID)
+
+        if err != nil {
+            return nil, err
+        }
+
 		messages = append(messages, message)
 	}
    
     return messages, nil
+}
+
+/*
+* Récupère la liste des réactions d'un message
+*/
+func (r *MessageRepo) GetMessageReactions(postID int, authorID string) ([]*domain.Reaction, error) {
+	rows, err := r.db.Query(`SELECT 
+	user_id,
+	reaction_type,
+	post_id
+    FROM reactions
+    WHERE post_id = ?`, postID)
+	if err != nil {
+		log.Print("Erreur dans la récupération des réactions : ", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+
+    var reactions = []*domain.Reaction{}
+	var invalidReactions = []*domain.Reaction{}
+	reactionMap := make(map[string]*domain.Reaction)
+	for rows.Next() {
+	reaction := &domain.Reaction{}
+
+	err := rows.Scan(
+            &reaction.UserID,
+			&reaction.Type,
+			&reaction.PostID,
+        )
+        if err != nil {
+            return nil, err
+        }
+
+		if reaction.UserID != authorID {
+			if reactionMap[reaction.Type] == nil {
+				reactionMap[reaction.Type] = reaction
+				reactionMap[reaction.Type].Count = 1
+			} else {
+				reactionMap[reaction.Type].Count += 1
+			}
+
+		} else {
+			invalidReactions = append(invalidReactions, reaction)
+		}
+	}
+
+	for _, reaction := range reactionMap {
+    reactions = append(reactions, reaction)
+	}
+
+	rows.Close()
+	r.RemoveInvalidReactions(invalidReactions)
+
+	return reactions, nil
+}
+
+func (r *MessageRepo) RemoveInvalidReactions(reactions []*domain.Reaction) {
+	for _, reaction := range reactions {
+		
+	_, err := r.db.Exec(`
+        DELETE FROM reactions WHERE post_id = ? AND user_id = ? AND reaction_type = ?
+        `, reaction.PostID, reaction.UserID, reaction.Type)
+
+        if err != nil {
+            log.Print(err)
+        }
+	}
 }
 
 /*
@@ -116,7 +189,6 @@ func (r *MessageRepo) GetMessagesByAuthor(author string) ([]*domain.Message, err
             m.topic_id,
             m.content,
             m.created_on,
-			m.reactions,
             t.title,
 			c.cat_id
         FROM messages m
@@ -132,7 +204,7 @@ func (r *MessageRepo) GetMessagesByAuthor(author string) ([]*domain.Message, err
     var messages = []*domain.Message{}
 	for rows.Next() {
 	message := &domain.Message{}
-		if err := rows.Scan(&message.ID, &message.TopicID, &message.Content, &message.Time, &message.Reactions, &message.TopicTitle, &message.CatID); err != nil {
+		if err := rows.Scan(&message.ID, &message.TopicID, &message.Content, &message.Time, &message.TopicTitle, &message.CatID); err != nil {
 			return nil, err
 		}
 		messages = append(messages, message)

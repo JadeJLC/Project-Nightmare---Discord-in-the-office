@@ -13,18 +13,18 @@ func NewReactionService(r *repositories.ReactionRepo) *ReactionService {
     return &ReactionService{repo: r}
 }
 
-func (s *ReactionService) AddReaction(postID, userID int, reaction string) error {
+func (s *ReactionService) AddReaction(postID int, userID string, reaction string) error {
 	return s.repo.Add(postID, userID, reaction)
 }
 
-func (s *ReactionService) DeleteReaction(postID, userID int) error {
-	return s.repo.Delete(postID, userID)
-}
-
-func (s *ReactionService) GetPostReactions(postID int) ([]*domain.Reaction, error) {
-	return s.repo.GetPostReactions(postID)
+func (s *ReactionService) DeleteReaction(postID int, userID, reaction string) error {
+	return s.repo.Delete(postID, userID, reaction)
 }
 
 func (s *ReactionService) GetUserReactions(userID string) ([]*domain.ReactionDisplay, error) {
 	return s.repo.GetUserReactions(userID)
+}
+
+func (s *ReactionService) GetUserReactionsOnPost(postID int, userID string) ([]*domain.Reaction, error) {
+	return s.repo.GetUserReactionsOnPost(postID, userID)
 }

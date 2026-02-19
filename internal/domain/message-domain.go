@@ -7,7 +7,7 @@ type Message struct {
 	Author User `json:"author"`
 	Content string `json:"content"`
 	Time string `json:"created_on"`
-	Reactions string `json:"reactions"`
+	Reactions []*Reaction `json:"reactions"`
 	TopicTitle string `json:"topic_title"`
 }
 
