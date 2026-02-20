@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -14,12 +13,14 @@ import (
 type ChatHandler struct {
     sessionService *services.SessionService
     chatService    *services.ChatService
+    adminService    *services.AdminService
 }
 
-func NewChatHandler(ss *services.SessionService, cs *services.ChatService) *ChatHandler {
+func NewChatHandler(ss *services.SessionService, cs *services.ChatService, as *services.AdminService) *ChatHandler {
     return &ChatHandler{
         sessionService: ss,
         chatService:    cs,
+        adminService:   as,
     }
 }
 
@@ -28,12 +29,12 @@ func (h *ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         if err == sql.ErrNoRows {
             logMsg := "ALERT : Tentative d'accès au chat par un utilisateur non connecté"
-            log.Print(logMsg)
+            h.adminService.SaveLogToDatabase(logMsg)
             http.Error(w, logMsg, http.StatusUnauthorized)
             return
         } else {
             logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des utilisateurs : %v", err)
-            log.Print(logMsg)
+            h.adminService.SaveLogToDatabase(logMsg)
             http.Error(w, logMsg, http.StatusInternalServerError)
             return
         }
@@ -50,7 +51,7 @@ func (h *ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     messages, err := h.chatService.GetDms(userID, otherID, offset, limit)
     if err != nil {
         logMsg := fmt.Sprintf("ERROR : Erreur dans le chargement des messages privés : %v", err)
-        log.Print(logMsg)
+        h.adminService.SaveLogToDatabase(logMsg)
         http.Error(w, logMsg, http.StatusInternalServerError)
         return
     }

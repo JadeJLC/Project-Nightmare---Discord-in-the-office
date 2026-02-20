@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
@@ -16,11 +15,12 @@ type CategoryHandler struct{
 	 messageService *services.MessageService
 	 categoryService services.CategoryService
 	 topicService *services.TopicService
+	 adminService *services.AdminService
 }
 
 
-func NewCategoryHandler(us *services.UserService, ms *services.MessageService, cs services.CategoryService, ts *services.TopicService) *CategoryHandler {
-    return &CategoryHandler{userService: us, messageService: ms, categoryService: cs, topicService: ts}
+func NewCategoryHandler(us *services.UserService, ms *services.MessageService, cs services.CategoryService, ts *services.TopicService, as *services.AdminService) *CategoryHandler {
+    return &CategoryHandler{userService: us, messageService: ms, categoryService: cs, topicService: ts, adminService: as}
 }
 
 /*
@@ -32,7 +32,7 @@ func (h *CategoryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	
 	if err != nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'ID de catégorie : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusBadRequest)
 		return
 	}
@@ -42,12 +42,12 @@ func (h *CategoryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	catInfo, err := h.categoryService.GetCategoryFromID(catID)
 	if err == sql.ErrNoRows {
 		logMsg := fmt.Sprintf("LOG : Tentative d'accès à une catégorie inexistante : %d", catID)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusNotFound)
 		return
 	} else if err != nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans l'ouverture de la catégorie : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
@@ -64,12 +64,12 @@ func (h *CategoryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		topic.PostList, err = h.messageService.GetMessagesByTopic(topic.ID)	
 		if len(topic.PostList) == 0 {
 			logMsg := fmt.Sprintf("ALERT : Aucun message trouvé sur le sujet %v. Vérifier ou supprimer le sujet.", topic.ID)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 			continue
 		}
 		if err != nil {
 			logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des messages du sujet %v : %v", topic.Title, err)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 			http.Error(w, logMsg, http.StatusInternalServerError)
 		}
 	}

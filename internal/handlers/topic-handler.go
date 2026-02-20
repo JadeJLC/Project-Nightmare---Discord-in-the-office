@@ -12,15 +12,16 @@ import (
 )
 
 type TopicHandler struct{
-	 messageService *services.MessageService
-	 topicService *services.TopicService
-	 reactionService *services.ReactionService
-	 sessionService *services.SessionService
+	 messageService 	*services.MessageService
+	 topicService 		*services.TopicService
+	 reactionService 	*services.ReactionService
+	 sessionService 	*services.SessionService
+	 adminService 		*services.AdminService
 }
 
 
-func NewTopicHandler(ms *services.MessageService, ts *services.TopicService, rs *services.ReactionService, ss *services.SessionService) *TopicHandler {
-    return &TopicHandler{messageService: ms, topicService: ts, reactionService: rs, sessionService: ss}
+func NewTopicHandler(ms *services.MessageService, ts *services.TopicService, rs *services.ReactionService, ss *services.SessionService, as *services.AdminService) *TopicHandler {
+    return &TopicHandler{messageService: ms, topicService: ts, reactionService: rs, sessionService: ss, adminService: as}
 }
 
 /*
@@ -31,8 +32,9 @@ func (h *TopicHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     topicID, err := strconv.Atoi(r.URL.Query().Get("topicID"))
 	postID, err2 := strconv.Atoi(r.URL.Query().Get("postID"))
 	if err != nil {
-		log.Print("Identifiant de sujet invalide : ", err)
-		http.Error(w, "Identifiant de sujet invalide", http.StatusNotFound)
+		logMsg := fmt.Sprintf("ERROR : Identifiant de sujet invalide : %v", err)
+		h.adminService.SaveLogToDatabase(logMsg)
+		http.Error(w, logMsg, http.StatusNotFound)
 	}
 	if err2 != nil {
 		postID = 0
@@ -43,12 +45,15 @@ func (h *TopicHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	
 	topicInfo, err := h.topicService.GetTopicById(topicID)
 	if err != nil {
-		log.Print("Erreur dans la récupération du sujet :", err)
 
 		if err == sql.ErrNoRows {
-		http.Error(w, "Ce sujet n'existe pas", http.StatusNotFound)
-		} else {
-			http.Error(w, "Erreur dans la récupération du sujet", http.StatusInternalServerError)
+		logMsg := fmt.Sprintf("LOG : Tentative d'accès à un sujet inexistant : %d", topicID)
+		h.adminService.SaveLogToDatabase(logMsg)
+		http.Error(w, logMsg, http.StatusNotFound)
+		} else if err != nil {
+		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération du sujet à afficher : %v", err)
+		h.adminService.SaveLogToDatabase(logMsg)
+			http.Error(w, logMsg, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -59,8 +64,9 @@ func (h *TopicHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	topicInfo.CurrentPost = postID
 	
     if err != nil || len(topicInfo.PostList) == 0 {
-		log.Print("Erreur dans le format du sujet : ", err)
-		http.Error(w, "Erreur dans le format du sujet", http.StatusInternalServerError)
+		logMsg := fmt.Sprintf("ERROR : Erreur dans le format du sujet : %v", err)
+		h.adminService.SaveLogToDatabase(logMsg)
+		http.Error(w, logMsg, http.StatusInternalServerError)
 	}
 	
     json.NewEncoder(w).Encode(topicInfo)
@@ -70,7 +76,9 @@ func (h *TopicHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *TopicHandler) ReactOnAPost(w http.ResponseWriter, r *http.Request) {
      files, err := os.ReadDir("./internal/templates/assets/images-reactions") 
     if err != nil {
-        http.Error(w, "Unable to read directory", http.StatusInternalServerError)
+		logMsg := fmt.Sprintf("Erreur dans la récupération des images de réaction : %v", err)
+		h.adminService.SaveLogToDatabase(logMsg)
+        http.Error(w, logMsg, http.StatusInternalServerError)
         return
     }
 
@@ -92,8 +100,9 @@ func (h *TopicHandler) ReactOnAPost(w http.ResponseWriter, r *http.Request) {
 	
 		postID, err := strconv.Atoi(r.URL.Query().Get("postID"))
 		if err != nil {
-			log.Print("Identifiant de sujet invalide : ", err)
-			http.Error(w, "Identifiant de sujet invalide", http.StatusNotFound)
+			logMsg := fmt.Sprintf("ERROR : Identifiant de sujet invalide : %v", err)
+			h.adminService.SaveLogToDatabase(logMsg)
+			http.Error(w, logMsg, http.StatusNotFound)
 		}
 		
 		reactionType := r.URL.Query().Get("reactionType")

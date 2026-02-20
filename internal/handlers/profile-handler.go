@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"real-time-forum/internal/domain"
@@ -11,15 +10,16 @@ import (
 )
 
 type ProfileHandler struct{
-     userService *services.UserService
-	 messageService *services.MessageService
-	 reactionService *services.ReactionService
-	 topicService *services.TopicService
+     userService        *services.UserService
+	 messageService     *services.MessageService
+	 reactionService    *services.ReactionService
+	 topicService       *services.TopicService
+     adminService   *services.AdminService
 }
 
 
-func NewProfileHandler(us *services.UserService, ms *services.MessageService, rs *services.ReactionService, ts *services.TopicService) *ProfileHandler {
-    return &ProfileHandler{userService: us, messageService: ms, reactionService: rs, topicService: ts}
+func NewProfileHandler(us *services.UserService, ms *services.MessageService, rs *services.ReactionService, ts *services.TopicService, as *services.AdminService) *ProfileHandler {
+    return &ProfileHandler{userService: us, messageService: ms, reactionService: rs, topicService: ts, adminService: as}
 }
 
 
@@ -36,7 +36,7 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     data, err := h.userService.GetProfile(profileUser, loggedUser)
     if err != nil {
         logMsg := fmt.Sprintf("LOG : Tentative d'accès au profil d'un utilisateur introuvable : %v", profileUser)
-        log.Print(logMsg)
+        h.adminService.SaveLogToDatabase(logMsg)
         http.Error(w, logMsg, http.StatusNotFound)
         return
     }
@@ -77,7 +77,7 @@ func (h *ProfileHandler) GetAvatarList(w http.ResponseWriter, r *http.Request) {
     files, err := os.ReadDir("./internal/templates/assets/images-avatar") 
     if err != nil {
         logMsg := fmt.Sprintf("Erreur dans la récupération de la liste des avatars : %v", err)
-        log.Print(logMsg)
+        h.adminService.SaveLogToDatabase(logMsg)
         http.Error(w, logMsg, http.StatusInternalServerError)
         return
     }

@@ -13,12 +13,13 @@ import (
 )
 
 type RegisterHandler struct {
-    userService *services.UserService
-    sessionService *services.SessionService
+    userService     *services.UserService
+    sessionService  *services.SessionService
+    adminService    *services.AdminService
 }
 
-func NewRegisterHandler(us *services.UserService, ss *services.SessionService) *RegisterHandler {
-    return &RegisterHandler{userService: us, sessionService: ss}
+func NewRegisterHandler(us *services.UserService, ss *services.SessionService, as *services.AdminService) *RegisterHandler {
+    return &RegisterHandler{userService: us, sessionService: ss, adminService: as}
 }
 
 /*
@@ -28,7 +29,7 @@ func NewRegisterHandler(us *services.UserService, ss *services.SessionService) *
 func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodPost {
         logMsg := fmt.Sprintf("ALERT : Tentative d'inscription avec une méthode non autorisée : %v", r.Method)
-        log.Print(logMsg)
+        h.adminService.SaveLogToDatabase(logMsg)
         http.Error(w, logMsg, http.StatusMethodNotAllowed)
         return
     }
@@ -58,7 +59,7 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     if mode == "edit" || mode == "avatar" {
        if !h.checkUserLoggedIn(w, r, newUser.Username) {
             logMsg := fmt.Sprintf("ALERT : Tentative de modification du profil d'un autre utilisateur.")
-            log.Print(logMsg)
+            h.adminService.SaveLogToDatabase(logMsg)
             http.Error(w, logMsg, http.StatusForbidden)
             return
         }
@@ -66,7 +67,7 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         if mode == "edit" {
         if err := h.userService.EditProfile(newUser); err != nil {
             logMsg := fmt.Sprintf("ERROR : Erreur dans la modification du profil : %v", err)
-            log.Print(logMsg)
+            h.adminService.SaveLogToDatabase(logMsg)
             http.Error(w, logMsg, http.StatusInternalServerError)
             return
             }
@@ -77,7 +78,7 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
             if err := h.userService.EditAvatar(newUser.Username, image); err != nil {
             logMsg := fmt.Sprintf("ERROR : Erreur dans la modification de l'image de profil : %v", err)
-            log.Print(logMsg)
+            h.adminService.SaveLogToDatabase(logMsg)
             http.Error(w, logMsg, http.StatusInternalServerError)
             return
             }
@@ -86,7 +87,7 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     } else  {
         if err := h.userService.Register(&newUser); err != nil {
             logMsg := fmt.Sprintf("ERROR : Erreur dans l'inscription d'un nouvel utilisateur : %v", err)
-            log.Print(logMsg)
+            h.adminService.SaveLogToDatabase(logMsg)
             http.Error(w, err.Error(), http.StatusBadRequest)
             return
         }

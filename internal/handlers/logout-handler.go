@@ -2,19 +2,19 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"real-time-forum/internal/services"
 	"time"
 )
 
 type LogoutHandler struct {
-    userService *services.UserService
-	sessionService *services.SessionService
+    userService 	*services.UserService
+	sessionService 	*services.SessionService
+	adminService 	*services.AdminService
 }
 
-func NewLogoutHandler(us *services.UserService, ss *services.SessionService) *LogoutHandler {
-    return &LogoutHandler{userService: us, sessionService: ss}
+func NewLogoutHandler(us *services.UserService, ss *services.SessionService, as *services.AdminService) *LogoutHandler {
+    return &LogoutHandler{userService: us, sessionService: ss, adminService: as}
 }
 
 /*
@@ -28,7 +28,7 @@ func (h *LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.sessionService.DeleteSession(cookie.Value) 
 	} else {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération du cookie pour la déconnexion : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 	}
 	
