@@ -27,7 +27,7 @@ func (h *LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	// Supprime le cookie côté client
 	http.SetCookie(w, &http.Cookie{
-		Name:     "auth_token", // adapte au nom réel de ton cookie
+		Name:     "auth_token",
 		Value:    "",
 		Path:     "/",
 		Expires:  time.Unix(0, 0),
@@ -37,10 +37,6 @@ func (h *LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteStrictMode,
 	})
 
-	
-
-	// Si tu as un service de session, tu peux invalider ici :
-	// h.service.Logout(token)
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"success": true, "message": "Déconnecté"}`))

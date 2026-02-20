@@ -20,7 +20,7 @@ func NewConversationHandler(ss *services.SessionService, cs *services.ChatServic
 }
 
 func (h *ConversationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	userID, err := h.sessionService.GetUserIDFromRequest(r)
+	userID, _, err := h.sessionService.GetUserIDFromRequest(r)
 	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"real-time-forum/internal/domain"
 	"time"
@@ -31,11 +32,76 @@ func (r *MessageRepo) Create(topicID int, content string, userID string) error {
 /*
 * Supprime le message demandé de la base de données
 */
-func (r *MessageRepo) Delete(postID int) error {
-    _, err := r.db.Exec(`
-        DELETE FROM messages WHERE post_id = ?
-    `, postID)
+func (r *MessageRepo) Delete(topicID, postID int, mode, user string) error {
+
+	logMsg := ""
+	content := ""
+	var err error
+
+    if mode == "MEMBER" || mode == "MODO" {
+		logMsg, content, err = r.SaveDeleteMessage(mode, user, topicID, postID)
+		if err != nil {
+			return err
+		}
+    }
+
+    result, err := r.db.Exec(`
+        DELETE FROM messages WHERE post_id = ? AND topic_id = ?
+    `, postID, topicID)
+
+	count, _ := result.RowsAffected()
+	if count == 0 {
+    return sql.ErrNoRows 
+	}
+    
+    if err != nil {
+        return err
+    }
+
+	if logMsg != "" {
+		err := r.LogDeletion(logMsg, mode, content)
+		if err != nil {
+        return err
+    	}
+	}
+
     return err
+} 
+
+func (r *MessageRepo) SaveDeleteMessage(mode, user string, topicID, postID int) (string, string, error) {
+	var posterName, content string
+	err := r.db.QueryRow(`
+            SELECT u.username, m.content
+            FROM messages m
+            JOIN users u ON m.author = u.user_id
+            WHERE m.topic_id = ? AND m.post_id = ?
+        `, topicID, postID).Scan(&posterName, &content)
+        
+        if err != nil {
+            return "", "", err
+        }
+
+		role := "membre"
+
+		if mode == "MODO" {
+			role = "modérateur"
+		}
+
+		content = fmt.Sprintf("[TOPIC:%d][POST:%d][MESSAGE:%v]", topicID, postID, content)
+
+        logMsg := fmt.Sprintf("Le %s %s a supprimé un message de %s.", role, user, posterName)
+
+		return logMsg, content, err
+        
+}
+
+func (r *MessageRepo) LogDeletion(logMsg, mode, content string) error {
+        _, err := r.db.Exec(`
+		    INSERT INTO logs (type, message, data)
+            VALUES (?, ?, ?)
+        `, mode, logMsg, content)
+        
+            return err
 }
 
 /*
@@ -160,8 +226,6 @@ func (r *MessageRepo) GetMessageReactions(postID int, authorID string) ([]*domai
 	}
 
 	for _, reaction := range reactionMap {
-	log.Print(authorID)
-	log.Print(reaction.UserID)
     reactions = append(reactions, reaction)
 	}
 

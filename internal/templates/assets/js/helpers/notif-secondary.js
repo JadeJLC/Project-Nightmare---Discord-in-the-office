@@ -53,7 +53,6 @@ export function setNotificationLinks(notifWindow) {
       const parentItem = seeMessage.closest(".notif-item");
       if (parentItem) {
         const notiftype = parentItem.dataset.type;
-        console.log(notiftype);
         switch (notiftype) {
           case "seepost":
             const topicID = parentItem.dataset.topicid;

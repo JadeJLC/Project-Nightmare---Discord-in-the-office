@@ -96,7 +96,7 @@ func (h *RegisterHandler) checkUserLoggedIn(w http.ResponseWriter, r *http.Reque
     }
 
     targetUser, err := h.userService.GetUserByUsername(targetUsername)
-    sessionUserID, err2 := h.sessionService.GetUserID(cookie.Value)
+    sessionUserID, _, err2 := h.sessionService.GetUserID(cookie.Value)
 
 
     if err != nil || err2 != nil {

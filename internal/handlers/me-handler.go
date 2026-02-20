@@ -50,5 +50,6 @@ func (h *MeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         "logged":   true,
         "username": user.Username,
         "image": user.Image,
+        "role" : user.Role,
     })
 }

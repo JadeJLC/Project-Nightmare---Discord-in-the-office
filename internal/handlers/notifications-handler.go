@@ -25,7 +25,7 @@ func NewNotificationHandler(ss *services.SessionService, ns *services.Notificati
 
 
 func (h *NotificationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	userID, err := h.sessionService.GetUserIDFromRequest(r)
+	userID, _, err := h.sessionService.GetUserIDFromRequest(r)
 	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
@@ -74,7 +74,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
         return
     	}
 
-		userID, err := h.sessionService.GetUserIDFromRequest(r)
+		userID, _, err := h.sessionService.GetUserIDFromRequest(r)
 
 		if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -94,7 +94,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
         return
     	}
 
-		userID, err := h.sessionService.GetUserIDFromRequest(r)
+		userID, _, err := h.sessionService.GetUserIDFromRequest(r)
 
 		if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)

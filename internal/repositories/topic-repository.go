@@ -32,12 +32,18 @@ func (r *TopicRepo) Create(catID int, title, authorId string) error {
 }
 
 /*
-* Supprime un sujet de la base de données
+* Supprime un sujet et tous les messages associés de la base de données
 */
 func (r *TopicRepo) Delete(topicID int) error {
-    _, err := r.db.Exec(`
+    result, err := r.db.Exec(`
         DELETE FROM topics WHERE topic_id = ?
     `, topicID)
+
+	count, _ := result.RowsAffected()
+	if count == 0 {
+    return sql.ErrNoRows 
+	}
+
     return err
 }
 

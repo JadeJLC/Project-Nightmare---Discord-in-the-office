@@ -11,6 +11,7 @@ type User struct {
 	Gender      string `json:"genre"`
 	Image       string `json:"image"`
 	Inscription string `json:"inscription"`
+	Role        int    `json:"role"`
 }
 
 type UserRepository interface {

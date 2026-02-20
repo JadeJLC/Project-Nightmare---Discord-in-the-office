@@ -117,7 +117,7 @@ func (h *TopicHandler) getUserIDFromSession(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "Non connecté", http.StatusUnauthorized)
     }
 
-	userID, _ := h.sessionService.GetUserID(cookie.Value)
+	userID, _, _ := h.sessionService.GetUserID(cookie.Value)
 
 	return userID
 }
@@ -142,6 +142,4 @@ func (h *TopicHandler) GetUserReactionsOnPost(w http.ResponseWriter, r *http.Req
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(reactionList)
 
-
-   
 }

@@ -32,10 +32,12 @@ export async function checkLoginStatus() {
       SessionData.isLogged = true;
       SessionData.username = data.username;
       SessionData.image = data.image;
+      SessionData.role = data.role;
     } else {
       SessionData.isLogged = false;
       SessionData.username = null;
       SessionData.image = null;
+      SessionData.role = 0;
     }
   } catch (err) {
     console.error("Erreur lors de la vérification de session :", err);

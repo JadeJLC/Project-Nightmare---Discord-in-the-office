@@ -124,6 +124,12 @@ function setTopicLinks(topicsPageContainer, catID, topicID) {
       editMessage(topicID, postID, postContent);
     }
 
+    const deleteBtn = event.target.closest(".delete-message");
+    if (deleteBtn) {
+      const postID = deleteBtn.dataset.postid;
+      deleteMessage(topicID, postID, catID);
+    }
+
     const reactImg = event.target.closest(".reaction-bloc");
     if (reactImg) {
       const reactionType = reactImg.dataset.rtype;
@@ -156,11 +162,16 @@ async function buildPostHTML(post, index) {
   const isFirst = index === 0;
   let editBtn;
   let reactBtn;
+  let deleteBtn;
 
-  if (post.author.username === SessionData.username) {
+  if (post.author.username === SessionData.username || SessionData.role === 1) {
     editBtn = `<button type="button" class="edit-content edit-message" id="confirm-edit" data-postid="${post.post_id}">
           <img src="assets/images/tool.svg" />
-          <span>Modifier mon<br> message</span>
+          <span>Modifier le<br> message</span>
+        </button>`;
+    deleteBtn = `<button type="button" class="edit-content delete-message" id="confirm-delete" data-postid="${post.post_id}">
+          <img src="assets/images/trash.svg" />
+          <span>Supprimer le<br> message</span>
         </button>`;
   }
 
@@ -179,10 +190,11 @@ async function buildPostHTML(post, index) {
         
         <div class="post-left">
         <div class="post-buttons">${editBtn ? `${editBtn}` : ""}
+        ${deleteBtn ? `${deleteBtn}` : ""}
         ${reactBtn ? `${reactBtn}` : ""} </div>
           <div class="post-date">Message du ${post.created_on}</div>
           <div class="post-message">${post.content}</div>
-          ${postReactions ? `${postReactions}` : ""}
+          <div class="post-reactions">${postReactions ? `${postReactions}` : ""}</div>
         </div>
 
         <div class="post-right">
@@ -202,4 +214,66 @@ async function buildPostHTML(post, index) {
         
       </div>
     </div>`;
+}
+
+function deleteConfirmation() {
+  return new Promise((resolve) => {
+    const popup = document.createElement("div");
+    popup.id = "opened-popup";
+    popup.className = "profile-popup-overlay";
+
+    popup.innerHTML = `
+      <div class="profile-popup">
+        <h3>Voulez-vous vraiment supprimer ce message ?</h3>
+        <div class="profile-popup-actions">
+          <button id="profile-popup-cancel">Annuler</button>
+          <button id="profile-popup-send">Confirmer</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    popup.addEventListener("click", (event) => {
+      const confirmBtn = event.target.closest("#profile-popup-send");
+      if (confirmBtn) {
+        popup.remove();
+        resolve(true);
+      }
+
+      const cancelBtn =
+        event.target.closest("#profile-popup-cancel") || event.target === popup;
+      if (cancelBtn) {
+        popup.remove();
+        resolve(false);
+      }
+    });
+  });
+}
+
+async function deleteMessage(topicID, postID, catID) {
+  const confirmed = await deleteConfirmation();
+
+  if (!confirmed) return;
+
+  try {
+    const response = await fetch(
+      `/api/post?mode=delete&topicID=${topicID}&postID=${postID}&user=${SessionData.username}`,
+    );
+    if (!response.ok) {
+      displayError(response.status);
+      return;
+    }
+
+    const result = await response.json();
+
+    if (result.topicDeleted) {
+      displayTopics(catID);
+    } else {
+      displayPosts(topicID);
+    }
+  } catch (e) {
+    console.log("Erreur dans la suppression du message");
+    displayError(500);
+  }
 }
