@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"real-time-forum/internal/services"
@@ -42,8 +43,9 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         }
 
         if err != nil {
-            log.Print(err)
-            http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+            logMsg := fmt.Sprintf("ERROR : Erreur dans le chargement de la page d'accueil : %v", err)
+            log.Print(logMsg)
+            http.Error(w, logMsg, http.StatusInternalServerError)
             return
         }
 

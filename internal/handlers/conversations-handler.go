@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
@@ -22,18 +24,20 @@ func NewConversationHandler(ss *services.SessionService, cs *services.ChatServic
 func (h *ConversationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	userID, _, err := h.sessionService.GetUserIDFromRequest(r)
 	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'utilisateur connecté : %v", err)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusUnauthorized)
 		return
 	}
 
 	convs, err := h.chatService.GetConversations(userID)
 	if err != nil {
-		log.Print("Erreur dans le chargement de la conversation : ", err)
-		http.Error(w, "Error loading conversations", http.StatusInternalServerError)
+		logMsg := fmt.Sprintf("ERROR : Erreur dans le chargement des conversations de l'utilisateur : %v", err)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
 
-	// enrichir avec infos utilisateur
 	type ConvResponse struct {
 		OtherUser domain.User `json:"otherUser"`
 		LastAt    time.Time   `json:"lastMessageAt"`
@@ -48,14 +52,15 @@ func (h *ConversationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		}
 
 		otherUser, err := h.userService.GetUserByID(otherID)
-		if err != nil {
-			log.Println("Erreur GetUserByID:", err)
-			http.Error(w, "Error loading user", http.StatusInternalServerError)
+		if err == sql.ErrNoRows {
+			logMsg := fmt.Sprintf("LOG : L'utilisateur est introuvable ou la conversation inexistante : %v - %v", userID, otherID)
+			log.Print(logMsg)
+			http.Error(w, logMsg, http.StatusNotFound)
 			return
-		}
-		if otherUser == nil {
-			log.Println("Utilisateur introuvable:", otherID)
-			http.Error(w, "User not found", http.StatusNotFound)
+		} else if err != nil {
+			logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'autre utilisateur de la conversation : %v", err)
+			log.Print(logMsg)
+			http.Error(w, logMsg, http.StatusInternalServerError)
 			return
 		}
 
@@ -63,9 +68,7 @@ func (h *ConversationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			OtherUser: *otherUser,
 			LastAt:    c.LastMessageAt,
 		})
-
 	}
-
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)

@@ -59,11 +59,14 @@ export async function openConversation(otherUserId) {
   DMstate.lastDMTime = null;
   DMstate.loggedUserID = otherUserId;
 
-  const res = await fetch(`/api/dm?user=${otherUserId}&limit=10`); // Increased limit slightly
+  const res = await fetch(`/api/dm?user=${otherUserId}&limit=10`);
   const messages = await res.json();
 
   const msgContainer = document.getElementById("dm-messages");
   msgContainer.innerHTML = "";
+
+  const existingInput = document.querySelector(".dm-input");
+  if (existingInput) existingInput.remove();
 
   if (messages.length === 0) {
     document.getElementById("dm-empty").style.display = "block";
@@ -105,7 +108,9 @@ export async function openConversation(otherUserId) {
     if (e.key === "Enter") sendMessage();
   });
 
-  msgContainer.appendChild(div);
+  const DMcontainer = document.getElementById("dm-content");
+
+  DMcontainer.appendChild(div);
   pageData.ConversationWith = `${otherUserId}`;
 
   msgContainer.scrollTop = msgContainer.scrollHeight;
@@ -122,6 +127,9 @@ export function closeConversation() {
   DMstate.lastSenderID = null;
   DMstate.lastGroup = null;
   DMstate.lastDMTime = null;
+
+  const existingInput = document.querySelector(".dm-input");
+  if (existingInput) existingInput.remove();
 }
 
 /**
@@ -131,7 +139,6 @@ export function closeConversation() {
  */
 export function displayDM(msg) {
   const container = document.getElementById("dm-messages");
-  const inputBar = document.querySelector(".dm-input");
 
   const senderId = msg.sender_id;
   const username = msg.sender_username;
@@ -159,21 +166,18 @@ export function displayDM(msg) {
     const timeStr = formatDMTime(msg.created_at);
 
     DMstate.lastGroup.innerHTML = `
-      <span class="dm-time">${timeStr}</span>
       <div class="dm-header">
         <div class="reduced-avatar">
           <img src="assets/images-avatar/${msg.sender_image}.png">
         </div>
-        <div class="dm-author">${username}</div>
+        <div><div class="dm-author">${username}</div>
+        <span class="dm-time">${timeStr}</span></div>
       </div>
+      
       <div class="dm-content">${decodeHTML(msg.content)}</div>
     `;
 
-    if (inputBar) {
-      container.insertBefore(DMstate.lastGroup, inputBar);
-    } else {
-      container.appendChild(DMstate.lastGroup);
-    }
+    container.appendChild(DMstate.lastGroup);
   }
 
   DMstate.lastSenderID = senderId;

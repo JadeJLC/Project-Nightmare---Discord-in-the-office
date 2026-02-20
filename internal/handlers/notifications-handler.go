@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -26,15 +27,15 @@ func NewNotificationHandler(ss *services.SessionService, ns *services.Notificati
 
 func (h *NotificationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	userID, _, err := h.sessionService.GetUserIDFromRequest(r)
-	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	if err != nil && err != sql.ErrNoRows {
 		return
 	}
 
 	notifications, err := h.notifService.GetNotificationList(userID)
 	if err != nil {
-		log.Print("Erreur dans le chargement des notifications : ", err)
-		http.Error(w, "Error loading notifications", http.StatusInternalServerError)
+		logMSg := fmt.Sprintf("ERROR : Erreur dans le chargement des notifications : %v", err)
+		log.Print(logMSg)
+		http.Error(w, logMSg, http.StatusInternalServerError)
 		return
 	}
 
@@ -49,8 +50,9 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 		notifID, err := strconv.Atoi(r.URL.Query().Get("notifID"))
 
 		if err != nil {
-		log.Print("Données invalides : ", err)
-        http.Error(w, "Données invalides", http.StatusBadRequest)
+		logMsg := fmt.Sprintf("ERROR : Données de la notification invalides (%v) : %v", mode, err)
+		log.Print(logMsg)
+        http.Error(w, logMsg, http.StatusBadRequest)
         return
     	}
 
@@ -69,87 +71,78 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 		topicID, err := strconv.Atoi(r.URL.Query().Get("topicID"))
 
 		if err != nil {
-		log.Print("Données invalides : ", err)
-        http.Error(w, "Données invalides", http.StatusBadRequest)
-        return
+			logMsg := fmt.Sprintf("ERROR : Données de la notification invalides (%v) : %v", mode, err)
+			log.Print(logMsg)
+        	http.Error(w, logMsg, http.StatusBadRequest)
+        	return
     	}
 
 		userID, _, err := h.sessionService.GetUserIDFromRequest(r)
 
 		if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
+			logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'utilisateur pour unfollow : %v", err)
+			log.Print(logMsg)
+			http.Error(w, logMsg, http.StatusUnauthorized)
+			return
 		}
 
 		h.topicService.UnfollowTopic(userID, topicID)
 		return
 	}
 
-	if mode == "follow" {
-		topicID, err := strconv.Atoi(r.URL.Query().Get("topicID"))
-
-		if err != nil {
-		log.Print("Données invalides : ", err)
-        http.Error(w, "Données invalides", http.StatusBadRequest)
-        return
-    	}
-
-		userID, _, err := h.sessionService.GetUserIDFromRequest(r)
-
-		if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-		}
-
-		h.topicService.FollowTopic(userID, topicID)
-		return
-
-	}
-
 	var notifData domain.NewNotif
 	
     if err := json.NewDecoder(r.Body).Decode(&notifData); err != nil {
-		log.Print("Données invalides : ", err)
-        http.Error(w, "Données invalides", http.StatusBadRequest)
+		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des données de notification' : %v", err)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusBadRequest)
         return
     }
 
-	if notifData.Type == "newreply"  {
-		if r.Method != http.MethodPost {
-        http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
-        return
-    }
+	// if notifData.Type == "newreply"  {
+	// 	if r.Method != http.MethodPost {
+	// 	logMsg := fmt.Sprintf("ERROR : Méthode non autorisée pour l'envoi d'un nouveau message.")
+	// 	log.Print(logMsg)
+    //     http.Error(w, logMsg, http.StatusMethodNotAllowed)
+    //     return
+    // }
 
-		sender, err := h.userService.GetUserByUsername(notifData.SenderName)
-		if err !=nil {
-			log.Print("Erreur dans la récupération de l'envoyeur : ", notifData.SenderName, " - ", err)
-			http.Error(w, "Erreur récupération sender", http.StatusInternalServerError)
-			return
-		}
+	sender, err := h.userService.GetUserByUsername(notifData.SenderName)
+	if err !=nil {
+		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'envoyeur de la notification : %v - %v ", notifData.SenderName, err)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusInternalServerError)
+		return
+	}
 
-		if notifData.Type == "newreply" {
+	if notifData.Type == "newreply" {
 		topicPosts, err := h.messageService.GetMessagesByTopic(notifData.TopicID)
 		if err !=nil {
-			log.Print("Erreur dans la récupération du lien du post : ", err)
-			http.Error(w, "Erreur récupération sender", http.StatusInternalServerError)
+			logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération du lien du post : %v", err)
+			log.Print(logMsg)
+			http.Error(w, logMsg, http.StatusInternalServerError)
 			return
 		}
 
 		lastPost := topicPosts[len(topicPosts)-1]
-
 		
 		data := fmt.Sprintf("[TOPIC:%v][POST:%v][USER:%v]", notifData.TopicID, lastPost.ID, notifData.SenderName)
 		h.notifService.GetTopicUsersToNotify(notifData.TopicID, sender.ID, notifData.NotifMessage, data)
 
-		users, _ := h.notifService.GetTopicUsersToNotify(notifData.TopicID, sender.ID, notifData.NotifMessage, data)
+		users, err := h.notifService.GetTopicUsersToNotify(notifData.TopicID, sender.ID, notifData.NotifMessage, data)
+		if err != nil {
+			logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de la liste des utilisateurs à notifier : %v", err)
+			log.Print(logMsg)
+			return
+		}
 		for _, u := range users {
 			h.wsHandler.SendTopicNotification(
-				u,
-				notifData.NotifMessage,
-				data,
+			u,
+			notifData.NotifMessage,
+			data,
 			)
 		}
 	}
-
-	}
+	// }
 }
+	

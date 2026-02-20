@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"real-time-forum/internal/domain"
@@ -33,7 +35,9 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     data, err := h.userService.GetProfile(profileUser, loggedUser)
     if err != nil {
-        http.Error(w, "User not found", http.StatusNotFound)
+        logMsg := fmt.Sprintf("LOG : Tentative d'accès au profil d'un utilisateur introuvable : %v", profileUser)
+        log.Print(logMsg)
+        http.Error(w, logMsg, http.StatusNotFound)
         return
     }
 
@@ -72,7 +76,9 @@ func (h *ProfileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *ProfileHandler) GetAvatarList(w http.ResponseWriter, r *http.Request) {
     files, err := os.ReadDir("./internal/templates/assets/images-avatar") 
     if err != nil {
-        http.Error(w, "Unable to read directory", http.StatusInternalServerError)
+        logMsg := fmt.Sprintf("Erreur dans la récupération de la liste des avatars : %v", err)
+        log.Print(logMsg)
+        http.Error(w, logMsg, http.StatusInternalServerError)
         return
     }
 

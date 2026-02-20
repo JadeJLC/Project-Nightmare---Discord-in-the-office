@@ -41,22 +41,18 @@ func NewWebSocketHandler(ss *services.SessionService, cs *services.ChatService, 
 }
 
 func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	
     userID, _, err := h.sessionService.GetUserIDFromRequest(r)
-
     if err != nil {
-        http.Error(w, "Unauthorized", http.StatusUnauthorized)
         return
     }
 
-    // 2. Upgrade HTTP → WebSocket
     conn, err := h.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Print("WS upgrade error:", err)
-		http.Error(w, "WebSocket upgrade failed", http.StatusInternalServerError)
+        logMsg := fmt.Sprintf("ERROR : Erreur dans la mise en place du WebSocket : %v", err)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
-
 
     wsMutex.Lock()
     wsClients[userID] = conn
@@ -123,7 +119,6 @@ func (h *WebSocketHandler) broadcastPresence() {
 
 
 func (h *WebSocketHandler) handlePrivateMessage(from, to string, content string) {
-    // 1. Construire le message
     now := time.Now()
     dm := domain.DM{
         SenderID:   from,
@@ -132,15 +127,16 @@ func (h *WebSocketHandler) handlePrivateMessage(from, to string, content string)
         CreatedAt:  now,
     }
 
-    // 2. Sauvegarde en DB
     if err := h.chatService.SaveDM(dm); err != nil {
-        fmt.Println("Error saving DM:", err)
+        logMsg := fmt.Sprintf("ERROR : Erreur dans la sauvegarde du message privé : %v", err)
+        log.Print(logMsg)
         return
     }
 
     // 3. Mise à jour de la conversation
     if err := h.chatService.UpdateConversation(from, to); err != nil {
-        fmt.Println("Error updating conversation:", err)
+        logMsg := fmt.Sprintf("ERROR : Erreur dans la mise à jour de la conversation : %v", err)
+        log.Print(logMsg)
     }
 
     fromUser, _ := h.userService.GetUserByID(from)
@@ -158,14 +154,11 @@ func (h *WebSocketHandler) handlePrivateMessage(from, to string, content string)
     "created_at":       now.Format(time.RFC3339),
     }
 
-
-    // 5. Envoi temps réel au destinataire
     wsMutex.Lock()
     if conn, ok := wsClients[to]; ok {
         conn.WriteJSON(outgoing)
     }
 
-    // 6. Envoi temps réel à l’expéditeur
     if conn, ok := wsClients[from]; ok {
         conn.WriteJSON(outgoing)
     }
@@ -179,13 +172,12 @@ func (h *WebSocketHandler) handlePrivateMessage(from, to string, content string)
 func (h *WebSocketHandler) handleNotifications(receiverID, message, data string) {
     currentTime := time.Now().Format("02/01/2006 à 15:04:05")
 
-    // 1. Sauvegarde en BDD
     if err := h.notifService.AddNotification(receiverID, message, data); err != nil {
-        fmt.Println("Erreur dans la sauvegarde de la notification :", err)
+        logMsg := fmt.Sprintf("Erreur dans la sauvegarde de la notification de message privé : %v", err)
+        log.Print(logMsg)
         return
     }
 
-    // 2. Construction du message WebSocket
     outgoing := map[string]interface{}{
         "type":          "notification",
         "receiver_id":   receiverID,
@@ -195,7 +187,7 @@ func (h *WebSocketHandler) handleNotifications(receiverID, message, data string)
         "data":          data,
     }
 
-    // 3. Envoi temps réel si l’utilisateur est connecté
+    // Envoi en temps réel si l’utilisateur est connecté
     wsMutex.Lock()
     if conn, ok := wsClients[receiverID]; ok {
         conn.WriteJSON(outgoing)

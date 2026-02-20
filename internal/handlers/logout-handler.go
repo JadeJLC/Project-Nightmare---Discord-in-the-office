@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"real-time-forum/internal/services"
 	"time"
@@ -24,8 +26,12 @@ func (h *LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("auth_token") 
 	if err == nil { 
 		h.sessionService.DeleteSession(cookie.Value) 
+	} else {
+		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération du cookie pour la déconnexion : %v", err)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusInternalServerError)
 	}
-	// Supprime le cookie côté client
+	
 	http.SetCookie(w, &http.Cookie{
 		Name:     "auth_token",
 		Value:    "",

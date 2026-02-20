@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -90,31 +91,32 @@ func (h *TopicHandler) ReactOnAPost(w http.ResponseWriter, r *http.Request) {
 	if mode == "add" || mode == "remove" {
 	
 		postID, err := strconv.Atoi(r.URL.Query().Get("postID"))
-	if err != nil {
-		log.Print("Identifiant de sujet invalide : ", err)
-		http.Error(w, "Identifiant de sujet invalide", http.StatusNotFound)
-	}
-	reactionType := r.URL.Query().Get("reactionType")
-	userID := h.getUserIDFromSession(w, r)
+		if err != nil {
+			log.Print("Identifiant de sujet invalide : ", err)
+			http.Error(w, "Identifiant de sujet invalide", http.StatusNotFound)
+		}
+		
+		reactionType := r.URL.Query().Get("reactionType")
+		userID := h.getUserIDFromSession(w, r)
 
-	switch mode {
-	case "add" :
-		h.reactionService.AddReaction(postID, userID, reactionType)
-		return
-	case "remove":
-		h.reactionService.DeleteReaction(postID, userID, reactionType)
-		return
-	}
+		switch mode {
+		case "add" :
+			h.reactionService.AddReaction(postID, userID, reactionType)
+			return
+		case "remove":
+			h.reactionService.DeleteReaction(postID, userID, reactionType)
+			return
+		}
 
 	}
-
 }
 
 func (h *TopicHandler) getUserIDFromSession(w http.ResponseWriter, r *http.Request) string {
-	 cookie, err := r.Cookie("auth_token")
+	cookie, err := r.Cookie("auth_token")
     if err != nil {
-		log.Print(err)
-		http.Error(w, "Non connecté", http.StatusUnauthorized)
+		logMsg := fmt.Sprintf("LOG : Erreur dans la récupération du cookie pour l'accès au sujet : %v", err)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusUnauthorized)
     }
 
 	userID, _, _ := h.sessionService.GetUserID(cookie.Value)
@@ -123,23 +125,24 @@ func (h *TopicHandler) getUserIDFromSession(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *TopicHandler) GetUserReactionsOnPost(w http.ResponseWriter, r *http.Request) {
-	 postID, err := strconv.Atoi(r.URL.Query().Get("postID"))
+	postID, err := strconv.Atoi(r.URL.Query().Get("postID"))
     if err != nil {
-		log.Print("Erreur dans la récupération du post : ", err)
-        http.Error(w, "Erreur dans la récupération du post", http.StatusInternalServerError)
+		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'ID du post : %v", err)
+		log.Print(logMsg)
+        http.Error(w, logMsg, http.StatusNotFound)
         return
     }
 
 	userID := h.getUserIDFromSession(w, r)
 
-   reactionList, err := h.reactionService.GetUserReactionsOnPost(postID,userID)
-   if err != nil && err != sql.ErrNoRows {
-	log.Print("Erreur dans la récupération des réactions de l'utilisateur : ", err)
-        http.Error(w, "Erreur dans la récupération des réactions de l'utilisateur", http.StatusInternalServerError)
+   	reactionList, err := h.reactionService.GetUserReactionsOnPost(postID,userID)
+   	if err != nil && err != sql.ErrNoRows {
+		logMsg := fmt.Sprintf("Erreur dans la récupération des réactions de l'utilisateur : %v", err)
+		log.Print(logMsg)
+        http.Error(w, logMsg, http.StatusInternalServerError)
         return
-   }
+   	}
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(reactionList)
-
 }

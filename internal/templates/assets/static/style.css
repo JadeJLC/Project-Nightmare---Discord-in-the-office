@@ -1562,14 +1562,25 @@ u {
   height: auto;
 }
 
+.dm-flex {
+  display: flex;
+}
+
 .dm-messages {
-  width: 70%;
+  width: 90%;
   max-width: 1200px;
   margin: auto;
+  height: 60vh;
+  overflow: auto;
+}
+
+.dm-sidebar {
+  width: 180px;
+  flex-shrink: 0;
 }
 
 .dm-group {
-  width: 90%;
+  width: 80%;
   padding: 10px;
   margin: 20px 0;
   position: relative;
@@ -1583,7 +1594,6 @@ u {
 }
 
 .dm-group.mine {
-  margin-left: -5%;
   border-radius: 15px;
   border-bottom-left-radius: 0px;
   background-color: var(--fond-categ);
@@ -1595,12 +1605,16 @@ u {
 
 .dm-header {
   display: flex;
+}
+
+.theirs .dm-header {
+  float: right;
   margin-bottom: 20px;
 }
 
 .dm-content {
-  padding-left: 20px;
-  padding-bottom: 20px;
+  width: 100%;
+  margin-top: 30px;
 }
 
 .dm-author {
@@ -1612,13 +1626,13 @@ u {
   font-size: 0.6em;
   font-style: italic;
   display: block;
-  float: right;
+  /* float: right; */
   text-align: right;
-  margin-right: 10%;
+  margin-right: 10px;
   margin-bottom: 5px;
 }
 
-.dm-sidebar h3 {
+#dm-page h3 {
   text-align: center;
   font-size: 42px;
   color: var(--neon);
@@ -1629,8 +1643,8 @@ u {
 }
 
 .dm-input {
-  width: 90%;
-  max-width: 1500px;
+  width: 80%;
+  max-width: 1200px;
   margin: 20px auto;
   padding: 20px;
   text-align: center;

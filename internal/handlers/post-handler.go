@@ -39,7 +39,7 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     mode := r.URL.Query().Get("mode")
 	cookie, err := r.Cookie("auth_token")
 	if err != nil {
-		logMsg := fmt.Sprintf("ERROR : Impossible d'accéder au cookie.")
+		logMsg := fmt.Sprintf("ERROR : Impossible d'accéder au cookie pour poster un message.")
         log.Print(logMsg)
         http.Error(w, logMsg, http.StatusUnauthorized)
         return
@@ -56,7 +56,7 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var newTopic formData 
 
     if err := json.NewDecoder(r.Body).Decode(&newTopic); err != nil {
-		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des données du messages à envoyer : %v", err)
+		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des données du message à envoyer : %v", err)
 		log.Print(logMsg)
         http.Error(w, "Données invalides", http.StatusBadRequest)
         return
@@ -129,7 +129,7 @@ func (h *PostHandler) DeleteMessageFromBDD(w http.ResponseWriter, r *http.Reques
 	deletedPost, err := h.messageService.GetMessageByID(postID)
 
 	if err == sql.ErrNoRows {
-		logMsg := fmt.Sprintf("ERROR : Le message à supprimer n'existe pas ou plus : %v", postID)
+		logMsg := fmt.Sprintf("LOG : Le message à supprimer n'existe pas ou plus : %v", postID)
 		log.Print(logMsg)
 		http.Error(w, logMsg, http.StatusBadRequest)
 		return
@@ -142,7 +142,7 @@ func (h *PostHandler) DeleteMessageFromBDD(w http.ResponseWriter, r *http.Reques
 
 	canDelete := (deletedPost.Author.ID == sessionUserID || sessionUserRole == "1" || sessionUserRole == "2")
     if !canDelete {
-        logMsg := fmt.Sprintf("ERROR : Tentative de suppression du message d'un autre utilisateur")
+        logMsg := fmt.Sprintf("ALERT : Tentative de suppression du message d'un autre utilisateur")
 		log.Print(logMsg)
 		http.Error(w, logMsg, http.StatusForbidden)
 		return
@@ -154,7 +154,7 @@ func (h *PostHandler) DeleteMessageFromBDD(w http.ResponseWriter, r *http.Reques
 	username := r.URL.Query().Get("user")
 	err = h.messageService.DeleteMessage(topicID, postID, mode, username)
 	if err == sql.ErrNoRows {
-		logMsg := fmt.Sprintf("ERROR : Tentative de suppression d'un message inexistant : %d", postID)
+		logMsg := fmt.Sprintf("LOG : Tentative de suppression d'un message inexistant : %d", postID)
 		log.Print(logMsg)
 	} else if err != nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la suppression du message : %v", err)
@@ -165,12 +165,12 @@ func (h *PostHandler) DeleteMessageFromBDD(w http.ResponseWriter, r *http.Reques
 
 	messages, err := h.messageService.GetMessagesByTopic(topicID)
 	if len(messages) == 0 {
-		logMsg := fmt.Sprintf("ERROR : Ce sujet ne contient plus aucun message : %d. Suppression du sujet", topicID)
+		logMsg := fmt.Sprintf("LOG : Ce sujet ne contient plus aucun message : %d. Suppression du sujet", topicID)
 		log.Print(logMsg)
 		err := h.topicService.DeleteTopic(topicID)
 
 		if err == sql.ErrNoRows {
-			logMsg := "ERROR : Le sujet à supprimer n'existe pas ou plus"
+			logMsg := fmt.Sprintf("LOG : Le sujet à supprimer n'existe pas ou plus : %v", topicID)
 			log.Print(logMsg)
 		} else if err != nil {
 			logMsg := fmt.Sprintf("ERROR : Erreur dans la suppression du sujet : %v", err)
@@ -179,14 +179,12 @@ func (h *PostHandler) DeleteMessageFromBDD(w http.ResponseWriter, r *http.Reques
 			return
 		}
 		topicDeleted = true
-
-
 	} 
+
 		response := map[string]interface{}{
     	"status":       "success",
     	"topicDeleted": topicDeleted,
 		}
-
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
@@ -206,13 +204,13 @@ func (h *PostHandler) EditMessageInBDD (w http.ResponseWriter, r *http.Request, 
 	editedPost, err := h.messageService.GetMessageByID(postID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			logMsg := fmt.Sprintf("ERROR : Tentative de modification d'un message inexistant : %d", postID)
+			logMsg := fmt.Sprintf("LOG : Tentative de modification d'un message inexistant : %d", postID)
 			log.Print(logMsg)
-			http.Error(w, "Post inexistant", http.StatusNotFound)
+			http.Error(w, logMsg, http.StatusNotFound)
 		} else {
 			logMsg := fmt.Sprintf("ERROR : Echec dans la récupération du post à modifier %v: ", err)
 			log.Print(logMsg)
-			http.Error(w, "Echec de modification", http.StatusInternalServerError)
+			http.Error(w, logMsg, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -222,10 +220,10 @@ func (h *PostHandler) EditMessageInBDD (w http.ResponseWriter, r *http.Request, 
 		if err != sql.ErrNoRows {
 			logMsg := fmt.Sprintf("ERROR : Echec dans la tentative de modification de post : %v", err)
 			log.Print(logMsg)
-			http.Error(w, "Echec de modification", http.StatusInternalServerError)
+			http.Error(w, logMsg, http.StatusInternalServerError)
 		}
 		} else if err != nil{
-		logMsg := fmt.Sprintf("ERROR : Tentative de modification du message d'un autre utilisateur")
+		logMsg := fmt.Sprintf("ALERT : Tentative de modification du message d'un autre utilisateur")
 		log.Print(logMsg)
 		http.Error(w, "Tentative de modification du message d'un autre utilisateur", http.StatusForbidden)
 		return

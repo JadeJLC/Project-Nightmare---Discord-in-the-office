@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"real-time-forum/internal/auth"
@@ -26,13 +27,16 @@ func NewRegisterHandler(us *services.UserService, ss *services.SessionService) *
 */
 func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodPost {
-        http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+        logMsg := fmt.Sprintf("ALERT : Tentative d'inscription avec une méthode non autorisée : %v", r.Method)
+        log.Print(logMsg)
+        http.Error(w, logMsg, http.StatusMethodNotAllowed)
         return
     }
 
     var newUser domain.User
     if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
-        http.Error(w, "Données invalides", http.StatusBadRequest)
+        logMsg := fmt.Sprintf("LOG : Erreur dans l'inscription d'un nouvel utilisateur : %v", err)
+        http.Error(w, logMsg, http.StatusBadRequest)
         return
     }
 
@@ -53,14 +57,17 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     if mode == "edit" || mode == "avatar" {
        if !h.checkUserLoggedIn(w, r, newUser.Username) {
-        log.Print("Autorisation de modification de profil refusée")
-            http.Error(w, "Autorisation de modification de profil refusée", http.StatusUnauthorized)
+            logMsg := fmt.Sprintf("ALERT : Tentative de modification du profil d'un autre utilisateur.")
+            log.Print(logMsg)
+            http.Error(w, logMsg, http.StatusForbidden)
             return
         }
 
         if mode == "edit" {
         if err := h.userService.EditProfile(newUser); err != nil {
-            http.Error(w, err.Error(), http.StatusBadRequest)
+            logMsg := fmt.Sprintf("ERROR : Erreur dans la modification du profil : %v", err)
+            log.Print(logMsg)
+            http.Error(w, logMsg, http.StatusInternalServerError)
             return
             }
         } 
@@ -69,27 +76,27 @@ func (h *RegisterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
             image := newUser.Image
 
             if err := h.userService.EditAvatar(newUser.Username, image); err != nil {
-            http.Error(w, err.Error(), http.StatusBadRequest)
+            logMsg := fmt.Sprintf("ERROR : Erreur dans la modification de l'image de profil : %v", err)
+            log.Print(logMsg)
+            http.Error(w, logMsg, http.StatusInternalServerError)
             return
             }
 
         }
     } else  {
         if err := h.userService.Register(&newUser); err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-   
-        return
+            logMsg := fmt.Sprintf("ERROR : Erreur dans l'inscription d'un nouvel utilisateur : %v", err)
+            log.Print(logMsg)
+            http.Error(w, err.Error(), http.StatusBadRequest)
+            return
+        }
     }
-    }
-
-    
 
     json.NewEncoder(w).Encode(map[string]string{"status": "success"})
 }
 
 
 func (h *RegisterHandler) checkUserLoggedIn(w http.ResponseWriter, r *http.Request, targetUsername string) bool {
-    
     cookie, err := r.Cookie("auth_token")
     if err != nil {
         return false
@@ -97,7 +104,6 @@ func (h *RegisterHandler) checkUserLoggedIn(w http.ResponseWriter, r *http.Reque
 
     targetUser, err := h.userService.GetUserByUsername(targetUsername)
     sessionUserID, _, err2 := h.sessionService.GetUserID(cookie.Value)
-
 
     if err != nil || err2 != nil {
         log.Print(err)

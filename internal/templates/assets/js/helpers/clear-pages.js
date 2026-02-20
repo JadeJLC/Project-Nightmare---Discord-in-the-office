@@ -8,6 +8,7 @@ import { updateNotificationCounter } from "../websockets/notif-websocket.js";
  *
  */
 export function clearPages(destination) {
+  console.log("Destination : ", destination);
   window.scrollTo(0, 0);
   clearPopups();
 

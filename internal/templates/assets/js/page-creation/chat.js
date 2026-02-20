@@ -27,18 +27,19 @@ export function displayMailbox() {
       dmPage.classList.add("dm-container");
     }
 
-    dmPage.innerHTML = `
-  <button class="go-back" id="go-back" style="margin:0px 20px">
-  <img src="/assets/images/arrow-left.svg"/><span>Revenir en arrière</span></button>
+    dmPage.innerHTML = `<h3> <button class="go-back" id="go-back" style="margin:0px 20px">
+  <img src="/assets/images/arrow-left.svg"/><span>Revenir en arrière</span></button> 
+  Messages privés</h3>
+  <div class="dm-flex">
       <div id="dm-sidebar" class="dm-sidebar">
-          <h3>Messages privés</h3>
+      
           <div id="dm-conversations"></div>
       </div>
 
       <div id="dm-content" class="dm-content">
           <div id="dm-header" class="dm-header"></div>
           <div id="dm-messages" class="dm-messages"></div>
-      </div>
+      </div></div>
     `;
 
     document.body.appendChild(dmPage);

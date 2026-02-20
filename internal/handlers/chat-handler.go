@@ -3,6 +3,8 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -25,11 +27,16 @@ func (h *ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     userID, _, err := h.sessionService.GetUserIDFromRequest(r)
     if err != nil {
         if err == sql.ErrNoRows {
-        http.Error(w, "Tentative d'accès au chat sans être connecté", http.StatusUnauthorized)
+            logMsg := "ALERT : Tentative d'accès au chat par un utilisateur non connecté"
+            log.Print(logMsg)
+            http.Error(w, logMsg, http.StatusUnauthorized)
+            return
         } else {
-            http.Error(w, "Erreur interne au serveur dans la récupération des utilisateurs", http.StatusInternalServerError)
+            logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des utilisateurs : %v", err)
+            log.Print(logMsg)
+            http.Error(w, logMsg, http.StatusInternalServerError)
+            return
         }
-        return
     }
 
     otherID := r.URL.Query().Get("user")
@@ -42,11 +49,12 @@ func (h *ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     messages, err := h.chatService.GetDms(userID, otherID, offset, limit)
     if err != nil {
-        http.Error(w, "Error loading messages", http.StatusInternalServerError)
+        logMsg := fmt.Sprintf("ERROR : Erreur dans le chargement des messages privés : %v", err)
+        log.Print(logMsg)
+        http.Error(w, logMsg, http.StatusInternalServerError)
         return
     }
 
-    // 4. Retourner en JSON
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(messages)
 }

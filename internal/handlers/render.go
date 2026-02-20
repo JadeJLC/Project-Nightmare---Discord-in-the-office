@@ -4,6 +4,7 @@ package handlers
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"path/filepath"
 )
@@ -15,7 +16,8 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, datas any) {
     templates, _ := template.ParseGlob(filepath.Join("internal", "templates", "*.html"))
     err := templates.ExecuteTemplate(w, tmpl, datas)
     if err != nil {
-        fmt.Printf("template error: %v\n", err)
+        logMsg := fmt.Sprintf("ERROR : Erreur dans la génération du template HTML : %v", err)
+        log.Print(logMsg)
         w.Write([]byte("❌ internal error: " + err.Error()))
     }
 }

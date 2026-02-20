@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
@@ -26,31 +29,51 @@ func NewCategoryHandler(us *services.UserService, ms *services.MessageService, c
 */
 func (h *CategoryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     catID, err := strconv.Atoi(r.URL.Query().Get("catID"))
+	
 	if err != nil {
-		http.Error(w, "Identifiant de catégorie invalide", http.StatusNotFound)
+		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'ID de catégorie : %v", err)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusBadRequest)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 
-	
 	catInfo, err := h.categoryService.GetCategoryFromID(catID)
-	if err != nil {
+	if err == sql.ErrNoRows {
+		logMsg := fmt.Sprintf("LOG : Tentative d'accès à une catégorie inexistante : %d", catID)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusNotFound)
+		return
+	} else if err != nil {
+		logMsg := fmt.Sprintf("ERROR : Erreur dans l'ouverture de la catégorie : %v", err)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
 
     list, err := h.topicService.GetTopicsByCategory(catID)
 	list.CatName = catInfo.Name
     if err != nil || len(list.Topics) == 0 {
-		    list.Topics = []*domain.Topic{{Title: "Nothing to Display"}}
-			json.NewEncoder(w).Encode(list)
-			return
-        }
+		list.Topics = []*domain.Topic{{Title: "Nothing to Display"}}
+		json.NewEncoder(w).Encode(list)
+		return
+    }
 
 	for _, topic := range list.Topics {
 		topic.PostList, err = h.messageService.GetMessagesByTopic(topic.ID)	
+		if len(topic.PostList) == 0 {
+			logMsg := fmt.Sprintf("ALERT : Aucun message trouvé sur le sujet %v. Vérifier ou supprimer le sujet.", topic.ID)
+			log.Print(logMsg)
+			continue
+		}
+		if err != nil {
+			logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des messages du sujet %v : %v", topic.Title, err)
+			log.Print(logMsg)
+			http.Error(w, logMsg, http.StatusInternalServerError)
+		}
 	}
 
     json.NewEncoder(w).Encode(list)
 	return
-
 }

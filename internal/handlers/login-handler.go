@@ -3,6 +3,8 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"real-time-forum/internal/auth"
 	"real-time-forum/internal/services"
@@ -32,7 +34,7 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.userService.Authenticate(req.Authenticator, req.Password)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]any{
 			"success": false,
 			"message": "Identifiants incorrects",
@@ -42,20 +44,16 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	token, err := auth.GenerateToken(user.ID)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]any{
-			"success": false,
-			"message": "Erreur lors de la génération du token",
-		})
+		logMsg := fmt.Sprintf("Erreur lors de la génération du token : %v", err)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
 
 	if err := h.sessionService.CreateSession(user.ID, token); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]any{
-			"success": false,
-			"message": "Erreur lors de la création de la session",
-		})
+		logMsg := fmt.Sprintf("Erreur lors de la création de la session : %v", err)
+		log.Print(logMsg)
+		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -71,5 +69,6 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(map[string]any{
 		"success": true,
+		"message" : "Connexion réussie.",
 	})
 }

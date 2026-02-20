@@ -11,19 +11,13 @@ export async function logOut() {
       method: "POST",
       credentials: "include",
     });
-
-    if (!response.ok) {
-      displayError(response.status);
-      return;
-    }
-
     const result = await response.json();
 
     if (result.success) {
       SessionData.isLogged = false;
       window.location.reload();
     } else {
-      alert(result.message || "Erreur lors de la déconnexion");
+      displayError(response.status);
     }
   } catch (err) {
     console.error("Erreur réseau :", err);

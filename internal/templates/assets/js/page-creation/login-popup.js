@@ -1,5 +1,6 @@
 import { logOut, getLoginData, getRegisterData } from "./register-login.js";
 import { SessionData } from "../variables.js";
+import { displayHome } from "./home-display.js";
 
 /**
  * Création du HTML pour le popup de connexion
@@ -97,6 +98,7 @@ function setupInteractions() {
   loginBtn.onclick = async () => {
     if (SessionData.isLogged) {
       logOut();
+      displayHome();
       return;
     }
     popup.classList.toggle("is-hidden");
