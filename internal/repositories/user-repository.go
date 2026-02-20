@@ -77,12 +77,12 @@ func (r *UserRepository) GetUserByEmail(email string) (*domain.User, error) {
 */
 func (r *UserRepository) GetUserByUsername(username string) (*domain.User, error) {
     row := r.db.QueryRow(`
-        SELECT user_id, username, email, password, age, gender, firstname, lastname, image, inscription
+        SELECT user_id, username, email, password, age, gender, firstname, lastname, image, inscription, role
         FROM users WHERE username = ?`, username)
 
     user := &domain.User{}
     err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password,
-        &user.Age, &user.Gender, &user.Firstname, &user.Lastname, &user.Image, &user.Inscription)
+        &user.Age, &user.Gender, &user.Firstname, &user.Lastname, &user.Image, &user.Inscription, &user.Role)
     if err != nil {
         return nil, err
     }

@@ -44,3 +44,22 @@ func (r * AdminRepo) ParseLog(log string) domain.Log {
 
 	return newLog
 }
+
+func (r *AdminRepo) BanUser(userID string) error {
+	_, err := r.db.Exec(`
+        UPDATE users
+        SET role = 4
+        WHERE user_id = ?
+    `, userID)
+	return err
+}
+
+func (r *AdminRepo) UnbanUser(userID string) error {
+	_, err := r.db.Exec(`
+        UPDATE users
+        SET role = 3
+        WHERE user_id = ?
+    `, userID)
+	return err
+
+}

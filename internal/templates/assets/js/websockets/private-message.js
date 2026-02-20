@@ -79,10 +79,12 @@ export async function openConversation(otherUserId) {
   const div = document.createElement("div");
   div.classList.add("dm-input");
 
-  div.innerHTML = `
-  <input id="dm-input-text" type="text" placeholder="Écrire un message...">
-  <button id="dm-send-btn"><img src="/assets/images/send.svg"/><span>Envoyer</span></button>
-`;
+  div.innerHTML = `${
+    SessionData.role != 4
+      ? `<input id="dm-input-text" type="text" placeholder="Écrire un message...">
+  <button id="dm-send-btn"><img src="/assets/images/send.svg"/><span>Envoyer</span></button>`
+      : `<div id="dm-input-text">Les utilisateurs bannis ne peuvent pas envoyer de message privé.</div>`
+  }`;
 
   const input = div.querySelector("#dm-input-text");
   const sendBtn = div.querySelector("#dm-send-btn");
@@ -102,7 +104,7 @@ export async function openConversation(otherUserId) {
     input.value = "";
   };
 
-  sendBtn.addEventListener("click", sendMessage);
+  if (sendBtn) sendBtn.addEventListener("click", sendMessage);
 
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendMessage();

@@ -30,10 +30,10 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     topicHandler := NewTopicHandler(messageService, topicService, reactionService, sessionService, adminService)
     postingHandler := NewPostHandler(messageService, topicService, userService, sessionService, adminService)
     errorHandler := NewErrorHandler(sessionService)
+    adminHandler := NewAdminHandler(userService, sessionService, adminService)
 
     // Routes
     mux.Handle("/", homeHandler)
-    mux.Handle("/error", errorHandler)
     mux.Handle("/ws", wsHandler)
     mux.Handle("/api/login", loginHandler)
     mux.Handle("/api/logout", logoutHandler)
@@ -53,6 +53,9 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     mux.HandleFunc("/api/avatars", profileHandler.GetAvatarList)
     mux.HandleFunc("/api/reactions", topicHandler.ReactOnAPost)
     mux.HandleFunc("/api/myreactions", topicHandler.GetUserReactionsOnPost)
+
+    mux.Handle("/error", errorHandler)
+    mux.Handle("/api/admin", adminHandler)
 
 
     // Assets

@@ -60,10 +60,14 @@ async function writePosts(topicID, postID) {
     <img src="/assets/images/arrow-left.svg"/><span>Retour à la catégorie</span></button>
     ${topic.topic_title} </h2>`;
 
-    const topicActions = `<div class="topic-actions">
+    const topicActions = `${
+      SessionData.role != 4
+        ? `<div class="topic-actions">
     <button class="new-topic-button" id="new-topic-button">Ouvrir un nouveau sujet</button>
     <button class="new-message-button" id="new-message-button">Répondre au sujet</button>
-    </div>`;
+    </div>`
+        : ""
+    }`;
 
     const postList = (
       await Promise.all(
@@ -134,6 +138,7 @@ function setTopicLinks(topicsPageContainer, catID, topicID) {
     if (reactImg) {
       const reactionType = reactImg.dataset.rtype;
       const postID = reactImg.dataset.postid;
+      if (SessionData.role === 4) return;
       if (reactImg.classList.contains("active")) {
         removeReaction(postID, reactionType);
       } else {
@@ -164,7 +169,11 @@ async function buildPostHTML(post, index) {
   let reactBtn;
   let deleteBtn;
 
-  if (post.author.username === SessionData.username || SessionData.role === 1) {
+  if (
+    (post.author.username === SessionData.username && SessionData.role != 4) ||
+    SessionData.role === 1 ||
+    SessionData.role === 2
+  ) {
     editBtn = `<button type="button" class="edit-content edit-message" id="confirm-edit" data-postid="${post.post_id}">
           <img src="assets/images/tool.svg" />
           <span>Modifier le<br> message</span>
@@ -175,7 +184,7 @@ async function buildPostHTML(post, index) {
         </button>`;
   }
 
-  if (post.author.username !== SessionData.username) {
+  if (post.author.username !== SessionData.username && SessionData.role != 4) {
     reactBtn = `<button type="button" class="edit-content add-reaction" id="add-reaction" data-postid="${post.post_id}">
           <img src="assets/images/react.svg" />
           <span>Réagir à ce message</span>

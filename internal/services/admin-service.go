@@ -15,3 +15,12 @@ func NewAdminService(r *repositories.AdminRepo) *AdminService {
 func (s *AdminService) SaveLogToDatabase(log string) (error) {
 	return s.repo.SaveLogToDatabase(log)
 }
+
+func (s *AdminService) BanUser(userID string) (error) {
+	return s.repo.BanUser(userID)
+}
+
+func (s *AdminService) UnbanUser(userID string) (error) {
+	return s.repo.UnbanUser(userID)
+}
+

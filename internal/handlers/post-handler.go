@@ -39,13 +39,20 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     mode := r.URL.Query().Get("mode")
 	cookie, err := r.Cookie("auth_token")
 	if err != nil {
-		logMsg := fmt.Sprintf("ERROR : Impossible d'accéder au cookie pour poster un message.")
+		logMsg := fmt.Sprintf("ERROR : Impossible d'accéder au cookie pour poster un message : %v", err)
         h.adminService.SaveLogToDatabase(logMsg)
         http.Error(w, logMsg, http.StatusUnauthorized)
         return
     }
 
 	sessionUserID, sessionUserRole, _ := h.sessionService.GetUserID(cookie.Value)	
+	
+	if (sessionUserRole == "4") {
+		logMsg := fmt.Sprintf("ALERT : Un utilisateur banni (ID : %v) a tenté d'accéder à une fonction non autorisée : %v", sessionUserID, mode)
+		h.adminService.SaveLogToDatabase(logMsg)
+		http.Error(w, logMsg, http.StatusForbidden)
+		return
+	}
 
 	if mode == "delete" {
 	h.DeleteMessageFromBDD(w, r, sessionUserID, sessionUserRole)
