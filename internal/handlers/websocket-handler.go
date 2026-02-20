@@ -42,7 +42,7 @@ func NewWebSocketHandler(ss *services.SessionService, cs *services.ChatService, 
 
 func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	
-    userID, err := h.sessionService.GetUserIDFromRequest(r)
+    userID, _, err := h.sessionService.GetUserIDFromRequest(r)
 
     if err != nil {
         http.Error(w, "Unauthorized", http.StatusUnauthorized)

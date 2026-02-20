@@ -4,6 +4,7 @@
 export const SessionData = {
   isLogged: false,
   username: null,
+  role: 0,
   notifications: [],
 };
 

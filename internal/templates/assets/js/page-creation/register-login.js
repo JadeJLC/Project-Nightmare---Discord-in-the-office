@@ -20,7 +20,6 @@ export async function logOut() {
     const result = await response.json();
 
     if (result.success) {
-      alert("Déconnexion réussie !");
       SessionData.isLogged = false;
       window.location.reload();
     } else {

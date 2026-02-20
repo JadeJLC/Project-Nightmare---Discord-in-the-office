@@ -109,5 +109,5 @@ export async function buildPostReactions(reactions, mode) {
     })
     .join("");
 
-  return `<div class="post-reactions">${reactionList}</div>`;
+  return `${reactionList}`;
 }

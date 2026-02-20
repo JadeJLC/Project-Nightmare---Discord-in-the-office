@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `topics` (
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `messages` (
 `post_id`    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-`topic_id`   INTEGER NOT NULL REFERENCES `topics`(`topic_id`),
+`topic_id`   INTEGER NOT NULL REFERENCES `topics`(`topic_id`) ON DELETE CASCADE,
 `author`     TEXT    NOT NULL REFERENCES `users`(`user_id`),
 `content`    TEXT    NOT NULL,
 `created_on` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -121,4 +121,15 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 CREATE TABLE IF NOT EXISTS `mutedtopics` (
 `user_id`  TEXT    NOT NULL REFERENCES `users`(`user_id`),
 `topic_id` INTEGER NOT NULL REFERENCES `topics`(`topic_id`)
+);
+
+-- ------------------------------------------------------------
+--  logs  (indépendant)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `logs` 
+(
+    `log_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+    `type` TEXT NOT NULL, 
+    `message` TEXT NOT NULL, 
+    `data` TEXT
 );

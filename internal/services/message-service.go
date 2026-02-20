@@ -17,8 +17,8 @@ func (s *MessageService) CreateMessage(topicID int, content string, userID strin
 	return s.repo.Create(topicID, content, userID)
 }
 
-func (s *MessageService) DeleteMessage(postID int) error {
-	return  s.repo.Delete(postID)
+func (s *MessageService) DeleteMessage(topicID, postID int, mode, user string) error {
+	return  s.repo.Delete(topicID, postID, mode, user)
 }
 
 func (s *MessageService) EditMessage(postID int, content string) error {

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -21,9 +22,13 @@ func NewChatHandler(ss *services.SessionService, cs *services.ChatService) *Chat
 }
 
 func (h *ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    userID, err := h.sessionService.GetUserIDFromRequest(r)
+    userID, _, err := h.sessionService.GetUserIDFromRequest(r)
     if err != nil {
-        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        if err == sql.ErrNoRows {
+        http.Error(w, "Tentative d'accès au chat sans être connecté", http.StatusUnauthorized)
+        } else {
+            http.Error(w, "Erreur interne au serveur dans la récupération des utilisateurs", http.StatusInternalServerError)
+        }
         return
     }
 

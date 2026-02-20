@@ -25,22 +25,22 @@ func (s *SessionService) DeleteSession(token string) error {
     return s.repo.Delete(token)
 }
 
-func (s *SessionService) GetUserID(token string) (string, error) {
+func (s *SessionService) GetUserID(token string) (string, string, error) {
     return s.repo.GetUserIDByToken(token)
 }
 
-func (s *SessionService) GetUserIDFromRequest(r *http.Request) (string, error) {
+func (s *SessionService) GetUserIDFromRequest(r *http.Request) (string, string, error) {
     // 1. Récupérer le cookie
     cookie, err := r.Cookie("auth_token")
     if err != nil {
-        return "", fmt.Errorf("no session cookie")
+        return "", "", fmt.Errorf("no session cookie")
     }
 
     // 2. Utiliser ta fonction existante dans le repo
-    userID, err := s.repo.GetUserIDByToken(cookie.Value)
+    userID, userRole, err := s.repo.GetUserIDByToken(cookie.Value)
     if err != nil {
-        return "", fmt.Errorf("invalid session token")
+        return "", "", fmt.Errorf("invalid session token")
     }
 
-    return userID, nil
+    return userID, userRole, nil
 }

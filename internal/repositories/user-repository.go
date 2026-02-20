@@ -104,8 +104,8 @@ func (r *UserRepository) GetUserByToken(token string) (*domain.User, error) {
 func (r *UserRepository) GetUserByID(id string) (*domain.User, error) { 
     user := &domain.User{}
     err := r.db.QueryRow(`
-        SELECT user_id, username, image FROM users WHERE user_id = ?`, id).
-        Scan(&user.ID, &user.Username, &user.Image)
+        SELECT user_id, username, image, role FROM users WHERE user_id = ?`, id).
+        Scan(&user.ID, &user.Username, &user.Image, &user.Role)
 
     if err != nil {
         return nil, err

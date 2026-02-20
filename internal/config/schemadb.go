@@ -146,6 +146,12 @@ func NormalizeColumn(col string) string {
 	col = strings.ToLower(col)
 	col = strings.ReplaceAll(col, "\"", "")
 	col = strings.ReplaceAll(col, "`", "")
+	
+	// Réduire les espaces multiples en un seul
+	for strings.Contains(col, "  ") {
+		col = strings.ReplaceAll(col, "  ", " ")
+	}
+	
 	return col
 }
 
