@@ -3,7 +3,6 @@ package repositories
 
 import (
 	"database/sql"
-	"fmt"
 	"html/template"
 	"real-time-forum/internal/domain"
 	"strings"
@@ -44,17 +43,34 @@ func (r *UserRepository) Create(user *domain.User) error {
     date := time.Now()
     formattedTime := date.Format("02/01/2006")
 
+    role, err := r.CheckIfFirstUser()
+
     _, err = r.db.Exec(`
         INSERT INTO users (user_id, username, email, password, age, gender, firstname, lastname, image, inscription, role)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        user.ID, user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", formattedTime, 3,
+        user.ID, user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", formattedTime, role,
     )
     if err != nil {
-        fmt.Println("Erreur inscription")
         return err
     }
     
     return nil
+}
+
+func (r *UserRepository) CheckIfFirstUser() (int, error) {
+    var count int
+	role := 3
+	err := r.db.QueryRow("SELECT COUNT(*) FROM user").Scan(&count)
+
+	if err != nil && err != sql.ErrNoRows {
+		return role, err
+	}
+
+	if count == 0 {
+        return role, nil
+	}
+
+    return role, nil
 }
 
 /*
@@ -132,4 +148,28 @@ func (r *UserRepository) UpdateUserImage(username, image string) error {
 	`, image, username)
 
     return err
+}
+
+func (r *UserRepository) GetUserList(onlineUsers map[string]bool) ([]*domain.User, error) {
+   rows, err := r.db.Query(`SELECT user_id, username, image 
+        FROM users 
+        ORDER BY username ASC`)
+	if err != nil {
+		return nil, err
+	}	
+	defer rows.Close()
+
+    var users []*domain.User
+	for rows.Next() {
+	user := &domain.User{}
+		if err := rows.Scan(&user.ID, &user.Username, &user.Image); err != nil {
+			return nil, err
+		}
+    if !onlineUsers[user.Username] {
+            users = append(users, user)
+    }
+
+	}
+
+    return users, nil
 }

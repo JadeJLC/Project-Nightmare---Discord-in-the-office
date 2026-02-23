@@ -22,28 +22,29 @@ func NewLogoutHandler(us *services.UserService, ss *services.SessionService, as 
 * Récupère les informations de l'utilisateur et supprime le cookie de la base de données
 */
 func (h *LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	PerformLogout(w, r, h.sessionService, h.adminService)
+}
 
-	cookie, err := r.Cookie("auth_token") 
-	if err == nil { 
-		h.sessionService.DeleteSession(cookie.Value) 
-	} else {
-		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération du cookie pour la déconnexion : %v", err)
-		h.adminService.SaveLogToDatabase(logMsg)
-		http.Error(w, logMsg, http.StatusInternalServerError)
-	}
-	
-	http.SetCookie(w, &http.Cookie{
-		Name:     "auth_token",
-		Value:    "",
-		Path:     "/",
-		Expires:  time.Unix(0, 0),
-		MaxAge:   -1,
-		HttpOnly: true,
-		Secure:   false, // true si HTTPS
-		SameSite: http.SameSiteStrictMode,
-	})
+func PerformLogout(w http.ResponseWriter, r *http.Request, ss *services.SessionService, as *services.AdminService) error {
+    cookie, err := r.Cookie("auth_token")
+    if err != nil {
+        logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération du cookie pour la déconnexion : %v", err)
+        as.SaveLogToDatabase(logMsg)
+        return fmt.Errorf(logMsg)
+    }
 
+    ss.DeleteSession(cookie.Value)
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"success": true, "message": "Déconnecté"}`))
+    http.SetCookie(w, &http.Cookie{
+        Name:     "auth_token",
+        Value:    "",
+        Path:     "/",
+        Expires:  time.Unix(0, 0),
+        MaxAge:   -1,
+        HttpOnly: true,
+        Secure:   false,
+        SameSite: http.SameSiteStrictMode,
+    })
+
+    return nil
 }

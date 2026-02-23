@@ -9,15 +9,35 @@ export function updateOnlineUsers(users) {
   state.UserList = users;
 
   const container = document.getElementById("online-user-cards");
-  container.innerHTML = "";
+  if (users.length !== 0) {
+    container.innerHTML = "<h3>Membres connectés</h3>";
+  } else {
+    container.innerHTML = "";
+  }
 
   users.forEach((user) => {
-    const card = createUserCard(user);
+    const card = createUserCard(user, "online");
     container.appendChild(card);
   });
 }
 
-function createUserCard(user) {
+export function updateOfflineUsers(users) {
+  state.UserList = users;
+
+  const container = document.getElementById("offline-user-cards");
+  if (users.length !== 0) {
+    container.innerHTML = "<h3>Membres hors ligne</h3>";
+  } else {
+    container.innerHTML = "";
+  }
+
+  users.forEach((user) => {
+    const card = createUserCard(user, "offline");
+    container.appendChild(card);
+  });
+}
+
+function createUserCard(user, status) {
   const card = document.createElement("div");
   card.className = "user-card";
 
@@ -27,7 +47,7 @@ function createUserCard(user) {
         </div>
         <div class="info">
             <span class="username" data-name="${user.username}">${user.username}</span>
-            <span class="status online">En&nbsp;ligne</span>
+            ${status == "online" ? `<span class="status online">En&nbsp;ligne</span>` : ""}
         </div>
     `;
 

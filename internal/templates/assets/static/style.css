@@ -25,7 +25,7 @@
   --neon: #0a6085;
   --neon-soft: #b7e6f3;
   --accent: #652774;
-  --danger: #ff5e7a;
+  --danger: #9b0c24;
   --text: #112c44;
   --shadow: rgba(200, 230, 243, 0.3);
   --button: rgba(122, 195, 218, 0.85);
@@ -120,6 +120,12 @@ body.members-list-visible {
 }
 body.members-list-visible #online-members-list {
   transform: translateX(0);
+}
+
+#members-list h3 {
+  font-size: 0.9em;
+  text-align: center;
+  margin: -10px 0px 20px 0px;
 }
 
 .is-hidden {
@@ -885,6 +891,8 @@ header {
   border-radius: 15px;
   padding: 10px 2%;
   padding-bottom: 0px;
+  position: relative;
+  min-height: 400px;
 }
 
 .profile-details input {
@@ -1017,6 +1025,13 @@ hr {
   padding: 15px;
 }
 
+#delete-account {
+  position: absolute;
+  bottom: 10px;
+  right: 5px;
+  border-color: var(--danger);
+}
+
 .button-link {
   background: transparent;
   border: none;
@@ -1116,6 +1131,10 @@ hr {
   display: block;
   width: 80%;
   margin: auto;
+  padding: 10px;
+  min-height: 80px;
+  border-radius: 10px;
+  margin-top: 20px;
 }
 /* #endregion */
 
@@ -1199,7 +1218,8 @@ hr {
 .form-group select:focus,
 .profile-right input:focus,
 .post-editor input:focus,
-.post-editor textarea:focus {
+.post-editor textarea:focus,
+.profile-popup textarea:focus {
   border: 2px solid var(--neon);
   box-shadow: 0 0 12px var(--neon-soft);
 }
@@ -1460,7 +1480,7 @@ u {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  z-index: 1000;
+  z-index: 80;
   transform: translateX(95%);
   transition: transform 0.3s ease;
 }
@@ -1674,7 +1694,7 @@ u {
   background-color: var(--bg-dim);
   border: 2px solid var(--neon);
   border-radius: 10px;
-  z-index: 10;
+  z-index: 100;
 }
 
 .notif-popup h4 {

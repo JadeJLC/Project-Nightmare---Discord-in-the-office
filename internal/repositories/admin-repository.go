@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"real-time-forum/internal/domain"
 	"regexp"
 	"time"
@@ -46,11 +47,13 @@ func (r * AdminRepo) ParseLog(log string) domain.Log {
 }
 
 func (r *AdminRepo) BanUser(userID string) error {
+	log.Print("Bannissement de l'utilisateur")
 	_, err := r.db.Exec(`
         UPDATE users
         SET role = 4
         WHERE user_id = ?
     `, userID)
+	log.Print(err)
 	return err
 }
 
@@ -62,4 +65,22 @@ func (r *AdminRepo) UnbanUser(userID string) error {
     `, userID)
 	return err
 
+}
+
+func (r *AdminRepo) DeleteUser(userID string) error {
+	result, err := r.db.Exec(`
+        DELETE FROM users WHERE user_id = ?
+    `, userID)
+
+	count, _ := result.RowsAffected()
+	if count == 0 {
+    return sql.ErrNoRows 
+	}
+    
+    if err != nil {
+		log.Print(err)
+        return err
+    }
+
+	return nil
 }

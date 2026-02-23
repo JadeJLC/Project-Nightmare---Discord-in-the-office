@@ -78,3 +78,7 @@ func (s *UserService) EditProfile(newInfo domain.User) error {
 func (s *UserService) EditAvatar(userID, image string) error {
     return s.repo.UpdateUserImage(userID, image)
 }
+
+func (s *UserService) GetUserList(onlineUsers map[string]bool) ([]*domain.User, error) {
+    return s.repo.GetUserList(onlineUsers)
+}

@@ -129,3 +129,32 @@ func (r *ChatRepo) GetConversations(userID string) ([]domain.Conversation, error
 
     return convs, nil
 }
+
+func (r *ChatRepo) GetLastMessageTimes() (map[string]time.Time, error) {
+    rows, err := r.db.Query(`
+        SELECT user1_id, user2_id, last_DM_at
+        FROM conversations
+        ORDER BY last_DM_at DESC
+    `)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    lastMsg := make(map[string]time.Time)
+    for rows.Next() {
+        var user1, user2 string
+        var t time.Time
+        if err := rows.Scan(&user1, &user2, &t); err != nil {
+            return nil, err
+        }
+        
+        if existing, ok := lastMsg[user1]; !ok || t.After(existing) {
+            lastMsg[user1] = t
+        }
+        if existing, ok := lastMsg[user2]; !ok || t.After(existing) {
+            lastMsg[user2] = t
+        }
+    }
+    return lastMsg, nil
+}

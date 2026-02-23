@@ -225,7 +225,7 @@ async function buildPostHTML(post, index) {
     </div>`;
 }
 
-function deleteConfirmation() {
+function deletePostConfirmation() {
   return new Promise((resolve) => {
     const popup = document.createElement("div");
     popup.id = "opened-popup";
@@ -261,7 +261,7 @@ function deleteConfirmation() {
 }
 
 async function deleteMessage(topicID, postID, catID) {
-  const confirmed = await deleteConfirmation();
+  const confirmed = await deletePostConfirmation();
 
   if (!confirmed) return;
 

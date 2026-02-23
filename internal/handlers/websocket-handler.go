@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
+	"sort"
 	"sync"
 	"time"
 
@@ -43,8 +44,6 @@ func NewWebSocketHandler(ss *services.SessionService, cs *services.ChatService, 
 func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     userID, _, err := h.sessionService.GetUserIDFromRequest(r)
     if err != nil {
-        log.Println("WS: impossible de récupérer l'userID :", err)
-        http.Error(w, "Unauthorized", http.StatusUnauthorized)
         return
     }
 
@@ -93,7 +92,7 @@ func (h *WebSocketHandler) broadcastPresence() {
     wsMutex.Lock()
     defer wsMutex.Unlock()
 
-    users := make([]map[string]interface{}, 0)
+    onlineUsers := make([]map[string]interface{}, 0)
 
     for userID := range wsClients {
         user, err := h.userService.GetUserByID(userID)
@@ -101,16 +100,49 @@ func (h *WebSocketHandler) broadcastPresence() {
             continue
         }
 
-        users = append(users, map[string]interface{}{
+        onlineUsers = append(onlineUsers, map[string]interface{}{
             "id":       user.ID,
             "username": user.Username,
             "image": user.Image,
         })
     }
 
+    online := make(map[string]bool)
+    for _, u := range onlineUsers {
+        if username, ok := u["username"].(string); ok {
+            online[username] = true
+        }
+    }
+
+    offline, err := h.userService.GetUserList(online)
+     if err != nil {
+        logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des utilisateurs du forum : %v", err)
+        h.adminService.SaveLogToDatabase(logMsg)
+        return
+    }
+
+    offlineUsers := make([]map[string]interface{}, 0)
+
+    for _, user := range offline {
+        offlineUsers = append(offlineUsers, map[string]interface{}{
+            "id":       user.ID,
+            "username": user.Username,
+            "image": user.Image,
+        })
+    }
+
+    lastMsgTimes, err := h.chatService.GetLastMessageTimes()
+    if err != nil {
+        lastMsgTimes = make(map[string]time.Time)
+    }
+
+    sortUsers(onlineUsers, lastMsgTimes)
+    sortUsers(offlineUsers, lastMsgTimes)
+
     msg := map[string]interface{}{
         "type":  "presence_update",
-        "users": users,
+        "online_users": onlineUsers,
+        "offline_users": offlineUsers,
     }
 
     for _, conn := range wsClients {
@@ -165,7 +197,7 @@ func (h *WebSocketHandler) handlePrivateMessage(from, to string, content string)
         conn.WriteJSON(outgoing)
     }
     wsMutex.Unlock()
-
+    h.broadcastPresence()
     msgNotif := fmt.Sprintf("<span class='notif-topic'>Nouveau message de %s</span>", fromUser.Username)
     h.handleNotifications(to, msgNotif, fmt.Sprintf("[DM:%v]", from))
 }
@@ -195,6 +227,7 @@ func (h *WebSocketHandler) handleNotifications(receiverID, message, data string)
         conn.WriteJSON(outgoing)
     }
     wsMutex.Unlock()
+    h.broadcastPresence()
 }
 
 func (h *WebSocketHandler) SendTopicNotification(receiverID, message, data string) {
@@ -214,4 +247,25 @@ func (h *WebSocketHandler) SendTopicNotification(receiverID, message, data strin
         conn.WriteJSON(outgoing)
     }
     wsMutex.Unlock()
+}
+
+
+func sortUsers(users []map[string]interface{}, lastMsgTimes map[string]time.Time) {
+    sort.Slice(users, func(i, j int) bool {
+        idI, _ := users[i]["id"].(string)
+        idJ, _ := users[j]["id"].(string)
+
+        tI, hasI := lastMsgTimes[idI]
+        tJ, hasJ := lastMsgTimes[idJ]
+
+        if hasI && hasJ {
+            return tI.After(tJ)
+        }
+        if hasI != hasJ {
+            return hasI
+        }
+        usernameI, _ := users[i]["username"].(string)
+        usernameJ, _ := users[j]["username"].(string)
+        return usernameI < usernameJ
+    })
 }

@@ -224,11 +224,10 @@ func (h *PostHandler) EditMessageInBDD (w http.ResponseWriter, r *http.Request, 
 
 	if editedPost.Author.ID == sessionUserID || sessionUserRole == "1" {
 		err := h.messageService.EditMessage(postID, newTopic.Content)
-		if err != sql.ErrNoRows {
+		if err == sql.ErrNoRows {
 			logMsg := fmt.Sprintf("ERROR : Echec dans la tentative de modification de post : %v", err)
 			h.adminService.SaveLogToDatabase(logMsg)
 			http.Error(w, logMsg, http.StatusInternalServerError)
-		}
 		} else if err != nil{
 		logMsg := fmt.Sprintf("ALERT : Tentative de modification du message d'un autre utilisateur")
 		h.adminService.SaveLogToDatabase(logMsg)
@@ -236,6 +235,5 @@ func (h *PostHandler) EditMessageInBDD (w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	
-
+}
 }

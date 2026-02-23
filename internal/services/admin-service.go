@@ -24,3 +24,6 @@ func (s *AdminService) UnbanUser(userID string) (error) {
 	return s.repo.UnbanUser(userID)
 }
 
+func (s *AdminService) DeleteUser(userID string) (error) {
+	return s.repo.DeleteUser(userID)
+}

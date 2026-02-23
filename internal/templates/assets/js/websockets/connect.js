@@ -1,4 +1,7 @@
-import { updateOnlineUsers } from "../page-creation/online-members.js";
+import {
+  updateOnlineUsers,
+  updateOfflineUsers,
+} from "../page-creation/online-members.js";
 import { handleIncomingDM } from "./private-message.js";
 import { handleIncomingNotification } from "../websockets/notif-websocket.js";
 
@@ -14,7 +17,7 @@ export function connectWebSocket() {
       ws = new WebSocket("ws://localhost:5006/ws");
 
       ws.onopen = () => {
-        console.log("WS connected");
+        console.log("Websocket connecté");
         ws.send(
           JSON.stringify({ type: "presence_subscribe", userID: user.id }),
         );
@@ -29,7 +32,8 @@ export function connectWebSocket() {
             break;
 
           case "presence_update":
-            updateOnlineUsers(msg.users);
+            updateOnlineUsers(msg.online_users);
+            updateOfflineUsers(msg.offline_users);
             break;
 
           case "notification":

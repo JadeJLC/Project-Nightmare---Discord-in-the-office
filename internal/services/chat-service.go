@@ -3,6 +3,7 @@ package services
 import (
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/repositories"
+	"time"
 )
 
 type ChatService struct {
@@ -27,4 +28,8 @@ func (s *ChatService) UpdateConversation(user1, user2 string) error {
 
 func (s *ChatService) GetConversations(userID string) ([]domain.Conversation, error) {
     return s.repo.GetConversations(userID)
+}
+
+func (s *ChatService) GetLastMessageTimes() (map[string]time.Time, error) {
+    return s.repo.GetLastMessageTimes()
 }

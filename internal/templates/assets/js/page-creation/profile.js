@@ -10,6 +10,11 @@ import {
 import { initProfileDMButton } from "../helpers/profile-secondary.js";
 import { selectPage } from "../helpers/call-page.js";
 import { displayError } from "./errors.js";
+import {
+  banUser,
+  unbanUser,
+  deleteAccount,
+} from "../helpers/admin-functions.js";
 
 // #region ***** Affichage des informations utilisateur
 
@@ -105,10 +110,15 @@ function buildProfileHTML(user) {
           </div>
           <div class="profile-basics">
             <h3>
-              <!-- <span class="profile-status online" alt="En ligne"></span> -->
               ${user.username}
             </h3>
             <span class="profile-signup">Inscrit.e le ${user.inscription}</span>
+            ${
+              SessionData.role == 1 && user.role == 4
+                ? `<span class="profile-signup" style="color:var(--danger)">Utilisateur banni</span>`
+                : ""
+            }
+
           </div>
         </div>
         <br />
@@ -144,7 +154,7 @@ function buildOtherDetails(user) {
    ${
      SessionData.role == 1 && user.role == 4
        ? `<button type="button" class="edit-content" id="unban-user">
-          <img src="assets/images/user-check.svg" />
+          <img src="assets/images/key.svg" />
           <span>Débannir l'utilisateur</span>
         </button>`
        : ""
@@ -155,6 +165,14 @@ function buildOtherDetails(user) {
             <p><span>Âge&nbsp;:</span> ${user.age}&nbsp;ans</p>
             <p><span>Genre&nbsp;:</span> ${user.genre}</p>
           </div>
+          ${
+            SessionData.role == 1
+              ? `<button type="button" class="edit-content" id="delete-account">
+          <img src="assets/images/x.svg" />
+          <span>Supprimer le compte</span>
+        </button>`
+              : ""
+          }
         </div>
         ${
           SessionData.role != 4
@@ -196,6 +214,14 @@ function buildSelfDetails(user) {
             <input class="is-hidden" type="text" name="lastname" value="${decodeHTML(user.lastname)}" id="profile-last-input"><span id="profile-last-span"> ${user.lastname}</span></p>
           </div>
         </div>
+        ${
+          SessionData.role != 1
+            ? `<button type="button" class="edit-content" id="delete-account">
+          <img src="assets/images/x.svg" />
+          <span>Supprimer mon compte</span>
+        </button>`
+            : ""
+        }
       </form>`;
 }
 
@@ -404,7 +430,7 @@ function switchToTopics(profileName) {
 }
 
 /**
- * Active les effets de clic sur les boutons du profil
+ * Active les effets de clic sur les boutons du profil. un seul event listener sur toute la page pour économiser les performances
  * @param {string} status Pour l'envoi à la fonction des boutons
  * @param {object} user Utilisateur concerné
  */
@@ -432,6 +458,14 @@ function setProfileButtons(status, user) {
     const editBtn = event.target.closest("#edit-infos");
     if (editBtn && status != "Not Available") {
       editProfileDetails();
+    }
+
+    const delBtn = event.target.closest("#delete-account");
+    if (
+      (delBtn && status != "NotAvailable") ||
+      (delBtn && SessionData.role == 1)
+    ) {
+      deleteAccount(user.username);
     }
 
     const goBack = event.target.closest("#go-back");
@@ -490,7 +524,9 @@ function setProfileButtons(status, user) {
 }
 
 /**
- * Gère l'affichage des boutons
+ * Gère l'affichage de tous les boutons du profil
+ * Réaction / Messages / Topics mis en évidence selon le mode d'affichage
+ * Modification d'avatar masquée ou afficher selon le profil consulté
  * @param {string} status "Not Available" si on affiche le profil de quelqu'un d'autre
  */
 function activateButton(status) {
@@ -517,13 +553,3 @@ function activateButton(status) {
 }
 
 // #endregion
-
-function banUser(user) {
-  console.log("Bannissement de l'utilisateur ", user.username);
-  displayProfile(user.username);
-}
-
-function unbanUser(user) {
-  console.log("Débannissement de l'utilisateur ", user.username);
-  displayProfile(user.username);
-}
