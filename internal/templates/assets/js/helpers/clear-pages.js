@@ -29,8 +29,10 @@ export function clearPages(destination) {
     if (notifPageContainer) notifPageContainer.remove();
   }
 
-  const profilePageContainer = document.getElementById("profile-page");
-  if (profilePageContainer) profilePageContainer.remove();
+  if (destination != "switchprofile") {
+    const profilePageContainer = document.getElementById("profile-page");
+    if (profilePageContainer) profilePageContainer.remove();
+  }
 
   if (destination != "newtopic") {
     const categoryTopics = document.getElementById("category-topics");

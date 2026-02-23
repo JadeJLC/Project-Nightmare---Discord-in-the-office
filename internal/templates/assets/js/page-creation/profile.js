@@ -23,7 +23,7 @@ import {
  * Fonction-mère pour la création du HTML de la page profil (conteneur, header, appel de fonction)
  * @param {string} profileName Nom de l'utilisateur dont on affiche le profil
  */
-export function displayProfile(profileName) {
+export function displayProfile(profileName, mode) {
   pageData.previousPage = pageData.currentPage;
   pageData.currentPage = `profile-${profileName}`;
 
@@ -31,7 +31,10 @@ export function displayProfile(profileName) {
 
   const usernameHeader = document.getElementById("header-username");
 
-  if (!isUserLoggedIn()) return;
+  if (!isUserLoggedIn()) {
+    displayError(401);
+    return;
+  }
 
   if (typeof profileName !== "string" || !profileName)
     profileName = SessionData.username;
@@ -45,15 +48,16 @@ export function displayProfile(profileName) {
     document.body.insertAdjacentHTML("beforeend", addedContainer);
   }
 
-  writeUserProfile(profileName, SessionData.username);
+  writeUserProfile(profileName, SessionData.username, mode);
 }
 
 /**
  * Génère le HTML du profil de l'utilisateur à partir des informations de la BDD
  * @param {string} profile Nom de l'utilisateur dont on consulte le profil
  * @param {string} logged Nom de l'utilisateur connecté
+ * @param {string} mode Le mode d'ouverture (normal ou "switchprofile" pour ne changer que la partie des messages)
  */
-async function writeUserProfile(profile, logged) {
+async function writeUserProfile(profile, logged, mode) {
   try {
     const response = await fetch(
       `/api/profile?profile=${profile}&user=${logged}`,
@@ -64,7 +68,6 @@ async function writeUserProfile(profile, logged) {
     }
 
     const user = await response.json();
-
     buildProfileHTML(user, logged);
     setProfileButtons(user.email, user);
 
@@ -416,7 +419,7 @@ async function displayProfileTopics(profileName) {
  */
 function switchToReactions(profileName) {
   localStorage.setItem("profileDisplay", "reactions");
-  displayProfile(profileName);
+  displayProfile(profileName, "switchprofile");
 }
 
 /**
@@ -425,7 +428,7 @@ function switchToReactions(profileName) {
  */
 function switchToMessages(profileName) {
   localStorage.setItem("profileDisplay", "messages");
-  displayProfile(profileName);
+  displayProfile(profileName, "switchprofile");
   editProfileImage(profileName);
 }
 
@@ -435,7 +438,7 @@ function switchToMessages(profileName) {
  */
 function switchToTopics(profileName) {
   localStorage.setItem("profileDisplay", "topics");
-  displayProfile(profileName);
+  displayProfile(profileName, "switchprofile");
 }
 
 /**

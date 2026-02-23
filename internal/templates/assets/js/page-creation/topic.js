@@ -174,7 +174,7 @@ async function buildPostHTML(post, index) {
     SessionData.role <= 2
   ) {
     editBtn = `<button type="button" class="edit-content edit-message" id="confirm-edit" data-postid="${post.post_id}">
-          <img src="assets/images/tool.svg" />
+          <img src="assets/images/pencil.svg" />
           <span>Modifier le<br> message</span>
         </button>`;
     deleteBtn = `<button type="button" class="edit-content delete-message" id="confirm-delete" data-postid="${post.post_id}">
