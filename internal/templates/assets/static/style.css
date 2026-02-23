@@ -1156,14 +1156,17 @@ hr {
 .profile-popup {
   width: 80%;
   max-width: 700px;
-  max-height: 70vh;
-  overflow: auto;
   margin: auto;
   position: relative;
   background: var(--bg);
   padding: 15px;
   border-bottom: 2px solid var(--accent);
   border-radius: 15px;
+}
+
+.popup-content {
+  max-height: 70vh;
+  overflow: auto;
 }
 
 .profile-popup div {
