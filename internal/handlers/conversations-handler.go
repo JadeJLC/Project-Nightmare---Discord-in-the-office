@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
@@ -15,17 +14,18 @@ type ConversationHandler struct {
 	sessionService *services.SessionService
 	chatService    *services.ChatService
 	userService    *services.UserService
+	adminService 	*services.AdminService
 }
 
-func NewConversationHandler(ss *services.SessionService, cs *services.ChatService, us *services.UserService) *ConversationHandler {
-	return &ConversationHandler{ss, cs, us}
+func NewConversationHandler(ss *services.SessionService, cs *services.ChatService, us *services.UserService, as*services.AdminService) *ConversationHandler {
+	return &ConversationHandler{ss, cs, us, as}
 }
 
 func (h *ConversationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	userID, _, err := h.sessionService.GetUserIDFromRequest(r)
 	if err != nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'utilisateur connecté : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusUnauthorized)
 		return
 	}
@@ -33,7 +33,7 @@ func (h *ConversationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	convs, err := h.chatService.GetConversations(userID)
 	if err != nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans le chargement des conversations de l'utilisateur : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
@@ -54,12 +54,12 @@ func (h *ConversationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		otherUser, err := h.userService.GetUserByID(otherID)
 		if err == sql.ErrNoRows {
 			logMsg := fmt.Sprintf("LOG : L'utilisateur est introuvable ou la conversation inexistante : %v - %v", userID, otherID)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 			http.Error(w, logMsg, http.StatusNotFound)
 			return
 		} else if err != nil {
 			logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'autre utilisateur de la conversation : %v", err)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 			http.Error(w, logMsg, http.StatusInternalServerError)
 			return
 		}

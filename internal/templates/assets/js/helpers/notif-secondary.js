@@ -67,6 +67,7 @@ export function setNotificationLinks(notifWindow) {
             notifPopup();
             break;
         }
+        markAsRead(parentItem.dataset.notifid);
       }
     }
 

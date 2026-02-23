@@ -29,6 +29,8 @@ func main() {
     reactionRepository := repositories.NewReactionRepo(db)
     notifRepository := repositories.NewNotificationRepo(db)
 
+    adminRepository := repositories.NewAdminRepo(db)
+
     // Service
     userService := services.NewUserService(userRepository)
     sessionService := services.NewSessionService(sessionRepository)
@@ -41,8 +43,10 @@ func main() {
     notifService := services.NewNotificationService(notifRepository)
     reactionService := services.NewReactionService(reactionRepository)
 
+    adminService := services.NewAdminService(adminRepository)
+
     // Router (handlers instanciés proprement)
-    router := handlers.Router(userService, sessionService, chatService, categService, topicService,messageService, reactionService, notifService)
+    router := handlers.Router(userService, sessionService, chatService, categService, topicService,messageService, reactionService, notifService, adminService)
 
     // Lancement serveur
     addr := ":5006"

@@ -9,31 +9,31 @@ import (
 /*
 * Gestion des réponses et des éléments de serveur à appeler en fonction des requêtes API de la page javascript
  */
-func Router(userService *services.UserService, sessionService *services.SessionService, chatService *services.ChatService, categService *services.CategoryService, topicService *services.TopicService, messageService *services.MessageService, reactionService *services.ReactionService, notifService *services.NotificationService) http.Handler {
+func Router(userService *services.UserService, sessionService *services.SessionService, chatService *services.ChatService, categService *services.CategoryService, topicService *services.TopicService, messageService *services.MessageService, reactionService *services.ReactionService, notifService *services.NotificationService, adminService *services.AdminService) http.Handler {
     mux := http.NewServeMux()
 
     // Handlers instanciés proprement
-    loginHandler := NewLoginHandler(userService, sessionService)
-    registerHandler := NewRegisterHandler(userService, sessionService)
-    homeHandler := NewHomeHandler(categService, topicService)
+    loginHandler := NewLoginHandler(userService, sessionService, adminService)
+    registerHandler := NewRegisterHandler(userService, sessionService, adminService)
+    homeHandler := NewHomeHandler(categService, topicService, adminService)
 	meHandler := NewMeHandler(userService)
-    logoutHandler := NewLogoutHandler(userService, sessionService)
+    logoutHandler := NewLogoutHandler(userService, sessionService, adminService)
 
-    chatHandler := NewChatHandler(sessionService, chatService)
-    conversationHandler := NewConversationHandler(sessionService, chatService, userService)
-    wsHandler := NewWebSocketHandler(sessionService, chatService, userService, notifService)
-    notificationHandler := NewNotificationHandler(sessionService, notifService, userService, messageService, topicService, wsHandler)
+    chatHandler := NewChatHandler(sessionService, chatService, adminService)
+    conversationHandler := NewConversationHandler(sessionService, chatService, userService, adminService)
+    wsHandler := NewWebSocketHandler(sessionService, chatService, userService, notifService, adminService)
+    notificationHandler := NewNotificationHandler(sessionService, notifService, userService, messageService, topicService, wsHandler, adminService)
 
     
-    profileHandler := NewProfileHandler(userService, messageService, reactionService, topicService)
-    categoryHandler := NewCategoryHandler(userService, messageService, *categService, topicService)
-    topicHandler := NewTopicHandler(messageService, topicService, reactionService, sessionService)
-    postingHandler := NewPostHandler(messageService, topicService, userService, sessionService)
+    profileHandler := NewProfileHandler(userService, messageService, reactionService, topicService, adminService)
+    categoryHandler := NewCategoryHandler(userService, messageService, *categService, topicService, adminService)
+    topicHandler := NewTopicHandler(messageService, topicService, reactionService, sessionService, adminService)
+    postingHandler := NewPostHandler(messageService, topicService, userService, sessionService, adminService)
     errorHandler := NewErrorHandler(sessionService)
+    adminHandler := NewAdminHandler(userService, sessionService, adminService)
 
     // Routes
     mux.Handle("/", homeHandler)
-    mux.Handle("/error", errorHandler)
     mux.Handle("/ws", wsHandler)
     mux.Handle("/api/login", loginHandler)
     mux.Handle("/api/logout", logoutHandler)
@@ -53,6 +53,9 @@ func Router(userService *services.UserService, sessionService *services.SessionS
     mux.HandleFunc("/api/avatars", profileHandler.GetAvatarList)
     mux.HandleFunc("/api/reactions", topicHandler.ReactOnAPost)
     mux.HandleFunc("/api/myreactions", topicHandler.GetUserReactionsOnPost)
+
+    mux.Handle("/error", errorHandler)
+    mux.Handle("/api/admin", adminHandler)
 
 
     // Assets

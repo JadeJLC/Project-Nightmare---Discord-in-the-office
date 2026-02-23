@@ -4,19 +4,19 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"real-time-forum/internal/services"
 )
 
 type HomeHandler struct{
     categoryService *services.CategoryService
-    topicService *services.TopicService
+    topicService    *services.TopicService
+    adminService    *services.AdminService
 }
 
 
-func NewHomeHandler(cs *services.CategoryService, ts *services.TopicService) *HomeHandler {
-    return &HomeHandler{categoryService: cs, topicService: ts,}
+func NewHomeHandler(cs *services.CategoryService, ts *services.TopicService, as *services.AdminService) *HomeHandler {
+    return &HomeHandler{categoryService: cs, topicService: ts, adminService: as}
 }
 
 /*
@@ -44,7 +44,7 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
         if err != nil {
             logMsg := fmt.Sprintf("ERROR : Erreur dans le chargement de la page d'accueil : %v", err)
-            log.Print(logMsg)
+            h.adminService.SaveLogToDatabase(logMsg)
             http.Error(w, logMsg, http.StatusInternalServerError)
             return
         }
@@ -54,5 +54,5 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    RenderTemplate(w, "index.html", nil)
+    RenderTemplate(w, "index.html", nil, h.adminService)
 }

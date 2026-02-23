@@ -4,19 +4,19 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"real-time-forum/internal/auth"
 	"real-time-forum/internal/services"
 )
 
 type LoginHandler struct {
-	userService    *services.UserService
-	sessionService *services.SessionService
+	userService    	*services.UserService
+	sessionService 	*services.SessionService
+	adminService 	*services.AdminService
 }
 
-func NewLoginHandler(us *services.UserService, ss *services.SessionService) *LoginHandler {
-	return &LoginHandler{userService: us, sessionService: ss}
+func NewLoginHandler(us *services.UserService, ss *services.SessionService, as *services.AdminService) *LoginHandler {
+	return &LoginHandler{userService: us, sessionService: ss, adminService: as}
 }
 
 type LoginRequest struct {
@@ -45,14 +45,14 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	token, err := auth.GenerateToken(user.ID)
 	if err != nil {
 		logMsg := fmt.Sprintf("Erreur lors de la génération du token : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
 
 	if err := h.sessionService.CreateSession(user.ID, token); err != nil {
 		logMsg := fmt.Sprintf("Erreur lors de la création de la session : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}

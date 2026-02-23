@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
@@ -17,14 +16,15 @@ var wsMutex sync.Mutex
 
 
 type WebSocketHandler struct {
-    sessionService *services.SessionService
-    chatService    *services.ChatService
-	userService *services.UserService
-    upgrader       websocket.Upgrader
-    notifService *services.NotificationService
+    sessionService  *services.SessionService
+    chatService     *services.ChatService
+	userService     *services.UserService
+    upgrader        websocket.Upgrader
+    notifService    *services.NotificationService
+    adminService    *services.AdminService
 }
 
-func NewWebSocketHandler(ss *services.SessionService, cs *services.ChatService, us *services.UserService, ns *services.NotificationService) *WebSocketHandler {
+func NewWebSocketHandler(ss *services.SessionService, cs *services.ChatService, us *services.UserService, ns *services.NotificationService, as *services.AdminService) *WebSocketHandler {
     return &WebSocketHandler{
         sessionService: ss,
         chatService:    cs,
@@ -51,7 +51,7 @@ func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     conn, err := h.upgrader.Upgrade(w, r, nil)
 	if err != nil {
         logMsg := fmt.Sprintf("ERROR : Erreur dans la mise en place du WebSocket : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
@@ -131,14 +131,14 @@ func (h *WebSocketHandler) handlePrivateMessage(from, to string, content string)
 
     if err := h.chatService.SaveDM(dm); err != nil {
         logMsg := fmt.Sprintf("ERROR : Erreur dans la sauvegarde du message privé : %v", err)
-        log.Print(logMsg)
+        h.adminService.SaveLogToDatabase(logMsg)
         return
     }
 
     // 3. Mise à jour de la conversation
     if err := h.chatService.UpdateConversation(from, to); err != nil {
         logMsg := fmt.Sprintf("ERROR : Erreur dans la mise à jour de la conversation : %v", err)
-        log.Print(logMsg)
+        h.adminService.SaveLogToDatabase(logMsg)
     }
 
     fromUser, _ := h.userService.GetUserByID(from)
@@ -176,7 +176,7 @@ func (h *WebSocketHandler) handleNotifications(receiverID, message, data string)
 
     if err := h.notifService.AddNotification(receiverID, message, data); err != nil {
         logMsg := fmt.Sprintf("Erreur dans la sauvegarde de la notification de message privé : %v", err)
-        log.Print(logMsg)
+        h.adminService.SaveLogToDatabase(logMsg)
         return
     }
 

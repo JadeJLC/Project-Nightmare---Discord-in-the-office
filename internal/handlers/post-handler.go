@@ -4,17 +4,17 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"real-time-forum/internal/services"
 	"strconv"
 )
 
 type PostHandler struct{
-   	messageService *services.MessageService
-	topicService *services.TopicService
-	userService *services.UserService
-	sessionService *services.SessionService
+   	messageService 	*services.MessageService
+	topicService 	*services.TopicService
+	userService 	*services.UserService
+	sessionService 	*services.SessionService
+	adminService 	*services.AdminService
 }
 
 type formData struct {
@@ -23,8 +23,8 @@ type formData struct {
 }
 
 
-func NewPostHandler(ms *services.MessageService, ts *services.TopicService, us *services.UserService, ss *services.SessionService) *PostHandler {
-    return &PostHandler{messageService: ms, topicService: ts, userService: us, sessionService: ss}
+func NewPostHandler(ms *services.MessageService, ts *services.TopicService, us *services.UserService, ss *services.SessionService, as *services.AdminService) *PostHandler {
+    return &PostHandler{messageService: ms, topicService: ts, userService: us, sessionService: ss, adminService: as}
 }
 
 /*
@@ -39,13 +39,20 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     mode := r.URL.Query().Get("mode")
 	cookie, err := r.Cookie("auth_token")
 	if err != nil {
-		logMsg := fmt.Sprintf("ERROR : Impossible d'accéder au cookie pour poster un message.")
-        log.Print(logMsg)
+		logMsg := fmt.Sprintf("ERROR : Impossible d'accéder au cookie pour poster un message : %v", err)
+        h.adminService.SaveLogToDatabase(logMsg)
         http.Error(w, logMsg, http.StatusUnauthorized)
         return
     }
 
 	sessionUserID, sessionUserRole, _ := h.sessionService.GetUserID(cookie.Value)	
+	
+	if (sessionUserRole == "4") {
+		logMsg := fmt.Sprintf("ALERT : Un utilisateur banni (ID : %v) a tenté d'accéder à une fonction non autorisée : %v", sessionUserID, mode)
+		h.adminService.SaveLogToDatabase(logMsg)
+		http.Error(w, logMsg, http.StatusForbidden)
+		return
+	}
 
 	if mode == "delete" {
 	h.DeleteMessageFromBDD(w, r, sessionUserID, sessionUserRole)
@@ -57,7 +64,7 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     if err := json.NewDecoder(r.Body).Decode(&newTopic); err != nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des données du message à envoyer : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
         http.Error(w, "Données invalides", http.StatusBadRequest)
         return
     }
@@ -75,7 +82,7 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	user, err := h.userService.GetUserByUsername(username)
 	if err != nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des informations de l'utilisateur connecté : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		return
 	}
 	
@@ -84,7 +91,7 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		err := h.topicService.CreateTopic(sectionID, user.ID, newTopic.Title)
 		if err !=nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la création d'un nouveau sujet : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 		}
@@ -93,7 +100,7 @@ func (h *PostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		if err !=nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération du nouveau sujet créé : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 		}
@@ -121,7 +128,7 @@ func (h *PostHandler) DeleteMessageFromBDD(w http.ResponseWriter, r *http.Reques
 
 	if err != nil || err2 != nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des informations du message à supprimer : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
@@ -130,12 +137,12 @@ func (h *PostHandler) DeleteMessageFromBDD(w http.ResponseWriter, r *http.Reques
 
 	if err == sql.ErrNoRows {
 		logMsg := fmt.Sprintf("LOG : Le message à supprimer n'existe pas ou plus : %v", postID)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusBadRequest)
 		return
 	} else if err != nil {
 		logMsg := fmt.Sprintf("ERROR : Echec de la récupération du message à supprimer : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
@@ -143,7 +150,7 @@ func (h *PostHandler) DeleteMessageFromBDD(w http.ResponseWriter, r *http.Reques
 	canDelete := (deletedPost.Author.ID == sessionUserID || sessionUserRole == "1" || sessionUserRole == "2")
     if !canDelete {
         logMsg := fmt.Sprintf("ALERT : Tentative de suppression du message d'un autre utilisateur")
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusForbidden)
 		return
     }
@@ -155,10 +162,10 @@ func (h *PostHandler) DeleteMessageFromBDD(w http.ResponseWriter, r *http.Reques
 	err = h.messageService.DeleteMessage(topicID, postID, mode, username)
 	if err == sql.ErrNoRows {
 		logMsg := fmt.Sprintf("LOG : Tentative de suppression d'un message inexistant : %d", postID)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 	} else if err != nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la suppression du message : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
@@ -166,15 +173,15 @@ func (h *PostHandler) DeleteMessageFromBDD(w http.ResponseWriter, r *http.Reques
 	messages, err := h.messageService.GetMessagesByTopic(topicID)
 	if len(messages) == 0 {
 		logMsg := fmt.Sprintf("LOG : Ce sujet ne contient plus aucun message : %d. Suppression du sujet", topicID)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		err := h.topicService.DeleteTopic(topicID)
 
 		if err == sql.ErrNoRows {
 			logMsg := fmt.Sprintf("LOG : Le sujet à supprimer n'existe pas ou plus : %v", topicID)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 		} else if err != nil {
 			logMsg := fmt.Sprintf("ERROR : Erreur dans la suppression du sujet : %v", err)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 			http.Error(w, logMsg, http.StatusInternalServerError)
 			return
 		}
@@ -196,7 +203,7 @@ func (h *PostHandler) EditMessageInBDD (w http.ResponseWriter, r *http.Request, 
 	postID, err := strconv.Atoi(r.URL.Query().Get("postID"))
 	if err != nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'ID du message à éditer : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
@@ -205,11 +212,11 @@ func (h *PostHandler) EditMessageInBDD (w http.ResponseWriter, r *http.Request, 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logMsg := fmt.Sprintf("LOG : Tentative de modification d'un message inexistant : %d", postID)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 			http.Error(w, logMsg, http.StatusNotFound)
 		} else {
 			logMsg := fmt.Sprintf("ERROR : Echec dans la récupération du post à modifier %v: ", err)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 			http.Error(w, logMsg, http.StatusInternalServerError)
 		}
 		return
@@ -219,12 +226,12 @@ func (h *PostHandler) EditMessageInBDD (w http.ResponseWriter, r *http.Request, 
 		err := h.messageService.EditMessage(postID, newTopic.Content)
 		if err != sql.ErrNoRows {
 			logMsg := fmt.Sprintf("ERROR : Echec dans la tentative de modification de post : %v", err)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 			http.Error(w, logMsg, http.StatusInternalServerError)
 		}
 		} else if err != nil{
 		logMsg := fmt.Sprintf("ALERT : Tentative de modification du message d'un autre utilisateur")
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, "Tentative de modification du message d'un autre utilisateur", http.StatusForbidden)
 		return
 	}

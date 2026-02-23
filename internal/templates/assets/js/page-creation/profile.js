@@ -84,6 +84,7 @@ async function writeUserProfile(profile, logged) {
  */
 function buildProfileHTML(user) {
   const profilePageContainer = document.getElementById("profile-page");
+
   const userDetails =
     user.email === "Not Available"
       ? buildOtherDetails(user)
@@ -132,6 +133,22 @@ function buildProfileHTML(user) {
  */
 function buildOtherDetails(user) {
   return `<div class="profile-right">
+  ${
+    SessionData.role == 1 && user.role != 4 && user.role != 1
+      ? `<button type="button" class="edit-content" id="ban-user">
+          <img src="assets/images/user-x.svg" />
+          <span>Bannir l'utilisateur</span>
+        </button>`
+      : ""
+  }
+   ${
+     SessionData.role == 1 && user.role == 4
+       ? `<button type="button" class="edit-content" id="unban-user">
+          <img src="assets/images/user-check.svg" />
+          <span>Débannir l'utilisateur</span>
+        </button>`
+       : ""
+   }
         <div class="profile-details">
           <span>Informations</span>
           <div class="profile-public">
@@ -139,10 +156,14 @@ function buildOtherDetails(user) {
             <p><span>Genre&nbsp;:</span> ${user.genre}</p>
           </div>
         </div>
-        <div id="profile-buttons">
+        ${
+          SessionData.role != 4
+            ? `<div id="profile-buttons">
           <button type="button" id="send-dm-btn">Envoyer un message</button>
-        </div>
-      </div>`;
+              </div>
+            </div>`
+            : ""
+        }`;
 }
 
 /**
@@ -156,7 +177,7 @@ function buildSelfDetails(user) {
       <button type="button" class="edit-content" id="edit-infos">
           <img src="assets/images/tool.svg" />
           <span>Modifier mon profil</span>
-        </button>
+      </button>
         <button type="submit" class="edit-content is-hidden" id="confirm-edit">
           <img src="assets/images/check-circle.svg" />
           <span>Valider les modifications</span>
@@ -418,6 +439,16 @@ function setProfileButtons(status, user) {
       selectPage("back");
     }
 
+    const banBtn = event.target.closest("#ban-user");
+    if (banBtn) {
+      banUser(user);
+    }
+
+    const unbanBtn = event.target.closest("#unban-user");
+    if (unbanBtn) {
+      unbanUser(user);
+    }
+
     const editAvatarBtn = event.target.closest("#edit-avatar");
 
     if (editAvatarBtn && status != "Not Available") {
@@ -486,3 +517,13 @@ function activateButton(status) {
 }
 
 // #endregion
+
+function banUser(user) {
+  console.log("Bannissement de l'utilisateur ", user.username);
+  displayProfile(user.username);
+}
+
+function unbanUser(user) {
+  console.log("Débannissement de l'utilisateur ", user.username);
+  displayProfile(user.username);
+}

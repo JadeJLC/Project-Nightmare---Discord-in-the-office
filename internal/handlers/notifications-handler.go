@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"real-time-forum/internal/domain"
 	"real-time-forum/internal/services"
@@ -12,16 +11,17 @@ import (
 )
 
 type NotificationHandler struct {
-	sessionService *services.SessionService
-	notifService *services.NotificationService
-	userService    *services.UserService
-	messageService *services.MessageService
-	topicService *services.TopicService
-	wsHandler *WebSocketHandler
+	sessionService 	*services.SessionService
+	notifService 	*services.NotificationService
+	userService    	*services.UserService
+	messageService 	*services.MessageService
+	topicService 	*services.TopicService
+	wsHandler 		*WebSocketHandler
+	adminService 	*services.AdminService
 }
 
-func NewNotificationHandler(ss *services.SessionService, ns *services.NotificationService, us *services.UserService, ms *services.MessageService, ts *services.TopicService, ws *WebSocketHandler) *NotificationHandler {
-    return &NotificationHandler{ss, ns, us, ms, ts, ws}
+func NewNotificationHandler(ss *services.SessionService, ns *services.NotificationService, us *services.UserService, ms *services.MessageService, ts *services.TopicService, ws *WebSocketHandler, as *services.AdminService) *NotificationHandler {
+    return &NotificationHandler{ss, ns, us, ms, ts, ws, as}
 }
 
 
@@ -33,9 +33,9 @@ func (h *NotificationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 	notifications, err := h.notifService.GetNotificationList(userID)
 	if err != nil {
-		logMSg := fmt.Sprintf("ERROR : Erreur dans le chargement des notifications : %v", err)
-		log.Print(logMSg)
-		http.Error(w, logMSg, http.StatusInternalServerError)
+		logMsg := fmt.Sprintf("ERROR : Erreur dans le chargement des notifications : %v", err)
+		h.adminService.SaveLogToDatabase(logMsg)
+		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -51,7 +51,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 
 		if err != nil {
 		logMsg := fmt.Sprintf("ERROR : Données de la notification invalides (%v) : %v", mode, err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
         http.Error(w, logMsg, http.StatusBadRequest)
         return
     	}
@@ -72,7 +72,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 
 		if err != nil {
 			logMsg := fmt.Sprintf("ERROR : Données de la notification invalides (%v) : %v", mode, err)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
         	http.Error(w, logMsg, http.StatusBadRequest)
         	return
     	}
@@ -81,7 +81,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 
 		if err != nil {
 			logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'utilisateur pour unfollow : %v", err)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 			http.Error(w, logMsg, http.StatusUnauthorized)
 			return
 		}
@@ -94,7 +94,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 	
     if err := json.NewDecoder(r.Body).Decode(&notifData); err != nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération des données de notification' : %v", err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusBadRequest)
         return
     }
@@ -102,7 +102,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 	// if notifData.Type == "newreply"  {
 	// 	if r.Method != http.MethodPost {
 	// 	logMsg := fmt.Sprintf("ERROR : Méthode non autorisée pour l'envoi d'un nouveau message.")
-	// 	log.Print(logMsg)
+	// 	h.adminService.SaveLogToDatabase(logMsg)
     //     http.Error(w, logMsg, http.StatusMethodNotAllowed)
     //     return
     // }
@@ -110,7 +110,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 	sender, err := h.userService.GetUserByUsername(notifData.SenderName)
 	if err !=nil {
 		logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de l'envoyeur de la notification : %v - %v ", notifData.SenderName, err)
-		log.Print(logMsg)
+		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusInternalServerError)
 		return
 	}
@@ -119,7 +119,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 		topicPosts, err := h.messageService.GetMessagesByTopic(notifData.TopicID)
 		if err !=nil {
 			logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération du lien du post : %v", err)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 			http.Error(w, logMsg, http.StatusInternalServerError)
 			return
 		}
@@ -132,7 +132,7 @@ func (h *NotificationHandler) NotificationDatabase(w http.ResponseWriter, r *htt
 		users, err := h.notifService.GetTopicUsersToNotify(notifData.TopicID, sender.ID, notifData.NotifMessage, data)
 		if err != nil {
 			logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération de la liste des utilisateurs à notifier : %v", err)
-			log.Print(logMsg)
+			h.adminService.SaveLogToDatabase(logMsg)
 			return
 		}
 		for _, u := range users {
