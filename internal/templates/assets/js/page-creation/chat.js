@@ -65,6 +65,16 @@ function setDMLinks(dmPage) {
         arrow.textContent = "↓";
         closeConversation();
       } else {
+        // Retire la classe active de l'ancienne conversation sélectionnée
+        const previousActive = dmPage.querySelector(
+          ".dm-conversation-item.active",
+        );
+        if (previousActive) {
+          previousActive.classList.remove("active");
+          const prevArrow = previousActive.querySelector(".dm-arrow");
+          if (prevArrow) prevArrow.textContent = "↓";
+        }
+
         convBtn.classList.add("active");
         const arrow = convBtn.querySelector(".dm-arrow");
         arrow.textContent = "↑";
@@ -81,15 +91,21 @@ export async function loadConversationsList() {
   const container = document.getElementById("dm-conversations");
   container.innerHTML = "";
 
-  if (!conversations) {
-    document.getElementById("dm-messages").innerHTML =
-      `<p id="dm-empty" class="dm-empty">Aucun message échangé</p>`;
+  if (!conversations || conversations.length === 0) {
+    container.innerHTML = `<p class="dm-empty">Aucune conversation</p>`;
+    return;
   }
+
   conversations.forEach((conv) => {
     const div = document.createElement("div");
     div.classList.add("dm-conversation-item");
     div.classList.add("user-card");
     div.dataset.userId = conv.otherUser.id;
+
+    // Remet la classe active si cette conversation était ouverte
+    if (pageData.ConversationWith === `${conv.otherUser.id}`) {
+      div.classList.add("active");
+    }
 
     div.innerHTML = `
         <div class="reduced-avatar">
