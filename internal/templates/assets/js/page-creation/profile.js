@@ -23,12 +23,11 @@ import {
  * Fonction-mère pour la création du HTML de la page profil (conteneur, header, appel de fonction)
  * @param {string} profileName Nom de l'utilisateur dont on affiche le profil
  */
-export function displayProfile(profileName, mode) {
+export function displayProfile(profileName) {
   pageData.previousPage = pageData.currentPage;
   pageData.currentPage = `profile-${profileName}`;
 
-  if (!mode) mode = "profile";
-  clearPages(mode);
+  clearPages();
 
   const usernameHeader = document.getElementById("header-username");
 
@@ -117,9 +116,12 @@ function buildProfileHTML(user) {
             ${
               SessionData.role <= 1 && user.role == 4
                 ? `<span class="profile-signup" style="color:var(--danger)">Utilisateur banni</span>`
-                : ""
+                : `
+          ${user.role == 0 ? `<span class="profile-signup">Compte fondateur</span>` : ""}
+          ${user.role == 1 ? `<span class="profile-signup">Admin</span>` : ""}
+          ${user.role == 2 ? `<span class="profile-signup">Modo</span>` : ""}
+        `
             }
-
           </div>
         </div>
         <br />
@@ -145,7 +147,7 @@ function buildProfileHTML(user) {
 function buildOtherDetails(user) {
   return `<div class="profile-right">
   ${
-    (SessionData.role == 0 && user.role != 4) ||
+    (SessionData.role == 0 && user.role != 4 && user.role != 0) ||
     (SessionData.role == 1 && user.role != 4 && user.role > 1)
       ? `<button type="button" class="edit-content" id="ban-user">
           <img src="assets/images/${SessionData.username == "Panna" ? "gavel" : "scale"}.svg" />
@@ -168,7 +170,8 @@ function buildOtherDetails(user) {
             <p><span>Genre&nbsp;:</span> ${user.genre}</p>
           </div>
           ${
-            SessionData.role == 0 || (SessionData.role == 1 && user.role > 1)
+            (SessionData.role == 0 && user.role != 0) ||
+            (SessionData.role == 1 && user.role > 1)
               ? `<button type="button" class="edit-content" id="delete-account">
           <img src="assets/images/x.svg" />
           <span>Supprimer le compte</span>

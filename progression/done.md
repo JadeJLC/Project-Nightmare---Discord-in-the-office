@@ -122,7 +122,8 @@ Données d'inscriptions demandées :
 
 ### Administration et modération
 
-- Permettre aux utilisateurs de modifier leurs messages
+- Permettre aux utilisateurs de modifier leurs messages (et aux modérateurs et administrateurs de tous les modifier)
+- Système de banissement, suppression et "promotion" des utilisateurs
 
 ### Front
 

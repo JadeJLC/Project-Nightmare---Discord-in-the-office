@@ -28,7 +28,6 @@ Créer un forum officiel pour la licence Project Nightmare. Le forum doit :
 
 - _Permettre aux modérateurs/admin de supprimer ou déplacer des messages_
 - _Panneau d'administration permettant de renommer des utilisateurs, des catégories et des sujets + de déplacer les sujets dans une autre catégorie_
-- _Système de banissement, suppression et "promotion" des utilisateurs_
 
 ## Packages autorisés
 

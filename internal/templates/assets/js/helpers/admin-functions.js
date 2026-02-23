@@ -238,7 +238,7 @@ async function changeUserRole(user, role) {
     displayError(500);
     return;
   }
-  displayProfile(user.username, "newrole");
+  displayProfile(user.username);
 }
 // #endregion
 
