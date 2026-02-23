@@ -3,6 +3,7 @@ package repositories
 
 import (
 	"database/sql"
+	"fmt"
 	"html/template"
 	"real-time-forum/internal/domain"
 	"strings"
@@ -44,11 +45,12 @@ func (r *UserRepository) Create(user *domain.User) error {
     formattedTime := date.Format("02/01/2006")
 
     _, err = r.db.Exec(`
-        INSERT INTO users (user_id, username, email, password, age, gender, firstname, lastname, image, inscription)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        user.ID, user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", formattedTime,
+        INSERT INTO users (user_id, username, email, password, age, gender, firstname, lastname, image, inscription, role)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        user.ID, user.Username, user.Email, hashedPassword, user.Age, user.Gender, user.Firstname, user.Lastname, "Carla", formattedTime, 3,
     )
     if err != nil {
+        fmt.Println("Erreur inscription")
         return err
     }
     
