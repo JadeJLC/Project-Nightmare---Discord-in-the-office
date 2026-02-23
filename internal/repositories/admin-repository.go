@@ -64,7 +64,6 @@ func (r *AdminRepo) UnbanUser(userID string) error {
         WHERE user_id = ?
     `, userID)
 	return err
-
 }
 
 func (r *AdminRepo) DeleteUser(userID string) error {
@@ -83,4 +82,14 @@ func (r *AdminRepo) DeleteUser(userID string) error {
     }
 
 	return nil
+}
+
+
+func (r *AdminRepo) PromoteUser(userID string, role int) error {
+	_, err := r.db.Exec(`
+        UPDATE users
+        SET role = ?
+        WHERE user_id = ?
+    `, role, userID)
+	return err
 }

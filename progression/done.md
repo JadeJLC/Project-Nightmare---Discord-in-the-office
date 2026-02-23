@@ -65,6 +65,7 @@ Données d'inscriptions demandées :
 - Créer un nouveau sujet et y attribuer une catégorie
 - Répondre à un sujet
 - Modifier ses propres messages
+- Réagir à un message
 
 ### Page d'accueil
 
@@ -112,9 +113,18 @@ Données d'inscriptions demandées :
 - Section "en ligne" accessible en permanence
 - Boîte MP pour les détails des conversation
 - N'affiche que les dix derniers messages de la conversation
-
-**Contenu**
+- Afficher les 10 derniers messages de la conversation lorsque l'on clique sur un utilisateur, et afficher les précédents uniquement en scrollant
+  **Contenu**
 
 - Date d'envoi du message
 - Nom d'utilisateur de la personne ayant envoyé le message
 - Contenu du message
+
+### Administration et modération
+
+- Permettre aux utilisateurs de modifier leurs messages
+
+### Front
+
+- Design du forum (CSS)
+- Créer les différentes pages via le javascript

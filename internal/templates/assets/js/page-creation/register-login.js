@@ -15,13 +15,14 @@ export async function logOut() {
 
     if (result.success) {
       SessionData.isLogged = false;
-      window.location.reload();
     } else {
       displayError(response.status);
     }
   } catch (err) {
     console.error("Erreur réseau :", err);
   }
+
+  window.location.reload();
 }
 
 /**

@@ -27,3 +27,7 @@ func (s *AdminService) UnbanUser(userID string) (error) {
 func (s *AdminService) DeleteUser(userID string) (error) {
 	return s.repo.DeleteUser(userID)
 }
+
+func (s *AdminService) PromoteUser(userID string, role int) (error) {
+	return s.repo.PromoteUser(userID, role)
+}

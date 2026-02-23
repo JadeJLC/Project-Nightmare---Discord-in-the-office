@@ -151,6 +151,7 @@ function updateHeader(destination) {
   }
 
   const logBtn = document.getElementById("log-in-text");
+  const logImg = document.getElementById("log-in-img");
   const memberBtns = document.getElementById("member-buttons");
   const memberList = document.getElementById("online-members-list");
 
@@ -159,12 +160,14 @@ function updateHeader(destination) {
       "Bienvenue&nbsp;! <br /> Pensez à vous connecter&nbsp;!";
 
     logBtn.innerHTML = `Inscription /<br />Connexion`;
+    logImg.src = `assets/images/log-in.svg`;
     memberBtns.innerHTML = "";
 
     memberList.classList.add("is-hidden");
   } else {
     usernameHeader.innerHTML = `Bienvenue ${SessionData.username}&nbsp;! <br /> Heureux de vous revoir&nbsp;!`;
     logBtn.innerHTML = `Déconnexion`;
+    logImg.src = "assets/images/log-out.svg";
 
     memberBtns.innerHTML = `<button type="button" id="display-profile">
           <img src="assets/images/user.svg" />

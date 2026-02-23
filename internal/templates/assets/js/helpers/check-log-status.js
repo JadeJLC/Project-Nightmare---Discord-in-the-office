@@ -37,7 +37,7 @@ export async function checkLoginStatus() {
       SessionData.isLogged = false;
       SessionData.username = null;
       SessionData.image = null;
-      SessionData.role = 0;
+      SessionData.role = null;
     }
   } catch (err) {
     console.error("Erreur lors de la vérification de session :", err);
