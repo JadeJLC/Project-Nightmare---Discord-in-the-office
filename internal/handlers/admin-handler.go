@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"real-time-forum/internal/services"
+	"strconv"
 )
 
 type AdminHandler struct{
@@ -51,7 +52,7 @@ func (h *AdminHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if sessionUserRole != "1" {
+	if sessionUserRole != "1" && sessionUserRole != "0" {
 		logMsg := fmt.Sprintf("ALERT : Un utilisateur non autorisé a tenté d'accéder à une fonction administrative : %v (%v)", sessionUserName, sessionUserID)
 		h.adminService.SaveLogToDatabase(logMsg)
 		http.Error(w, logMsg, http.StatusForbidden)
@@ -65,6 +66,11 @@ func (h *AdminHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if mode == "unban" {
 		h.UnbanUser(w, r, sessionUserName)
+		return
+	}
+
+	if mode == "promote" {
+		h.PromoteUser(w, r, sessionUserName, sessionUserRole)
 		return
 	}
 }
@@ -107,7 +113,6 @@ func (h *AdminHandler) DeleteUser(w http.ResponseWriter, r *http.Request, sessio
 }
 
 func (h *AdminHandler) BanUser(w http.ResponseWriter, r *http.Request, sessionUserName string) {
-
 	userID := r.URL.Query().Get("userID")
 	user, err := h.userService.GetUserByID(userID)
 
@@ -170,4 +175,52 @@ func (h *AdminHandler) UnbanUser(w http.ResponseWriter, r *http.Request, session
 	logMsg := fmt.Sprintf("ADMIN : L'utilisateur %v a été débanni par %v.", user.Username, sessionUserName)
 	h.adminService.SaveLogToDatabase(logMsg)
 	return
+}
+
+func (h *AdminHandler) PromoteUser(w http.ResponseWriter, r *http.Request, sessionUserName, sessionUserRole string)  {
+	userID := r.URL.Query().Get("userID")
+	user, err := h.userService.GetUserByID(userID)
+
+	if err != nil {
+		logMsg := fmt.Sprintf("ERROR : Impossible de récupérer les informations de l'utilisateur à promouvoir : %v, %v", userID, err)
+		h.adminService.SaveLogToDatabase(logMsg)
+		http.Error(w, logMsg, http.StatusBadRequest)
+		return
+	}
+
+	if (sessionUserRole != "0" && user.Role == 1) {
+		logMsg := fmt.Sprintf("ALERT : %v a tenté de modifier le rôle d'un administrateur : %v", sessionUserName, user.Username)
+		h.adminService.SaveLogToDatabase(logMsg)
+		http.Error(w, logMsg, http.StatusBadRequest)
+		return
+	}
+
+	roleID, _ := strconv.Atoi(r.URL.Query().Get("role"))
+	err = h.adminService.PromoteUser(userID, roleID)
+
+	if err != nil {
+		logMsg := fmt.Sprintf("ERROR : Erreur lors du changement de rôle de l'utilisateur : %v", err)
+		h.adminService.SaveLogToDatabase(logMsg)
+		http.Error(w, logMsg, http.StatusInternalServerError)
+		return
+	}
+
+	role := ""
+	switch roleID {
+	case 1 : 
+		role = "Administrateur"
+		break
+	case 2 :
+		role = "Modérateur"
+		break
+	case 3 :
+		role = "Simple membre"
+		break
+
+	}
+
+	logMsg := fmt.Sprintf("ADMIN : L'utilisateur %v a été modifié par %v. Il est désormais %v.", user.Username, sessionUserName, role)
+	h.adminService.SaveLogToDatabase(logMsg)
+	return
+
 }

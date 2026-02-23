@@ -14,6 +14,7 @@ import {
   banUser,
   unbanUser,
   deleteAccount,
+  promoteUser,
 } from "../helpers/admin-functions.js";
 
 // #region ***** Affichage des informations utilisateur
@@ -103,7 +104,7 @@ function buildProfileHTML(user) {
           <div class="profile-icon">
             <img id="profile-image" src="assets/images-avatar/${user.image}.png" data-character="${user.image}" alt="Image de profil : ${user.image}"/>
             <button type="button" class="edit-content is-hidden" id="edit-avatar">
-          <img src="assets/images/tool.svg" />
+          <img src="assets/images/images.svg" />
           <span>Changer d'image</span>
         </button>
             
@@ -114,7 +115,7 @@ function buildProfileHTML(user) {
             </h3>
             <span class="profile-signup">Inscrit.e le ${user.inscription}</span>
             ${
-              SessionData.role == 1 && user.role == 4
+              SessionData.role <= 1 && user.role == 4
                 ? `<span class="profile-signup" style="color:var(--danger)">Utilisateur banni</span>`
                 : ""
             }
@@ -144,15 +145,16 @@ function buildProfileHTML(user) {
 function buildOtherDetails(user) {
   return `<div class="profile-right">
   ${
-    SessionData.role == 1 && user.role != 4 && user.role != 1
+    (SessionData.role == 0 && user.role != 4) ||
+    (SessionData.role == 1 && user.role != 4 && user.role > 1)
       ? `<button type="button" class="edit-content" id="ban-user">
-          <img src="assets/images/user-x.svg" />
+          <img src="assets/images/${SessionData.username == "Panna" ? "gavel" : "scale"}.svg" />
           <span>Bannir l'utilisateur</span>
         </button>`
       : ""
   }
    ${
-     SessionData.role == 1 && user.role == 4
+     SessionData.role <= 1 && user.role == 4
        ? `<button type="button" class="edit-content" id="unban-user">
           <img src="assets/images/key.svg" />
           <span>Débannir l'utilisateur</span>
@@ -166,10 +168,14 @@ function buildOtherDetails(user) {
             <p><span>Genre&nbsp;:</span> ${user.genre}</p>
           </div>
           ${
-            SessionData.role == 1
+            SessionData.role == 0 || (SessionData.role == 1 && user.role > 1)
               ? `<button type="button" class="edit-content" id="delete-account">
           <img src="assets/images/x.svg" />
           <span>Supprimer le compte</span>
+        </button>
+        <button type="button" class="edit-content" id="promote-user">
+          <img src="assets/images/promote.svg" />
+          <span>Modifier le rôle</span>
         </button>`
               : ""
           }
@@ -193,7 +199,7 @@ function buildSelfDetails(user) {
   return `<form class="profile-right" method="post" id="profile-form">      
       <input type="hidden" name="username" value="${user.username}">
       <button type="button" class="edit-content" id="edit-infos">
-          <img src="assets/images/tool.svg" />
+          <img src="assets/images/user-pen.svg" />
           <span>Modifier mon profil</span>
       </button>
         <button type="submit" class="edit-content is-hidden" id="confirm-edit">
@@ -215,7 +221,7 @@ function buildSelfDetails(user) {
           </div>
         </div>
         ${
-          SessionData.role != 1
+          SessionData.role != 0
             ? `<button type="button" class="edit-content" id="delete-account">
           <img src="assets/images/x.svg" />
           <span>Supprimer mon compte</span>
@@ -463,9 +469,14 @@ function setProfileButtons(status, user) {
     const delBtn = event.target.closest("#delete-account");
     if (
       (delBtn && status != "NotAvailable") ||
-      (delBtn && SessionData.role == 1)
+      (delBtn && SessionData.role <= 1)
     ) {
       deleteAccount(user.username);
+    }
+
+    const promoteBtn = event.target.closest("#promote-user");
+    if (promoteBtn) {
+      promoteUser(user);
     }
 
     const goBack = event.target.closest("#go-back");

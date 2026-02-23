@@ -199,8 +199,8 @@ function openDMPopup(targetUsername) {
         <h3>Envoyer un message à ${targetUsername}</h3>
         <textarea id="profile-popup-text" placeholder="Écrire un message..."></textarea>
         <div class="profile-popup-actions">
-          <button id="profile-popup-cancel">Annuler</button>
           <button id="profile-popup-send">Envoyer</button>
+          <button id="profile-popup-cancel">Annuler</button>
         </div>
       </div>
     `;

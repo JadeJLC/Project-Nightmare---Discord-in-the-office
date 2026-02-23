@@ -59,6 +59,7 @@ func DefaultDatabase(db *sql.DB) {
 	}
 
 	log.Println("INIT : Création des rôles par défaut")
+	execAndLog(`INSERT INTO roles (role_id, role_name) VALUES (?, ?)`, 0, "FONDATEUR")
 	execAndLog(`INSERT INTO roles (role_name) VALUES (?)`, "ADMIN")
 	execAndLog(`INSERT INTO roles (role_name) VALUES (?)`, "MODO")
 	execAndLog(`INSERT INTO roles (role_name) VALUES (?)`, "MEMBRE")

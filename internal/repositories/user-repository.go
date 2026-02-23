@@ -67,7 +67,7 @@ func (r *UserRepository) CheckIfFirstUser() (int, error) {
 	}
 
 	if count == 0 {
-        return role, nil
+        return 0, nil
 	}
 
     return role, nil

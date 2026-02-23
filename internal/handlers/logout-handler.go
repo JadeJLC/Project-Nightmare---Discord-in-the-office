@@ -23,28 +23,28 @@ func NewLogoutHandler(us *services.UserService, ss *services.SessionService, as 
 */
 func (h *LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	PerformLogout(w, r, h.sessionService, h.adminService)
+
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprint(w, `{"success": true}`)
 }
 
 func PerformLogout(w http.ResponseWriter, r *http.Request, ss *services.SessionService, as *services.AdminService) error {
     cookie, err := r.Cookie("auth_token")
-    if err != nil {
-        logMsg := fmt.Sprintf("ERROR : Erreur dans la récupération du cookie pour la déconnexion : %v", err)
-        as.SaveLogToDatabase(logMsg)
-        return fmt.Errorf(logMsg)
+    if err == nil {
+        ss.DeleteSession(cookie.Value)
+    } else {
+        as.SaveLogToDatabase(fmt.Sprintf("ALERT : Erreur dans la récupération du cookie pour la déconnexion : %v", err))
     }
 
-    ss.DeleteSession(cookie.Value)
-
+    // On supprime le cookie côté client dans tous les cas
     http.SetCookie(w, &http.Cookie{
-        Name:     "auth_token",
-        Value:    "",
-        Path:     "/",
-        Expires:  time.Unix(0, 0),
-        MaxAge:   -1,
+        Name:    "auth_token",
+        Value:   "",
+        Path:    "/",
+        Expires: time.Unix(0, 0),
+        MaxAge:  -1,
         HttpOnly: true,
-        Secure:   false,
-        SameSite: http.SameSiteStrictMode,
     })
 
-    return nil
+    return err
 }

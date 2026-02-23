@@ -1032,6 +1032,13 @@ hr {
   border-color: var(--danger);
 }
 
+#promote-user {
+  position: absolute;
+  bottom: 10px;
+  right: 60px;
+  border-color: var(--neon-soft);
+}
+
 .button-link {
   background: transparent;
   border: none;
@@ -1156,14 +1163,17 @@ hr {
 .profile-popup {
   width: 80%;
   max-width: 700px;
-  max-height: 70vh;
-  overflow: auto;
   margin: auto;
   position: relative;
   background: var(--bg);
   padding: 15px;
   border-bottom: 2px solid var(--accent);
   border-radius: 15px;
+}
+
+.popup-content {
+  max-height: 70vh;
+  overflow: auto;
 }
 
 .profile-popup div {

@@ -11,15 +11,8 @@ Créer un forum officiel pour la licence Project Nightmare. Le forum doit :
 - Posséder une base de données SQlite
 - Avoir un serveur en Go et un front en JS, HTML et CSS
 
-### Sujets et messages
-
-Comme dans le premier forum, il faut pouvoir :
-
-- _Réagir à un message_
-
 ### Messages privés
 
-- Afficher les 10 derniers messages de la conversation lorsque l'on clique sur un utilisateur, et afficher les précédents uniquement en scrollant (throttle, debounce, etc)
 - (optionnel) "... est en train d'écrire"
 
 ### Bonus de l'audit
@@ -33,7 +26,6 @@ Comme dans le premier forum, il faut pouvoir :
 
 ### _Panneau d'administration et modération_
 
-- _Permettre aux utilisateurs de modifier leurs messages_
 - _Permettre aux modérateurs/admin de supprimer ou déplacer des messages_
 - _Panneau d'administration permettant de renommer des utilisateurs, des catégories et des sujets + de déplacer les sujets dans une autre catégorie_
 - _Système de banissement, suppression et "promotion" des utilisateurs_
@@ -50,6 +42,4 @@ Comme dans le premier forum, il faut pouvoir :
 
 ### Front
 
-- Design du forum (CSS)
-- Créer les différentes pages via le javascript
 - _Petites animations avec les personnages à divers endroits du forum_

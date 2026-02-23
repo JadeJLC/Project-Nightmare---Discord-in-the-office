@@ -171,8 +171,7 @@ async function buildPostHTML(post, index) {
 
   if (
     (post.author.username === SessionData.username && SessionData.role != 4) ||
-    SessionData.role === 1 ||
-    SessionData.role === 2
+    SessionData.role <= 2
   ) {
     editBtn = `<button type="button" class="edit-content edit-message" id="confirm-edit" data-postid="${post.post_id}">
           <img src="assets/images/tool.svg" />
